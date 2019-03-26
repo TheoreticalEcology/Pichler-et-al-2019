@@ -1,0 +1,168 @@
+---
+title: "Simulating bipartite species interaction networks"
+author: "Stefan Ried"
+date: "`r Sys.Date()`"
+output:rmarkdown::html_vignette:
+  toc: TRUE
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+# About
+
+Two small functions for creating matrices containing a defined number of species with a defined number of traits and using these matrices to simulate bipartite interaction networks.
+
+## Creating species matrices
+
+The function provides parameters for defining the desired number of species and the desired number of continuous and ordinal traits. The "abundance_dist" parameter allows setting the desired distribution of species abundances. Default is an exponential distribution where the value for "abundance_dist" gives the rate of the exponential function.
+
+```{r}
+plantSpeciesnumber = 200 
+pollinatorSpeciesnumber = 200 
+plantTraitNumber = 11
+factorPlantTraitNumber = 5 
+pollinatorTraitNumber = 5 
+factorPollinatorTraitNumber = 5 
+abundance_dist = 1
+```
+
+```{r}
+pla_abund = rexp(plantSpeciesnumber, abundance_dist)
+pol_abund = rexp(pollinatorSpeciesnumber, abundance_dist)
+```
+
+The absolute numbers given by the exponential distribution are divided by their sum to normalize to ratios between 0 and 1.
+```{r}
+pla_abund <- pla_abund/sum(pla_abund)
+pol_abund <- pol_abund/sum(pol_abund)
+```
+
+In the trait matrices the continuous traits are random numbers drawn from a normal distribution that are rolled separately for each trait whereas the discrete traits are sampled from a vector of random (also normally distributed) numbers that stays the same for all discrete traits. This solution only provides pseudo factors, that despite having a discrete number of levels are still numeric and so can be calculated by the second function.
+
+```{r}
+numericPlantMatrix <- matrix(nrow = plantSpeciesnumber , ncol = plantTraitNumber)
+numericPlantMatrix <- apply(numericPlantMatrix, MARGIN = 2, function(numericPlantMatrix) rnorm(plantSpeciesnumber, mean = 0, sd = 1))
+
+factorPlantMatrix <- matrix(nrow = plantSpeciesnumber , ncol = factorPlantTraitNumber)
+levels <- rnorm(6, mean = 0, sd = 1.5)
+factorPlantMatrix <- apply(factorPlantMatrix, 2, function(factorPlantMatrix) sample(levels, plantSpeciesnumber, replace = T, prob = dnorm(1:6, mean = 3.5, sd = 1)))
+```
+
+```{r}
+GetSpeciesProperties <- function(plantSpeciesnumber = 200, pollinatorSpeciesnumber = 200, plantTraitNumber = 11, factorPlantTraitNumber = 5, pollinatorTraitNumber = 5, factorPollinatorTraitNumber = 5, abundance_dist = 1){
+
+  out = list()
+
+  if(is.numeric(abundance_dist)) {
+    pla_abund = rexp(plantSpeciesnumber, abundance_dist)
+    pol_abund = rexp(pollinatorSpeciesnumber, abundance_dist)
+  }
+  else if(is.function(abundance_dist)) {
+    pla_abund <- abundance_dist(plantSpeciesnumber)
+    pol_abund <- abundance_dist(pollinatorSpeciesnumber)
+  }
+  else stop("wrong argument to abundance_dist")
+
+  if(plantTraitNumber >= factorPlantTraitNumber && pollinatorTraitNumber >= factorPollinatorTraitNumber){
+
+    out$pla_abund <- pla_abund/sum(pla_abund) # creating a vector of plant abundances
+
+    numericPlantMatrix <- matrix(nrow = plantSpeciesnumber , ncol = plantTraitNumber) # creating a matrix of all plant species and their continuous traits
+    numericPlantMatrix <- apply(numericPlantMatrix, MARGIN = 2, function(numericPlantMatrix) rnorm(plantSpeciesnumber, mean = 0, sd = 1))
+
+    factorPlantMatrix <- matrix(nrow = plantSpeciesnumber , ncol = factorPlantTraitNumber) # creating a matrix of all plant species and their nominal traits
+    levels <- rnorm(6, mean = 0, sd = 1.5)
+    factorPlantMatrix <- apply(factorPlantMatrix, 2, function(factorPlantMatrix) sample(levels, plantSpeciesnumber, replace = T, prob = dnorm(1:6, mean = 3.5, sd = 1)))
+    plantMatrix <- cbind(factorPlantMatrix, numericPlantMatrix) # merging the the matrices
+    out$plantMatrix <- plantMatrix
+
+    names(out$pla_abund) <- sapply(1:length(out$pla_abund), function(x) paste("B", x, sep = ""))
+    colnames(out$plantMatrix) <- sapply(1:ncol(out$plantMatrix), function(x) paste("A", x, sep = ""))
+    rownames(out$plantMatrix) <- sapply(1:plantSpeciesnumber, function(x) paste("a", x, sep = ""))
+
+    out$pol_abund <- pol_abund/sum(pol_abund) # creating a vector of pollinator abundances
+
+    numericPollinatorMatrix <- matrix(nrow = pollinatorSpeciesnumber , ncol = pollinatorTraitNumber) # creating a matrix of all pollinator species and their continuous traits
+    numericPollinatorMatrix <- apply(numericPollinatorMatrix, MARGIN = 2, function(numericPollinatorMatrix) rnorm(pollinatorSpeciesnumber, mean = 0, sd = 1))
+
+    factorPollinatorMatrix <- matrix(nrow = pollinatorSpeciesnumber , ncol = factorPollinatorTraitNumber) # creating a matrix of all pollinator species and their nominal traits
+    factorPollinatorMatrix <- apply(factorPollinatorMatrix, 2, function(factorPollinatorMatrix) sample(levels, pollinatorSpeciesnumber, replace = T, prob = dnorm(1:6, mean = 3, sd = 2)))
+    pollinatorMatrix <- cbind(factorPollinatorMatrix, numericPollinatorMatrix)
+    out$pollinatorMatrix <- numericPollinatorMatrix
+
+    names(out$pol_abund) <- sapply(1:length(out$pol_abund), function(x) paste("B", x, sep = ""))
+    colnames(out$pollinatorMatrix) <- sapply(1:ncol(out$pollinatorMatrix), function(x) paste("B", x, sep = ""))
+    rownames(out$pollinatorMatrix) <- sapply(1:pollinatorSpeciesnumber, function(x) paste("b", x, sep = ""))
+  }
+  else stop("number of ordinal traits cannot be larger than number of total traits")
+
+
+  return(out)
+}
+```
+
+The function returns a list containing the plant and pollinator matrices and the abundance vectors.
+
+## Simulating interaction
+
+The second function calls on the first and uses the output to create a bipartite interaction network. There are parameters for setting the number of traits that are main effects, interact with other traits or have random effects. 
+In a first step those are sampled from the total number of traits.
+```{r}
+mainTraits = 4
+randomTraits = 4
+inter = 5
+```
+
+```{r}
+mat <- GetSpeciesProperties(plantSpeciesnumber, pollinatorSpeciesnumber , plantTraitNumber , factorPlantTraitNumber, pollinatorTraitNumber, factorPollinatorTraitNumber, abundance_dist)
+```
+
+```{r}
+sampledmTraits <- sample(c(colnames(mat$plantMatrix), colnames(mat$pollinatorMatrix)), mainTraits)
+  left_over <- c(colnames(mat$plantMatrix), colnames(mat$pollinatorMatrix))[!(c(colnames(mat$plantMatrix), colnames(mat$pollinatorMatrix)) %in% sampledmTraits)]
+  sampledInteractingTraits <- t(sapply(1:inter, function(x) sample(left_over, size = 2)))
+  left_over1 <- left_over[!left_over %in% sampledInteractingTraits]
+  sampledRandomTraits <- sample(left_over, randomTraits)
+```
+
+Then a nested for-loop is used to calculate interaction probabilities for each species pair [i,j] from their respective trait values. 
+Trait values for main effect traits are given to a gaussian distribution function and normalized to values between 0 and 1 by dividing by the function value for a mean of 0.
+Trait values for interacting effects are given pairwise to a multivariate gaussian distribution function and normalized to values between 0 and 1 by dividing by the function value for a mean of (0,0)
+```{r}
+interactionmatrix <- matrix(nrow = plantSpeciesnumber, ncol = pollinatorSpeciesnumber)
+normalization = dnorm(0, sd = 0.9)
+  normMult = mvtnorm::dmvnorm(c(0,0), mean = c(0,0),  sigma = matrix(c(1, 0.5, 0.5, 1), ncol = 2))
+  tempInt = t(sampledInteractingTraits)
+  m = matrix(c(1, 0.5, 0.5, 1), ncol = 2)
+```
+
+```{r}
+for(i in 1:plantSpeciesnumber){
+    tmp = mat$plantMatrix[i,]
+
+    for(j in 1:pollinatorSpeciesnumber){
+      con <- c(tmp, mat$pollinatorMatrix[j,]) 
+      mainprobs <- sapply(con[sampledmTraits], dnorm, sd = 0.9)/normalization 
+      randomprobs <- runif(randomTraits)
+      iamat <- matrix(con[tempInt], nrow = inter)
+      interprobs <- apply(iamat, 1, mvtnorm::dmvnorm, mean = c(0,0),  sigma = m)/normMult 
+
+      interactionmatrix[i,j] <- prod(mainprobs) * prod(randomprobs) * prod(interprobs) * mat$pla_abund[i] * mat$pol_abund[j]
+    }
+  }
+```
+
+For each species pair the element wise products of the three resulting probability vectors are multiplied with each other and then with the relative abundance of species i and j to give a total probability value. This probability value is then stored in an interaction matrix.
+
+The function returns a list containing the interaction matrix and vectors of the sampled main/random/interacting traits.
+
+

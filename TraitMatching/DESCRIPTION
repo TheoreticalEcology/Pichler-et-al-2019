@@ -1,0 +1,35 @@
+Package: TraitMatching
+Title: Analysis of bipartite networks
+Version: 0.0.0.9000
+Authors@R: person("Maximilian", "Pichler", email = "Maximilian-Pichler@web.de", role = c("aut", "cre"))
+Description: 
+Depends:
+    R (>= 3.3.2),
+    mlr,
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Imports: 
+    mlr,
+    party,
+    e1071,
+    parallel,
+    parallelMap,
+    cluster,
+    dprep,
+    cvTools,
+    DMwR,
+    rowr,
+    ParamHelpers,
+    missForest,
+    kknn,
+    sensitivity,
+    snow,
+    keras,
+    kknn
+RoxygenNote: 6.0.1.9000
+Suggests:
+    testthat,
+    kknn,
+    mvtnorm
+VignetteBuilder: knitr

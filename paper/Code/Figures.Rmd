@@ -1,0 +1,614 @@
+---
+title: "Figures"
+author: "Max Pichler"
+date: "27 November 2018"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+
+library(TraitMatching)
+oldpar = par()
+reset = function() suppressWarnings(do.call(par, oldpar))
+run = TRUE
+set.seed(42)
+source("./Code/helpFunctions.R")
+```
+
+
+## Figure 2
+```{r,results=FALSE}
+load(file = "./Results/SimulationAggreationFig2.RData")
+cols =c( "#C0B9B2" ,"#CC0744" ,"#001E09" ,"#C2FF99" ,"#A079BF" ,"#00489C" ,"#6F0062" )
+names(cols) = c("dnn","cnn","knn","SVM","naive","RF","boost")
+tck = -0.04
+plotSim = function(df, labels = c("20*50","50*100", "100*200"), cex.axis = 0.8,
+                   cex.lab=0.8, ylab = "AUC", cols, ylim = c(0,1), 
+                   cexP = 0.8, axisY = NULL,xlab = "A x B Individuals", xpd = NA){
+  par(mgp = c(1.7,0.2,0))
+  plot(NULL, NULL, xlim = c(0,1), ylim = ylim, axes = F,xlab ="", 
+       ylab = ylab, font.lab = 2, cex.lab = cex.lab, xpd = NA)
+    par(mgp = c(1.3,0.2,0))
+  text(x = 0.5, y = -0.25*max(ylim), pos = 1, labels = xlab, font = 2, cex = cex.lab, xpd = NA)
+  axis(1,at = seq(0,1, length.out = 3),labels = labels,cex.axis = cex.axis, xpd = NA, tck = tck)
+  par(mgp = c(3,0.4,0))
+  if(is.null(axisY)) axis(2,cex.axis = cex.axis, las = 2, tck = tck)
+  else axis(at = seq(0, max(ylim),0.1),2,cex.axis = cex.axis, labels = axisY, las = 2, tck = tck)
+  par(mgp = c(1.7,0.2,0))
+  for(i in 1:ncol(df)){
+    lines(x = seq(0,1, length.out = 3), y = df[,i], type = "o", col = cols[i], pch = 21, cex = cexP, bg = "white")
+  }
+}
+cexP = 0.9
+cexA = 0.7
+nPixel = 10
+pdf(file = "./Figures/Fig2.pdf", width = 5.50, height = 2.40)
+par(mfrow = c(2,4), mar = c(2.3,2.4,1,2.0)-0.2, oma = c(0.33,0.4,0.5,1.4), mgp = c(1.7,0.5,0))
+names(cols) = colnames(auc)
+xText = -.59
+plotSim(auc, labels = NA, cols = cols, ylab = "AUC", ylim = c(0.5,1),xlab = "", cex.axis = cexA, cex.lab = cexP)
+text(labels  = "(a)",x = xText, y = 1.09,pos = 4, xpd = NA,font = 2,cex = cexP)
+plotSim(aucAB, labels = NA, cols = cols, ylab = "AUC", ylim = c(0.5,1), xlab = "", cex.axis = cexA, cex.lab = cexP)
+text(labels  = "(b)",x = xText, y = 1.09,pos = 4, xpd = NA,font = 2,cex = cexP)
+plotSim(aucGenSize, labels = NA, cols = cols, ylab = "Error", ylim = c(0.,0.5), 
+        axisY = paste0(seq(0,50,10), "%"), xlab = "", cex.axis = cexA, cex.lab = cexP)
+text(labels  = "(c)",x = xText, y = .59,pos = 4, xpd = NA,font = 2,cex = 0.7)
+plotSim(aucObs, labels = NA, xlab = "",cols = cols, ylab = "AUC", ylim = c(0.5,1), cex.axis = cexA, cex.lab = cexP)
+text(labels  = "(d)",x = xText, y = 1.09,pos = 4, xpd = NA,font = 2,cex = cexP)
+
+legend(x=1.05, y = 0.8,col = cols, legend = c("DNN","CNN","kNN","SVM","naive","RF","BRT"), pch = 16, 
+       xpd = NA, bty = "n", cex = cexP, text.font = 2, y.intersp = 1.7, x.intersp = 0.7,horiz = F, pt.cex = 0.9)
+namesSpear = colnames(spear)
+namesSpear[1] = "dnn"
+which(names(cols) %in% namesSpear, arr.ind = T)
+colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T))]
+
+
+plotSim(spear, labels = c("20*50","50*100", "100*200"), cols = colsReg, 
+        ylab = "Spearman", ylim = c(0.,1), cex.axis = cexA, cex.lab = cexP)
+text(labels  = "(e)",x = xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP)
+plotSim(spearAB, labels = c("20*50","50*100", "100*200"), cols = colsReg, 
+        ylab = "Spearman", ylim = c(0.,1), cex.axis = cexA, cex.lab = cexP)
+text(labels  = "(f)",x = xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP)
+plotSim(spearGenSize, labels = c("20*50","50*100", "100*200"), cols = colsReg, 
+        ylab = "Error", ylim = c(0.,0.8), axisY = paste0(seq(0,80,10), "%"), cex.axis = cexA, cex.lab = cexP)
+text(labels  = "(g)",x = xText, y =  0.944,pos = 4, xpd = NA,font = 2,cex = cexP)
+plotSim(spearObs, labels = c("50","500", "2000"), xlab = "Observation time", cols = colsReg, 
+        ylab = "Spearman", ylim = c(0.,1), cex.axis = cexA, cex.lab = cexP)
+text(labels  = "(h)",x = xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP)
+
+dev.off()
+```
+
+
+## Figure 3
+```{r}
+Results = readRDS(file = "./Results/aggregatedResults.RDS")
+test = Results$combinedTable[Results$combinedTable$set == "test",]
+train = Results$combinedTable[Results$combinedTable$set == "train",]
+colnames(test) = c("auc", "f1", "bac", "acc", "fdr", "fpr", "npv", "precision","specificity", "sensitivity", "tss", "set", "method", "balance")
+colnames(train) = c("auc", "f1", "bac", "acc", "fdr", "fpr", "npv", "precision","specificity", "sensitivity", "tss", "set", "method", "balance")
+test = test[order(test$auc, decreasing = T),]
+bestTest = test[!duplicated(test$method),]
+bestTest = bestTest[order(bestTest$sensitivity,decreasing = TRUE),]
+bestTrain = train[paste0(rep("tr",7),substr(rownames(bestTest),3,4)),]
+
+library(Aranea)
+cols =c( "#C0B9B2" ,"#CC0744" ,"#001E09" ,"#C2FF99" ,"#A079BF" ,"#00489C" ,"#6F0062" )
+names(cols) = c("dnn","cnn","knn","SVM","naive","RF","boost")
+addA = function(col, alpha = 0.25) apply(sapply(col, col2rgb)/255, 2, function(x) rgb(x[1], x[2], x[3], alpha=alpha)) 
+multiCoords = matrix(0,8,4)
+multiCoords[1,] = c(0.25, 0.75, 1/3, 1)
+multiCoords[c(2:4),2] = 0.25  
+multiCoords[c(2:4),3] = c(2/3,1/3,0) 
+multiCoords[c(2:4),4] = c(1,2/3,1/3)
+multiCoords[c(4:7),4] = 1/3
+multiCoords[c(4:7),1] = seq(0,0.75,0.25)
+multiCoords[c(4:7),2] = seq(0.25,1,0.25)
+multiCoords[8,] = c(0.75,1,1/3,2/3)
+pdf(file = "./Figures/Fig3.pdf", width = 5.5, height = 3.75)
+par(mfcol = c(1,1), oma = c(0,0,0,0) + 0.1, mar = c(0,0,0,0)+0.3, las=1, mgp=c(1.5, 0.5, 0), lwd=75/75, cex.axis=3/3, cex.lab=2/3, tcl=(-0.2),font.axis = 2, bty="l")
+bestTest2 = bestTest
+bestTrain2 = bestTrain
+cols = cols[as.character(bestTest2$method)]
+Aranea::multiSpider(x1 = bestTest2[,c(1,4,8:10)], x2 = bestTrain2[,c(1,4,8:10)],
+                    cexSteps = c(NA,0.9),cexProcent = c(0.5,0.5), 
+                    alphaRec = 0.3, alphaSpider = 0.4, 
+                    colRec = cols, 
+                    colRecBorder  = cols,
+                    titles =  names(cols), cexPoints = 0.5, 
+                    stepsText = c("AUC", "ACC", "Prec", "Spec", "Sens"), 
+                    twistSteps = 18,circleLines = c(5,3),
+                    rectangular = F, multiCoords = multiCoords, cexTitles = 0.9)
+legend(x = 8,y = 8,border = "n",legend = c("Validation", "Training"), lty = c(1,2),xpd = NA, cex = 0.9, bty = "n", text.font = 2)
+dev.off()
+
+write.table(cbind(round(bestTest2[,-c(6,7,12:14)], digits = 3), method = bestTest2$method),file = "./Results/Table3.txt")
+
+```
+
+
+## Figure 4
+
+```{r,results=FALSE}
+load(file = "./Results/InferenceTop4Reg.RData")
+load(file = "./Results/InferenceTop4Class.RData")
+
+traits =  c("A1.1", "A1.2", "A2", "A3", "A4", "A5", "B1.1", "B1.2", "B2", "B3", "B4", "B5", "B6")
+nPixel = 10
+cexP = 0.9
+cex = 0.9
+groups =list(a = c("A1.1", "A1.2", "A2", "A3", "A4", "A5", "A6"), b= c("B1.1", "B1.2", "B2", "B3", "B4", "B5", "B6"))
+true = c("A1.1:B2", "A1.2:B2", "B2:A1.1", "B2:A1.2", "A2:B3", "B3:A2", "A3:B4", "B4:A3")
+
+pdf(file = "./Figures/Fig4.pdf",width = 5.5,height = 1.7)
+reset()
+xText = 0.07
+yText = 1.13
+par(mfrow = c(1,3), mar = c(0.3,2.,1.2,1.5)+0.1,oma = c(1.3,0.1,0.5,0.0) ,xaxs = "i", yaxs = "i")
+drawRankingMatrix2(ResultClassifInteractionAb$RF,true = true, groups = groups,  cex = cex, lwd = 0.5)
+text(x = -xText, y = yText, labels = "(a)", cex = cexP, xpd = NA, font = 2)
+points(x = 0.02, y = -0.09, pch = 7, cex = 1.0, xpd = NA)
+text(x = 0.022, y = -0.09,labels = "True Matching Traits",pos = 4,font = 2, cex = cexP, xpd = NA )
+drawRankingMatrix2(ResultClassifInteractionAb$dnn,true = true, groups = groups,   cex = cex, lwd = 0.5, muteY = T)
+text(x = -xText, y = yText, labels = "(b)", cex = cexP, xpd = NA, font = 2)
+for(i in 1:9){
+  rect(ytop = -0.04,ybottom = -0.07,xleft = seq(0.0,1,length.out = 10)[i],xright = seq(0,1,length.out = 10)[i+1], col = RColorBrewer::brewer.pal(9,name = "YlGnBu")[i],border = NA, xpd = NA)
+}
+text(y= -0.07,x = seq(0, seq(0,1,length.out = 10)[9], length.out = 5)+0.03, labels = c("0 %", "25 %", "50 %", "75 %", "100 %"), pos = 1, font = 2, cex = cexP, xpd = NA)
+drawRankingMatrix2(ResultClassifInteractionAb$boost,true = true, groups = groups,cex = cex, lwd = 0.5, muteY = T)
+text(x = -xText, y = yText, labels = "(c)", cex = cexP, xpd = NA, font = 2)
+dev.off()
+
+```
+
+<!-- ## Figure 5 -->
+<!-- ```{r,results=FALSE} -->
+<!-- load(file = "./Results/trueInteractionStructure.RData") -->
+<!-- load(file = "./Results/ALEplotsSim.RData") -->
+
+<!-- cexP = 0.9 -->
+<!-- cexP2 = 0.6 -->
+<!-- reset() -->
+<!-- pdf(file = "./Figures/Fig5.pdf", width = 5.5, height = 3.38) -->
+<!-- par(mfrow= c(3,4),xaxs = "i", yaxs = "i", mar = c(1.2,1.5,1.2,2.2), oma = c(0.0,0.8,0.0,1), mgp = c(2,0.3,0)) -->
+<!-- plotInteractionEffect(nullAbRA2, cuts = 12, heat = viridis::viridis, cexP = cexP2) -->
+
+<!-- axis(1, labels = round(seq(min(nullAbRA2$x.values[[1]]), max(nullAbRA2$x.values[[1]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
+<!--      font = 2, cex.axis = 0.5, mgp = c(2,-0.00,0), tcl = -0.2,lwd.ticks = 0.6) -->
+<!-- axis(2, labels = round(seq(min(nullAbRA2$x.values[[2]]), max(nullAbRA2$x.values[[2]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
+<!--      font = 2, cex.axis = 0.5,mgp = c(2,0.3,0), tcl = -0.2,lwd.ticks = 0.6, las = 2) -->
+<!-- text(x = 0.5, y = -0.08, pos = 1, labels = "A2", xpd = NA, cex = cexP, font = 2) -->
+<!-- text(x = -0.11, y = 0.5, pos = 2, labels = "B3", xpd = NA, cex = cexP, font = 2) -->
+<!-- text(x = 0.04, y = 1.1, labels = "(a)", cex = cexP, xpd = NA, font = 2) -->
+<!-- for(x in 1:3){ -->
+<!--   plotInteractionEffect(A2_B3_Regressor[[x]], cuts = 12, heat = viridis::viridis, cexP = cexP2) -->
+<!--   text(x = 0.04, y = 1.1, labels = c("(b)", "(c)", "(d)")[x], cex = cexP, xpd = NA, font = 2) -->
+<!-- } -->
+
+
+<!-- plotInteractionEffect(nullAbRA3, cuts = 12, heat = viridis::viridis, cexP = cexP2) -->
+<!-- axis(1, labels = round(seq(min(nullAbRA3$x.values[[1]]), max(nullAbRA3$x.values[[1]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
+<!--      font = 2, cex.axis = 0.5, mgp = c(2,0.00,0), tcl = -0.2,lwd.ticks = 0.6) -->
+<!-- axis(2, labels = round(seq(min(nullAbRA3$x.values[[2]]), max(nullAbRA3$x.values[[2]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
+<!--      font = 2, cex.axis = 0.5,mgp = c(2,0.3,0), tcl = -0.2,lwd.ticks = 0.6, las = 2) -->
+<!-- text(x = 0.5, y = -0.10, pos = 1, labels = "A3", xpd = NA, cex = cexP, font = 2) -->
+<!-- text(x = -0.11, y = 0.5, pos = 2, labels = "B4", xpd = NA, cex = cexP, font = 2) -->
+<!-- .s = lapply(A3_B4_Regressor, function(x) plotInteractionEffect(x, cuts = 12, heat = viridis::viridis, cexP = cexP2)) -->
+
+<!-- par(mgp = c(0.5,0.5,0)) -->
+<!-- plotInteractionEffect(nullAbRA1, cuts = 12, heat = viridis::viridis, cexP = cexP2) -->
+<!-- axis(2, labels = round(seq(min(nullAbRA1$x.values[[2]]), max(nullAbRA1$x.values[[2]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
+<!--      font = 2, cex.axis = 0.5,mgp = c(2,0.3,0), tcl = -0.2,lwd.ticks = 0.6, las = 2) -->
+<!-- text(x = c(0.25, 0.75), y = 0.02, pos = 1, labels = c("A1.1", "A1.2"), font = 2, cex = cexP, xpd = NA) -->
+<!-- text(x = -0.11, y = 0.5, pos = 2, labels = "B2", xpd = NA, cex = cexP, font = 2) -->
+<!-- .s = lapply(A1_B2_Regressor, function(x) plotInteractionEffect(x, cuts = 12, heat = viridis::viridis, cexP = cexP2)) -->
+<!-- dev.off() -->
+<!-- ``` -->
+
+
+## Figure 5
+```{r,results=FALSE}
+load(file = "./Results/HummingInferenceResult.RData")
+humT = c( "Bill.Length", "Bill.Curvature", "Body.Mass","Wing" , "Tail" , "plot.Low", "plot.Mid", "plot.High")
+plantT = c( "Corolla.Length","Corolla.Curvature", "Corolla.Volumen","Inner.Diameter", "Ext.Diameter")
+interHum = apply(rbind(expand.grid(humT, plantT), expand.grid( plantT, humT)), 1, function(x) paste0(x[1],":", x[2]))
+reset()
+cexP = 0.9
+
+pdf(file = "./Figures/Fig5.pdf", width = 5.5, height = 3.7)
+par(mfrow = c(1,2),mar = c(0.3,1,1,3)+0.0,oma = c(1,0.3,2,1))
+# Fig5a
+plot(NULL,NULL, xlim = c(0,1), ylim = c(0,1), axes = F, xlab = "", ylab = "")
+#text(x = -0.06, y = 1.03, labels = "(a)", cex = 0.9, xpd = NA, font = 2)
+polygon(c(0,0.125,0.17,0.19,0.35,0.51,0.65,0.85), c(0,0.25,0.5,0.42,1,0.35,0.09,0), lwd = 2, col = "lightgrey", xpd = NA)
+baseX = 0.72
+baseYv = c(0.1,0.4,0.7)
+cols = RColorBrewer::brewer.pal(3, "Accent")
+altitude = c("50 m.a.s.l", "1000 m.a.s.l", "2000 m.a.s.l")
+lineY = baseYv+0.05
+for(i in 1:3) {
+  baseY = baseYv[i]
+  rect(xleft = baseX, xright = baseX+0.025,ybottom = baseY,ytop = baseY+0.1, col = cols[i], lwd = 0.8)
+  rect(xleft = baseX+0.035, xright = baseX+0.135,ybottom = baseY,ytop = baseY+0.1, col = cols[i], lwd = 0.8)
+  rect(xleft = baseX+0.035, xright = baseX+0.135,ybottom = baseY+0.11,ytop = baseY+0.135, col = cols[i], lwd = 0.8)
+  y = lineY[i]
+  lines(y = rep(y,2), x = c(0.0,baseX-0.05), lty = 3, lwd = 1.2, xpd = NA)
+  text(y = y+0.03, x = -0.15, labels = altitude[i], cex = 0.7, pos = 4, xpd = NA, font = 2)
+}
+text(x = 0.85, y = baseYv[1]+0.05,pos = 4, xpd = NA, cex = 0.9, labels = "Low", font = 2)
+text(x = 0.85, y = baseYv[2]+0.05,pos = 4, xpd = NA, cex = 0.9, labels = "Mid", font = 2)
+text(x = 0.85, y = baseYv[3]+0.05,pos = 4, xpd = NA, cex = 0.9, labels = "High", font = 2)
+text(x = 0.35, y = 0, pos = 3, labels = "Costa Rica", cex = 0.9, font = 2)
+
+par(mar = c(1,3,2,0.2)+0.0)
+
+best = ResultInterCombined$rf
+best$pairwise_interactions = best$pairwise_interactions[order(best$pairwise_interactions$Interactions,decreasing = TRUE),, drop = FALSE]
+
+groups = list(a = humT, b = plantT)
+drawRankingMatrix2(best, groups = groups, cex = 0.7, top_n = 8)
+
+#text(x = -0.01, y = 1.03, labels = "(b)", cex = 0.9, xpd = NA, font = 2)
+
+for(i in 8:1){
+  rect(ytop = -0.04,ybottom = -0.07,xleft = seq(0.0,1,length.out = 9)[i],xright = seq(0,1,length.out = 9)[i+1], col = RColorBrewer::brewer.pal(8,name = "YlGnBu")[i],border = NA, xpd = NA)
+}
+text(y= -0.07,x = rev(seq(0, seq(0,1,length.out = 9)[8], length.out = 8))+0.03, labels = 8:1, pos = 1, font = 2, cex = 0.7, xpd = NA)
+mtext(side = 3, text = c("(a)", "(b)"),line = 3,at = c(-1.7,-0.5), font = 2, cex = 0.9)
+dev.off()
+```
+
+
+## Figure S1
+```{r, results = FALSE}
+reset()
+cols =c( "#C0B9B2" ,"#CC0744" ,"#001E09" ,"#C2FF99" ,"#A079BF" ,"#00489C" ,"#6F0062" )
+names(cols) = c("dnn","cnn","knn","SVM","naive","RF","boost")
+cexP = 0.9
+xText = .59
+tck = -0.04
+plotSim = function(df, labels = c("20 x 50","50 x 100", "100 x 200"), cex.axis = 0.8,
+                   cex.lab=0.8, ylab = "AUC", cols, ylim = c(0,1), 
+                   cexP = 0.8, axisY = NULL,xlab = "A x B Individuals", xpd = NA){
+  par(mgp = c(1.4,0.2,0))
+  plot(NULL, NULL, xlim = c(0,1), ylim = ylim, axes = F,xlab ="", 
+       ylab = ylab, font.lab = 2, cex.lab = cex.lab, xpd = NA)
+    par(mgp = c(1.3,0.2,0))
+  text(x = 0.5, y = -0.25*max(ylim), pos = 1, labels = xlab, font = 2, cex = cex.lab, xpd = NA)
+  axis(1,at = seq(0,1, length.out = 3),labels = labels,cex.axis = cex.axis, xpd = NA, tck = tck)
+  par(mgp = c(3,0.4,0))
+  if(is.null(axisY)) axis(2,cex.axis = cex.axis, las = 2, tck = tck)
+  else axis(at = seq(0, max(ylim),0.1),2,cex.axis = cex.axis, labels = axisY, las = 2, tck = tck)
+  par(mgp = c(1.7,0.2,0))
+  for(i in 1:ncol(df)){
+    lines(x = seq(0,1, length.out = 3), y = df[,i], type = "o", col = cols[i], pch = 21, cex = cexP, bg = "white")
+  }
+}
+pdf(file = "./Figures/FigS1.pdf", width = 5.50, height = 2.2)
+par(mfrow = c(2,4), mar = c(2.3,2.3,1,2.2)-0.2, oma = c(0.33,0.4,0.5,1.2), mgp = c(1.7,0.5,0))
+names(cols) = colnames(auc)
+plotSim(tss, labels = NA, cols = cols, ylab = "TSS", ylim = c(0,1),xlab = "", cex.axis = 0.7, cex.lab = cexP)
+text(labels  = "(a)",x = -xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP)
+plotSim(tssAB, labels = NA, cols = cols, ylab = "TSS", ylim = c(0,1), xlab = "", cex.axis = 0.7, cex.lab = cexP)
+text(labels  = "(b)",x = -xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP)
+plotSim(tssObs, labels = NA, xlab = "",cols = cols, ylab = "TSS", ylim = c(0.0,1), cex.axis = 0.7, cex.lab = cexP)
+text(labels  = "(c)",x = -xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP)
+plot(NULL,NULL, ylim = c(0.,0.5), xlab = "", ylab = "", axes = F, xlim = c(0,1))
+legend(x=0, y = 0.2,col = cols, legend = c("DNN","CNN","kNN","SVM","naive","RF","BRT"), pch = 16, xpd = NA, 
+       bty = "n", cex = cexP, text.font = 2, y.intersp = 1.3, x.intersp = 0.7,horiz = F, pt.cex = 0.9)
+namesSpear = colnames(rmse)
+namesSpear[1] = "dnn"
+which(names(cols) %in% namesSpear, arr.ind = T)
+colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T))]
+plotSim(rmse, labels = c("20*50","50*100", "100*200"), cols = colsReg, 
+        ylab = "RMSE", ylim = c(0.,40), cex.axis = 0.7, cex.lab = cexP)
+text(labels  = "(e)",x = -xText, y = 47.2,pos = 4, xpd = NA,font = 2,cex = cexP)
+plotSim(rmseAB, labels = c("20*50","50*100", "100*200"), cols = colsReg, 
+        ylab = "RMSE", ylim = c(0.,27), cex.axis = 0.7, cex.lab = cexP)
+text(labels  = "(f)",x = -xText, y = 31.86,pos = 4, xpd = NA,font = 2,cex = cexP)
+plotSim(rmseObs, labels = c("50","500", "2000"), xlab = "Observation time", 
+        cols = colsReg, ylab = "RMSE", ylim = c(0.,27), cex.axis = 0.7, cex.lab = cexP)
+text(labels  = "(g)",x = -xText, y = 31.86,pos = 4, xpd = NA,font = 2,cex = cexP)
+dev.off()
+
+```
+
+
+## Figure S2
+```{r}
+reset()
+par(oma = c(0,0,0,0))
+pdf(file = "./Figures/FigS2.pdf")
+plotOverfitting(Results, box = T)
+dev.off()
+```
+
+
+<!-- ## Figure S3 -->
+<!-- ```{r,results=FALSE} -->
+<!-- # Regression with+wo AB -->
+<!-- reset() -->
+<!-- groups =list(a = c("A1.1", "A1.2", "A2", "A3", "A4", "A5", "A6"), b= c("B1.1", "B1.2", "B2", "B3", "B4", "B5", "B6")) -->
+
+<!-- pdf(file = "./Figures/FigS3.pdf",width = 5.5,height = 4) -->
+<!-- par(mfrow = c(2,3), mar = c(0.5,0.2,2,0.1)+0.1,oma = c(1,1.4,0.2,1)  ,xaxs = "i", yaxs = "i", pty = "s") -->
+<!-- cexLabels = 0.7 -->
+<!-- drawRankingMatrix2(ResultRegrInteractionAB$RF,true = true,groups = groups,  cex = cexLabels, lwd = 0.5) -->
+<!-- text(x = -0.01, y = 1.1, labels = "(a)", cex = cexP, xpd = NA, font = 2) -->
+<!-- drawRankingMatrix2(ResultRegrInteractionAB$negBinDnn,true = true,groups = groups, cex = cexLabels, lwd = 0.5, muteY = T) -->
+<!-- text(x = -0.01, y = 1.1, labels = "(b)", cex = cexP, xpd = NA, font = 2) -->
+<!-- drawRankingMatrix2(ResultRegrInteractionAB$boost,true = true,groups = groups,  cex = cexLabels, lwd = 0.5, muteY = T) -->
+<!-- text(x = -0.01, y = 1.1, labels = "(c)", cex = cexP, xpd = NA, font = 2) -->
+
+<!-- drawRankingMatrix2(ResultRegrInteraction$RF,true = true,groups = groups,   cex = cexLabels, lwd = 0.5) -->
+<!-- text(x = -0.01, y = 1.1, labels = "(d)", cex = cexP, xpd = NA, font = 2) -->
+<!-- points(x = 0.02, y = -0.09, pch = 7, cex = 1.0, xpd = NA) -->
+<!-- text(x = 0.022, y = -0.09,labels = "True Matching Traits",pos = 4,font = 2, cex = cexP, xpd = NA ) -->
+<!-- drawRankingMatrix2(ResultRegrInteraction$negBinDnn,true = true,groups = groups,   cex = cexLabels, lwd = 0.5, muteY = T) -->
+<!-- text(x = -0.01, y = 1.1, labels = "(e)", cex = cexP, xpd = NA, font = 2) -->
+<!-- for(i in 1:9){ -->
+<!--   rect(ytop = -0.03,ybottom = -0.06,xleft = seq(0.0,1,length.out = 10)[i],xright = seq(0,1,length.out = 10)[i+1], col = RColorBrewer::brewer.pal(9,name = "YlGnBu")[i],border = NA, xpd = NA) -->
+<!-- } -->
+<!-- text(y= -0.05,x = seq(0, seq(0,1,length.out = 10)[9], length.out = 5)+0.03, labels = c("0 %", "25 %", "50 %", "75 %", "100 %"), pos = 1, font = 2, cex = cexP, xpd = NA) -->
+<!-- drawRankingMatrix2(ResultRegrInteraction$boost,true = true,groups = groups,   cex = cexLabels, lwd = 0.5, muteY = T) -->
+<!-- text(x = -0.01, y = 1.1, labels = "(f)", cex = cexP, xpd = NA, font = 2) -->
+<!-- dev.off() -->
+
+<!-- ``` -->
+
+
+
+<!-- ## Figure S4 -->
+
+<!-- ```{r} -->
+<!-- # Classification with+wo AB -->
+<!-- reset() -->
+<!-- groups =list(a = c("A1.1", "A1.2", "A2", "A3", "A4", "A5", "A6"), b= c("B1.1", "B1.2", "B2", "B3", "B4", "B5", "B6")) -->
+<!-- pdf(file = "./Figures/FigS4.pdf",width = 5.5,height = 4) -->
+<!-- par(mfrow = c(2,3), mar = c(0.5,0.2,2,0.1)+0.1,oma = c(1,1.4,0.2,1)  ,xaxs = "i", yaxs = "i", pty = "s") -->
+<!-- cexLabels = 0.7 -->
+
+<!-- drawRankingMatrix2(ResultClassifInteractionAb$RF,true = true,groups = groups,   cex = cexLabels, lwd = 0.5) -->
+<!-- text(x = -0.01, y = 1.1, labels = "(a)", cex = cexP, xpd = NA, font = 2) -->
+<!-- drawRankingMatrix2(ResultClassifInteractionAb$dnn,true = true,groups = groups,   cex = cexLabels, lwd = 0.5, muteY = T) -->
+<!-- text(x = -0.01, y = 1.1, labels = "(b)", cex = cexP, xpd = NA, font = 2) -->
+<!-- drawRankingMatrix2(ResultClassifInteractionAb$boost,true = true,groups = groups,   cex = cexLabels, lwd = 0.5, muteY = T) -->
+<!-- text(x = -0.01, y = 1.1, labels = "(c)", cex = cexP, xpd = NA, font = 2) -->
+
+<!-- drawRankingMatrix2(ResultClassifInteraction$RF,true = true,groups = groups,  cex = cexLabels, lwd = 0.5) -->
+<!-- text(x = -0.01, y = 1.1, labels = "(d)", cex = cexP, xpd = NA, font = 2) -->
+<!-- points(x = 0.02, y = -0.09, pch = 7, cex = 1.0, xpd = NA) -->
+<!-- text(x = 0.022, y = -0.09,labels = "True Matching Traits",pos = 4,font = 2, cex = cexP, xpd = NA ) -->
+<!-- drawRankingMatrix2(ResultClassifInteraction$dnn,true = true,groups = groups,  cex = cexLabels, lwd = 0.5, muteY = T) -->
+<!-- text(x = -0.01, y = 1.1, labels = "(e)", cex = cexP, xpd = NA, font = 2) -->
+<!-- for(i in 1:9){ -->
+<!--   rect(ytop = -0.03,ybottom = -0.06,xleft = seq(0.0,1,length.out = 10)[i],xright = seq(0,1,length.out = 10)[i+1], col = RColorBrewer::brewer.pal(9,name = "YlGnBu")[i],border = NA, xpd = NA) -->
+<!-- } -->
+<!-- text(y= -0.05,x = seq(0, seq(0,1,length.out = 10)[9], length.out = 5)+0.03, labels = c("0 %", "25 %", "50 %", "75 %", "100 %"), pos = 1, font = 2, cex = cexP, xpd = NA) -->
+<!-- drawRankingMatrix2(ResultClassifInteraction$boost,true = true,groups = groups,   cex = cexLabels, lwd = 0.5, muteY = T) -->
+<!-- text(x = -0.01, y = 1.1, labels = "(f)", cex = cexP, xpd = NA, font = 2) -->
+<!-- dev.off() -->
+
+<!-- ``` -->
+
+
+
+<!-- ## Figure S5 -->
+
+<!-- ```{r,results=FALSE} -->
+<!-- load(file = "./Results/trueInteractionStructure.RData") -->
+<!-- load(file = "./Results/ALEplotsSim.RData") -->
+<!-- pdf(file = "./Figures/FigS5.pdf", width = 5.5, height = 3.38) -->
+<!-- par(mfrow= c(3,4),xaxs = "i", yaxs = "i", mar = c(1.2,1.5,1.2,2.2), oma = c(0.0,0.8,0.0,1), mgp = c(2,0.3,0)) -->
+<!-- plotInteractionEffect(nullAbRA2, cuts = 12, heat = viridis::viridis, cexP = cexP2) -->
+
+<!-- axis(1, labels = round(seq(min(nullAbCA2$x.values[[1]]), max(nullAbCA2$x.values[[1]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
+<!--      font = 2, cex.axis = 0.5, mgp = c(2,-0.00,0), tcl = -0.2,lwd.ticks = 0.6) -->
+<!-- axis(2, labels = round(seq(min(nullAbCA2$x.values[[2]]), max(nullAbCA2$x.values[[2]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
+<!--      font = 2, cex.axis = 0.5,mgp = c(2,0.3,0), tcl = -0.2,lwd.ticks = 0.6, las = 2) -->
+<!-- text(x = 0.5, y = -0.08, pos = 1, labels = "A2", xpd = NA, cex = cexP, font = 2) -->
+<!-- text(x = -0.11, y = 0.5, pos = 2, labels = "B3", xpd = NA, cex = cexP, font = 2) -->
+<!-- text(x = 0.04, y = 1.1, labels = "(a)", cex = cexP, xpd = NA, font = 2) -->
+<!-- for(x in 1:3){ -->
+<!--   plotInteractionEffect(A2_B3_Classifier[[x]], cuts = 12, heat = viridis::viridis, cexP = cexP2) -->
+<!--   text(x = 0.04, y = 1.1, labels = c("(b)", "(c)", "(d)")[x], cex = cexP, xpd = NA, font = 2) -->
+<!-- } -->
+
+
+<!-- plotInteractionEffect(nullAbCA3, cuts = 12, heat = viridis::viridis, cexP = cexP2) -->
+<!-- axis(1, labels = round(seq(min(nullAbCA3$x.values[[1]]), max(nullAbCA3$x.values[[1]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
+<!--      font = 2, cex.axis = 0.5, mgp = c(2,0.00,0), tcl = -0.2,lwd.ticks = 0.6) -->
+<!-- axis(2, labels = round(seq(min(nullAbCA3$x.values[[2]]), max(nullAbCA3$x.values[[2]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
+<!--      font = 2, cex.axis = 0.5,mgp = c(2,0.3,0), tcl = -0.2,lwd.ticks = 0.6, las = 2) -->
+<!-- text(x = 0.5, y = -0.10, pos = 1, labels = "A3", xpd = NA, cex = cexP, font = 2) -->
+<!-- text(x = -0.11, y = 0.5, pos = 2, labels = "B4", xpd = NA, cex = cexP, font = 2) -->
+<!-- .s = lapply(A3_B4_Classifier, function(x) plotInteractionEffect(x, cuts = 12, heat = viridis::viridis, cexP = cexP2)) -->
+
+<!-- par(mgp = c(0.5,0.5,0)) -->
+<!-- plotInteractionEffect(nullAbCA1, cuts = 12, heat = viridis::viridis, cexP = cexP2) -->
+<!-- axis(2, labels = round(seq(min(nullAbCA1$x.values[[2]]), max(nullAbCA1$x.values[[2]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
+<!--      font = 2, cex.axis = 0.5,mgp = c(2,0.3,0), tcl = -0.2,lwd.ticks = 0.6, las = 2) -->
+<!-- text(x = c(0.25, 0.75), y = 0.02, pos = 1, labels = c("A1.1", "A1.2"), font = 2, cex = cexP, xpd = NA) -->
+<!-- text(x = -0.11, y = 0.5, pos = 2, labels = "B2", xpd = NA, cex = cexP, font = 2) -->
+<!-- .s = lapply(A1_B2_Classifier, function(x) plotInteractionEffect(x, cuts = 12, heat = viridis::viridis, cexP = cexP2)) -->
+<!-- dev.off() -->
+<!-- ``` -->
+
+
+## Figure S3
+goodness of fit on train for appendix
+
+```{r, results=FALSE}
+load(file = "./Results/HummingInferenceResult.RData")
+load(file = "./Results/HummingBirdResult.RData")
+models = list(modelRF = modelRF, modelBoost = modelBoost, modelNegBin = modelNegBin, modelPoisson = modelPoisson)
+plotNames = names(community)
+predList = list()
+counter = 1
+for(m in 1:length(models)){
+  for(i in 1:length(community)){
+    data = community[[i]]$data[,-c(1,2)]
+    predList[[counter]] = predict(models[[m]][[i]], newdata = data)$data
+    names(predList)[[counter]] = paste0(names(models)[[m]], "_", plotNames[i])
+    counter = counter + 1
+  }
+}
+cols = c("#009BB2", "#FF8D30")
+colsInner = addA(cols, 0.3)
+pos = matrix(0, nrow = 28, ncol = 4)
+pos[,1] = c(sapply(0:3, function(x) return(rep(0+x*0.25, 7))))
+pos[,2] = c(sapply(1:4, function(x) return(rep(0+x*0.25, 7))))
+pos[,3] = rep(seq(1,0,length.out = 8)[2:8], 4)
+pos[,4] = rep(seq(1,0,length.out = 8)[1:7], 4)
+lwd = 1.0
+pdf(file = "./Figures/FigS3.pdf")
+par(mar = c(0.5,.2,.5,.2)-0.1, oma = c(2, 2, 2, 2), xaxt = "s", yaxt = "s", mgp = c(1,1,0))
+plotNames = c("Low", "Mid", "High", "Mid+High", "Low+Mid", "Low+High" , "All")
+labelCounter = 1
+for(counter in 1:28){
+  if(counter == 1) par(fig = pos[counter,])
+  else par(fig = pos[counter,], new = T)
+  maxV = max(predList[[counter]][,1:2])*1.2
+  plot(predList[[counter]][,c(2,1)], xlim = c(-3,maxV), ylim = c(-3, maxV), axes = F, col = "black", pch = 16, xlab = "", ylab = "", cex = 0.5)
+  lines(x = c(-2,maxV*0.7), y = c(-2,maxV*0.7))
+  par(mgp = c(1,0.04,0))
+  axis(1,cex.axis = 0.5, las = 1)
+  par(mgp = c(1,0.504,0))
+  axis(2,cex.axis = 0.5, las = 1 )
+  spear = round(measureSpearmanRho(predList[[counter]][,1], predList[[counter]][,2]),digits = 3)
+  text(x = 0.1*maxV, y = maxV*0.5, labels = spear, cex = 0.5, font = 2, pos = 3, col = "blue")
+  if(counter > 21){
+    text(x = maxV*1.2, y = maxV*0.3, labels = plotNames[labelCounter], cex = 0.8, font = 2, xpd = NA, srt = 270)
+    labelCounter = labelCounter+1
+  }
+}
+mtext(outer = T, at = seq(0.15,0.87,length.out = 4),text = c("RandomForest", "BoostedTrees", "NegbinDNN", "PoissonDNN"), side = 3, font = 2, cex = 0.8) 
+mtext(outer = T, side = 2, at = 0.5, cex = 0.7, font = 2, text = "true response",line = 0.9)
+mtext(outer = T, side = 1, at = 0.5, cex = 0.7, font = 2, text = "predicted response",line = 0.9)
+mtext(outer = T, side = 3, at = 0.0, cex = 0.5, font = 2, text = "Spearman",line = -1 , col = "blue")
+dev.off()
+reset()
+```
+
+
+## Figure S4
+
+
+```{r,results=FALSE}
+load(file = "./Results/HummingInferenceResult.RData")
+humT = c( "Bill.Length", "Bill.Curvature", "Body.Mass","Wing" , "Tail" )
+plantT = c( "Corolla.Length","Corolla.Curvature", "Corolla.Volumen","Inner.Diameter", "Ext.Diameter")
+interHum = apply(rbind(expand.grid(humT, plantT), expand.grid( plantT, humT)), 1, function(x) paste0(x[1],":", x[2]))
+
+
+groups = list(a = humT, b = plantT)
+
+best = ResultInterCombined$rf
+best$pairwise_interactions = best$pairwise_interactions[order(best$pairwise_interactions$Interactions,decreasing = TRUE),, drop = FALSE]
+pdf(file = "./Figures/FigS4.pdf")
+modelNames = c("BRT", "NgDNN", "pDNN", "RF")
+par(mfrow = c(4,4), mar = c(1.5,1,1.5,1)+0.3,oma = c(0.0,5,3,0))
+for(i in 1:4){
+  if(i <2) muteY = FALSE
+  else muteY = TRUE
+  best = ResultInterLow[[i]]
+  best$pairwise_interactions = best$pairwise_interactions[order(best$pairwise_interactions$Interactions,decreasing = TRUE),, drop = FALSE]
+  drawRankingMatrix2(best, groups = groups, top_n = 8L,muteY = muteY, muteX = FALSE)
+  if(i == 1) text(x = -0.1, y = 1.2, xpd = NA, font = 2, cex = 0.9, labels = "Low")
+  text(x = 0.5, y = 0.05, labels = modelNames[i],pos = 3, cex = 0.7, font = 2, xpd = NA)
+}
+
+for(i in 1:4){
+  if(i <2) muteY = FALSE
+  else muteY = TRUE
+  best = ResultInterMid[[i]]
+  best$pairwise_interactions = best$pairwise_interactions[order(best$pairwise_interactions$Interactions,decreasing = TRUE),, drop = FALSE]
+  drawRankingMatrix2(best, groups = groups, top_n = 8L,muteY = muteY,muteX = TRUE)  
+  if(i == 1) text(x =  -0.1, y = 1.2, xpd = NA, font = 2, cex = 0.9, labels = "Mid")
+  text(x = 0.5, y = 0.05, labels = modelNames[i],pos = 3, cex = 0.7, font = 2, xpd = NA)
+}
+
+for(i in 1:4){
+  if(i <2) muteY = FALSE
+  else muteY = TRUE
+ best = ResultInterHigh[[i]]
+ best$pairwise_interactions = best$pairwise_interactions[order(best$pairwise_interactions$Interactions,decreasing = TRUE),, drop = FALSE]
+ drawRankingMatrix2(best, groups = groups, top_n = 8L,muteY = muteY,muteX = TRUE)  
+ if(i == 1) text(x =  -0.1, y = 1.2, xpd = NA, font = 2, cex = 0.9, labels = "High")
+  text(x = 0.5, y = 0.05, labels = modelNames[i],pos = 3, cex = 0.7, font = 2, xpd = NA)
+}
+
+for(i in 1:4){
+    if(i <2) muteY = FALSE
+  else muteY = TRUE
+ best = ResultInterCombined[[i]]
+ best$pairwise_interactions = best$pairwise_interactions[order(best$pairwise_interactions$Interactions,decreasing = TRUE),, drop = FALSE]
+
+ drawRankingMatrix2(best, groups = list(a = c(humT,"plot.Low", "plot.Mid", "plot.High"), b = c(plantT)), top_n = 8L,muteY = muteY,muteX = TRUE)  
+  if(i == 1) text(x =  -0.1, y = 1.2, xpd = NA, font = 2, cex = 0.9, labels = "All")
+  text(x = 0.5, y = 0.05, labels = modelNames[i],pos = 3, cex = 0.7, font = 2, xpd = NA)
+  if(i == 2){
+    for(i in 1:8){
+  rect(ytop = -0.04,ybottom = -0.07,xleft = seq(0.0,1,length.out = 9)[i]+0.5,xright = seq(0,1,length.out = 9)[i+1]+0.5, col = RColorBrewer::brewer.pal(8,name = "YlGnBu")[i],border = NA, xpd = NA)
+}
+text(y= -0.07,x = seq(0, seq(0,1,length.out = 9)[8], length.out = 8)+0.55, labels = 8:1, pos = 1, font = 2, cex = 0.7, xpd = NA)
+  }
+}
+dev.off()
+
+```
+
+
+
+## Table 1
+
+```{r,include=FALSE}
+bestTestTable = bestTest[order(bestTest$sensitivity, decreasing = T),]
+test = test[order(test$method),]
+#Full for appendix
+print(xtable::xtable(test, auto = T, digits = 3), include.rownames=FALSE)
+#Small
+print(xtable::xtable(bestTestTable[,c(1,2,4,5,8,9,10,11,13)], auto = T, digits = 3), include.rownames=FALSE)
+
+tablePaper = bestTestTable[,c(1,2,4,5,8,9,10,11,13)]
+tablePaper[,1:8] = apply(tablePaper[,1:8], 2, FUN = function(x) round(x, digits = 3))
+write_csv(tablePaper, path = "./Figures/resultsPollinator.csv")
+
+```
+
+## Table S1
+```{r,include=FALSE}
+bestTestTable = bestTest[order(bestTest$sensitivity, decreasing = T),]
+test = test[order(test$method),]
+#Full for appendix
+kableExtra::landscape(knitr::kable(test,digits = 3, format = "latex",  longtable = TRUE, row.names = F))
+#Small
+knitr::kable(bestTestTable[,c(1,2,4,5,8,9,10,11,13)], "latex", digits = 3,row.names = F)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,474 @@
+---
+# title: "PredictionSimulation"
+# author: "Max Pichler"
+# date: "26 August 2018"
+documentclass: report
+fontsize: 11pt
+output:
+  pdf_document: 
+    highlight: monochrome
+  html_document: 
+    keep_md: yes
+    
+    
+---
+\pagenumbering{gobble} 
+
+
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,warning = FALSE, error = F,tidy.opts=list(width.cutoff=40),tidy=TRUE , tidy = TRUE,size = "tiny")
+hook_output = knitr::knit_hooks$get('output')
+knitr::knit_hooks$set(output = function(x, options) {
+  if (!is.null(n<- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+```
+# Simulation
+
+## Run Simulation for comparing predictive performance
+```{r, results = FALSE}
+library(TraitMatching)
+library(mlr)
+oldpar = par()
+reset = function() suppressWarnings(do.call(par, oldpar))
+run =TRUE
+set.seed(42)
+```
+
+
+
+```{r, echo=FALSE}
+df = data.frame("Trait Interaction" = c("A1 + B2", "A2 + B3", "A3 + B4"), 
+                "Type" = c("discrete + continuous", "continuous + continuous", "continuous + continuous"),
+                "Weight" = c(1,1,3))
+knitr::kable(df,caption = "Simulated trait combinations")
+```
+
+## meta parameter
+```{r}
+epochs = 50
+iter = 30
+parallel = 30
+run = TRUE
+crossValidation = list(outer = list(method = "SpCV", iters = 5, predict = "both"), 
+                                 inner = list(method = "SpCV", iters = 3))
+# crossValidation = list(outer = list(method = "Holdout", predict = "both"), 
+#                                  inner = list(method = "Holdout"))
+run = TRUE
+```
+
+
+### Network Size with species abundance
+Create Simulation:
+```{r,results=FALSE}
+set.seed(42)
+simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
+                                                                   "A2", "B2",
+                                                                   "A3", "B3"), ncol = 2, byrow = T),
+                              weights = list(inter = c(4,1,1)),
+                              NumberA = 100, NumberB = 200, traitsA = c(0,6), 
+                              traitsB = c(0,6),abundance = 2, rangeDiscrete = 2:5)
+
+```
+
+I tested the influence of three sizes on the performance. I set the observation time $=4e3$ to get for alomost all species at least one interaction. I sampled 25 \%, 50 \% and 100 \% of the species to get three network sizes of:
+
+```{r,results=FALSE}
+interBaseP = minOneInter(simulatedData$poisson(4e3))
+interBaseC = minOneInter(simulatedData$binar(4e3))
+smallP = interBaseP[sample(rownames(interBaseP), 0.25*length(rownames(interBaseP))),
+                    sample(colnames(interBaseP), 0.25*length(colnames(interBaseP)))]
+smallC = interBaseC[rownames(smallP), colnames(smallP)]
+
+midP = interBaseP[sample(rownames(interBaseP), 0.5*length(rownames(interBaseP))),
+                  sample(colnames(interBaseP), 0.5*length(colnames(interBaseP)))]
+midC = interBaseC[rownames(midP), colnames(midP)]
+
+largeP = interBaseP
+largeC = interBaseC
+
+sizeC = list(smallC = smallC, midC = midC, largeC = largeC)
+sizeR = list(smallP = smallP, midP = midP, largeP = largeP)
+
+
+
+```
+
+
+Fit models with 30 random tuning steps, nested cross-validation (five-fold outer and three-fold inner). SpcCV = Leave out species with all of their interactions. AUC and Spearman evaluated tuning.
+```{r,results=FALSE}
+resultC = list()
+if(run){
+  resultC = list()
+  for(i in 1:length(sizeC)){
+    resultC[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeC[[i]]), 
+                         method = c("dnn", "cnn", "knn", "SVM", "naive", "RFranger", "boost", "glm"), 
+          settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
+                          cnn = list(seed = 42, activation = "relu", 
+                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, 
+                       balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultC, file = "../Results/simSizeC.RDS")
+  }
+  
+  
+  resultR = list()
+  for(i in 1:length(sizeC)){
+    resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeR[[i]], log = F), 
+                         method = c("negBinDnn", "RFranger", "SVM", "knn", "boost", "glm"), 
+          settings = list(negBin = list(seed = 42, nLayer = 3L, batch = 50, 
+                                        distribution = "poisson",  archFunction = "continous", epochs = epochs),
+                          boost = list( objective = "count:poisson"),
+                          glm = list(family = "poisson")),
+                       tune = "random", iters = iter,  fitSpecies = F,tuningMetric = "spearmanrho",
+          crossValidation = crossValidation,
+                        block = T, parallel = parallel, seed = 42, keepModels = T)
+    
+    saveRDS(resultR, file = "../Results/simSizeR.RDS")
+  }
+}
+
+```
+
+### Observation time
+Varying observation times results in diffrent class distributions (classification). I choose times so, that the positive interaction had class proportions of 10 \%, 20-25 \% and 50 \%:
+
+```{r,results=FALSE}
+set.seed(42)
+simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
+                                                                   "A2", "B2",
+                                                                   "A3", "B3"), ncol = 2, byrow = T),
+                              weights = list(inter = c(4,1,1)),
+                              NumberA = 50, NumberB = 100, traitsA = c(0,6), 
+                              traitsB = c(0,6),abundance = 2, rangeDiscrete = 2:5)
+
+obsC = list(low = minOneInter(simulatedData$binar(2e2)), 
+            mid = minOneInter(simulatedData$binar(1e3)), 
+            high = minOneInter(simulatedData$binar(10e3)))
+
+obsR = list(low = minOneInter(simulatedData$poisson(2e2)), 
+            mid = minOneInter(simulatedData$poisson(1e3)), 
+            high = minOneInter(simulatedData$poisson(10e3)))
+```
+
+
+Fit models with 30 random tuning steps, nested cross-validation (five-fold outer and three-fold inner). SpcCV = Leave out species with all of their interactions. AUC and Spearman evaluated tuning.
+```{r,results=FALSE}
+if(run){
+resultC = list()
+  for(i in 1:length(obsC)){
+    if(i != 3) bc = "Over"
+    else bc = "None"
+    resultC[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, obsC[[i]]), 
+                         method = c("dnn", "cnn", "knn", "SVM", "naive", "RFranger", "boost", "glm"), 
+          settings = list(dnn = list(seed = 42,  activation = "relu",  archFunction = "continous",  epochs = epochs),
+                          cnn = list(seed = 42,  activation = "relu", 
+                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, 
+                       balanceClasses = bc, block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultC, file = "../Results/simObsC.RDS")
+  }
+  
+  resultR = list()
+  for(i in 1:length(obsR)){
+      resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, obsR[[i]], log = F), 
+                           method = c("negBinDnn", "RFranger", "SVM", "knn", "boost", "glm"), 
+          settings = list(negBin = list(seed = 42, nLayer = 3L, batch = 50, 
+                                        distribution = "poisson",  archFunction = "continous", epochs = epochs),
+                          boost = list( objective = "count:poisson"), 
+                          glm = list(family = "poisson")),
+                       tune = "random", iters = iter,  fitSpecies = F,tuningMetric = "spearmanrho",
+          crossValidation = crossValidation,
+                        block = T, parallel = parallel, seed = 42, keepModels = T)
+    
+    saveRDS(resultR, file = "../Results/simObsR.RDS")
+  }
+}
+```
+
+
+
+
+### Abundance
+We assumed that the observer had no information about abundances. Here, We set abundances to uniform to test whether the performances increases. Algorithms were tested again on the three different network sizes:
+```{r,results=FALSE}
+set.seed(42)
+simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
+                                                                   "A2", "B2",
+                                                                   "A3", "B3"), ncol = 2, byrow = T),
+                              weights = list(inter = c(4,1,1)),
+                              NumberA = 100, NumberB = 200, traitsA = c(0,6), 
+                              traitsB = c(0,6),abundance = FALSE, rangeDiscrete = 2:5)
+interBaseP = minOneInter(simulatedData$poisson(4e3))
+interBaseC = minOneInter(simulatedData$binar(4e3))
+smallP = interBaseP[sample(rownames(interBaseP), 0.25*length(rownames(interBaseP))),
+                    sample(colnames(interBaseP), 0.25*length(colnames(interBaseP)))]
+smallC = interBaseC[rownames(smallP), colnames(smallP)]
+
+midP = interBaseP[sample(rownames(interBaseP), 0.5*length(rownames(interBaseP))),
+                  sample(colnames(interBaseP), 0.5*length(colnames(interBaseP)))]
+midC = interBaseC[rownames(midP), colnames(midP)]
+
+largeP = interBaseP
+largeC = interBaseC
+
+sizeC = list(smallC = smallC, midC = midC, largeC = largeC)
+sizeR = list(smallP = smallP, midP = midP, largeP = largeP)
+
+```
+Fit models with 30 random tuning steps, nested cross-validation (five-fold outer and three-fold inner). SpcCV = Leave out species with all of their interactions. AUC and Spearman evaluated tuning.
+```{r}
+set.seed(42)
+resultC = list()
+if(run){
+  for(i in 1:length(sizeC)){
+    resultC[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeC[[i]]), 
+                         method = c("dnn", "cnn", "knn", "SVM", "naive", "RFranger", "boost", "glm"), 
+          settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
+                          cnn = list(seed = 42,   activation = "relu", 
+                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, 
+                       balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultC, file = "../Results/simAbC.RDS")
+  }
+  
+  
+  resultR = list()
+  for(i in 1:length(sizeC)){
+    resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeR[[i]], log = F), 
+                         method = c("negBinDnn", "RFranger", "SVM", "knn", "boost", "glm"), 
+          settings = list(negBin = list(seed = 42, nLayer = 3L, batch = 50, 
+                                        distribution = "poisson",  archFunction = "continous", epochs = epochs),
+                          boost = list( objective = "count:poisson"), 
+                          glm = list(family = "poisson")),
+                       tune = "random", iters = iter,  fitSpecies = F,tuningMetric = "spearmanrho",
+          crossValidation = crossValidation,
+                        block = T, parallel = parallel, seed = 42, keepModels = T)
+    
+    saveRDS(resultR, file = "../Results/simAbR.RDS")
+  }
+}
+```
+
+
+
+##  Results
+```{r, echo = FALSE,results=FALSE}
+if(run){
+  ResultSizeC = readRDS(file = "../Results/simSizeC.RDS")
+  ResultSizeR = readRDS(file = "../Results/simSizeR.RDS")
+  
+  ResultObsC = readRDS(file = "../Results/simObsC.RDS")
+  ResultObsR = readRDS(file = "../Results/simObsR.RDS")
+  
+  ResultAbC = readRDS(file = "../Results/simAbC.RDS")
+  ResultAbR = readRDS(file = "../Results/simAbR.RDS")
+  source("../Code/helpFunctions.R")
+}
+```
+
+Tune classifiers' thresholds with the true skill statistic and aggregate results for both (classifier and regressor):
+```{r,results=FALSE}
+if(run){
+  tune = tuneAndAggregate
+  ResultSizeCagg = lapply(ResultSizeC, 
+                          function(x) return(tune(x, tuneT = tss, bc = "None", onlyTest = F)))
+  ResultObsCagg = lapply(ResultObsC, 
+                         function(x) return(tune(x, TraitMatching::tss,"None", onlyTest = F)))
+  ResultAbCagg = lapply(ResultAbC, 
+                        function(x) return(tune(x, tuneT = TraitMatching::tss, bc = "None", onlyTest = F)))
+  
+  tune = tuneAndAggregateRegression
+  ResultSizeRagg = lapply(ResultSizeR, 
+                          function(x) return(tune(x,
+                                                                        onlyTest = F)))
+  ResultObsRagg = lapply(ResultObsR, 
+                         function(x) return(tune(x, 
+                                                                       onlyTest = F)))
+  ResultAbRagg = lapply(ResultAbR, 
+                        function(x) return(tune(x, 
+                                                                      onlyTest = F)))
+  
+  save(ResultSizeCagg, ResultObsCagg,ResultSizeRagg,ResultObsRagg,ResultAbCagg,ResultAbRagg, 
+       file = "../Results/ResultsSimulationAgg.RData")
+}
+```
+
+
+We computed tss, auc (rmse, spearman) for testing and training splits: 
+```{r,results=FALSE}
+load(file = "../Results/ResultsSimulationAgg.RData")
+tss = auc =  tssObs = aucObs = aucGenSize = data.frame(matrix(0,3,7))
+tssGenSize = aucAB = tssAB = data.frame(matrix(0,3,7))
+rmse = spear = rmseObs = spearObs = spearGenSize = data.frame(matrix(0, 3, 5))
+spearGenObs = spearAB = rmseAB = data.frame(matrix(0, 3, 5))
+
+methods = ResultSizeRagg[[1]][[6]][ResultSizeRagg[[1]][[6]]$set == "test",]$method
+colnames(rmse) = colnames(spear) = methods
+colnames(rmseObs) = colnames(spearObs) = methods
+colnames(spearGenObs) = colnames(spearGenSize) = methods
+colnames(spearAB) = colnames(rmseAB) = methods
+
+methods2 = ResultSizeCagg[[1]][[8]][ResultSizeCagg[[1]][[8]]$set == "test",c(1,11,13)]$method
+colnames(tss) = colnames(auc) = methods2
+colnames(aucObs) = colnames(tssObs) = methods2
+colnames(aucGenSize) = colnames(tssGenSize) = methods2
+colnames(aucAB) = colnames(tssAB)= methods2
+
+agg = function(d, m,  n) d[d$set == "test" & d$method == m, n]
+aggT = function(d, m, n) d[d$set == "train" & d$method == m, n]
+aucCheck = function(a) ifelse(a < 0.5, 1- a, a)
+for(i in 1:3){
+  for(k in 1:8){
+    # Classification
+    tss[i,k] = agg(ResultSizeCagg[[i]][[8]], colnames(tss)[k], 11)
+    tssAB[i,k] = agg(ResultAbCagg[[i]][[8]], colnames(tss)[k], 11)
+    tssObs[i,k] = agg(ResultObsCagg[[i]][[8]], colnames(tss)[k], 11)
+    
+    auc[i,k] = agg(ResultSizeCagg[[i]][[8]], colnames(auc)[k], 1)
+    aucAB[i,k] = agg(ResultAbCagg[[i]][[8]], colnames(auc)[k], 1)
+    aucObs[i,k] = agg(ResultObsCagg[[i]][[8]], colnames(auc)[k], 1)
+    
+    aucGenSize[i,k] = (aucCheck(aggT(ResultSizeCagg[[i]][[8]], colnames(auc)[k], 1))- aucCheck(auc[i,k]))/aucCheck(aggT(ResultSizeCagg[[i]][[8]], colnames(auc)[k], 1))
+    
+    tssGenSize[i,k] = (aggT(ResultSizeCagg[[i]][[8]], colnames(tss)[k], 11)-tss[i,k])/aggT(ResultSizeCagg[[i]][[8]], colnames(tss)[k], 11)
+    
+    # Regression
+    if(k < 6){
+      rmse[i,k] = agg(ResultSizeRagg[[i]][[6]], colnames(rmse)[k], 1)
+      rmseAB[i,k] = agg(ResultAbRagg[[i]][[6]], colnames(rmse)[k], 1)
+      rmseObs[i,k] = agg(ResultObsRagg[[i]][[6]], colnames(rmse)[k], 1)
+      spear[i,k] = abs(agg(ResultSizeRagg[[i]][[6]], colnames(spear)[k], 2))
+      spearAB[i,k] = abs(agg(ResultAbRagg[[i]][[6]], colnames(spear)[k], 2))
+      spearObs[i,k] = abs(agg(ResultObsRagg[[i]][[6]], colnames(spear)[k], 2))
+      spearGenSize[i,k] =(aggT(ResultSizeRagg[[i]][[6]], colnames(spear)[k], 2)-spear[i,k])/aggT(ResultSizeRagg[[i]][[6]], colnames(spear)[k], 2)
+      spearGenObs[i,k] = (aggT(ResultObsRagg[[i]][[6]], colnames(spear)[k], 2)-spear[i,k])/aggT(ResultObsRagg[[i]][[6]], colnames(spear)[k], 2)
+    }
+  }
+}
+auc = as.data.frame(lapply(auc, function(x) ifelse(x < 0.5, 1-x, x)))
+aucAB = as.data.frame(lapply(aucAB, function(x) ifelse(x < 0.5, 1-x, x)))
+aucObs = as.data.frame(lapply(aucObs, function(x) ifelse(x < 0.5, 1-x, x)))
+
+save(rmse, rmseAB, rmseObs, spear,spearAB,spearGenObs, spearGenSize,tss,tssAB,tssGenSize,tssObs,auc,aucAB,aucObs,aucGenSize, file = "../Results/SimulationAggreationFig2.RData")
+
+```
+
+
+
+# Plant-pollinator network
+
+## Prepare Data 
+```{r}
+set.seed(42)
+library(dplyr)
+plantPollRaw<-read.csv("../Data/Raw/traits2_florian.csv",sep=";")
+
+plantTraitsRaw<-plantPollRaw[,1:11]
+insectTraitsRaw<-plantPollRaw[,12:ncol(plantPollRaw)]
+
+colnames(plantTraitsRaw)[1] = "plant"
+colnames(insectTraitsRaw)[1] = "insect"
+
+interactionMatrix<-plantPollRaw[,-c(2:11,13:ncol(plantPollRaw))]
+interactionMatrix<-xtabs(~.,data=interactionMatrix)
+interactionMatrix<-as.data.frame.matrix(interactionMatrix)
+
+data = TraitMatching::createCommunity(plantTraitsRaw, insectTraitsRaw, z = interactionMatrix)
+
+saveRDS(data, file = "../Data/plantPoll.RDS")
+
+```
+
+
+
+
+
+
+## Predictive comparison on empirical plant-pollinator network
+```{r,results=FALSE}
+library(mlr)
+library(TraitMatching)
+library(tidyverse)
+oldpar = par()
+reset = function() suppressWarnings(do.call(par, oldpar))
+source("../Code/helpFunctions.R")
+```
+
+### Train models
+Training was splitted due to high computional cost
+- 20 random tuning steps of hyper-parameter
+- AUC evaluates tuning
+- Nested cross-validation: ten-fold outer and three-fold inner with leaving out insect species+all of their interactions
+
+```{r,results=FALSE}
+run = TRUE
+if(run){
+  cv = list(outer = list(method = "SpCV", iters = 10, predict = "both"), inner = list(method = "SpCV", iters = 5))
+  
+  
+  
+  cC = readRDS(file = "../Data/plantPoll.RDS")
+  
+  
+  result = runTM(cC, tune = "random", iters = iter, tuningMetric = "auc", crossValidation = cv, block = T, parallel = parallel, fitSpecies = F, balanceClasses = c("Over", "SMOTE", "Under"),
+                 method = c("dnn", "cnn", "RFranger", "boost", "SVM", "knn","naive", "glm"),
+                 seed = 42,settings =  list(
+                   dnn = list(seed = 42, arch = 30L, opti = "sgd", drop = 0.3, archFunction = "continous",batch = 50L, epochs = epochs),
+                   cnn = list(seed = 42, arch = 30L, opti = "sgd", drop = 0.3, archFunction = "continous",batch = 50L, kernel_size = 2, epochs = epochs)
+                 ))
+  saveRDS(result, file = "../Results/CaseStudy1.RDS")
+  
+}
+```
+
+
+
+
+## Results
+
+Connect results and tune thresholds+computing of additional measurements
+```{r,results=FALSE}
+tune = FALSE
+if(tune){
+  
+  raw = readRDS(file = "../Results/CaseStudy1.RDS")
+  
+  
+ 
+  Results = tuneAndAggregate(raw, tuneT = tss,onlyTest = F, bc = "all")
+  
+  saveRDS(Results, file = "../Results/aggregatedResults.RDS")
+}
+
+
+```
+
+Prepare data for figure
+```{r,results=FALSE}
+Results = readRDS(file = "../Results/aggregatedResults.RDS")
+test = Results$combinedTable[Results$combinedTable$set == "test",]
+train = Results$combinedTable[Results$combinedTable$set == "train",]
+colnames(test) = c("auc", "f1", "bac", "acc", "fdr", "fpr", "npv", "precision","specificity", "sensitivity", "tss", "set", "method", "balance")
+colnames(train) = c("auc", "f1", "bac", "acc", "fdr", "fpr", "npv", "precision","specificity", "sensitivity", "tss", "set", "method", "balance")
+test = test[order(test$tss, decreasing = T),]
+bestTest = test[!duplicated(test$method),]
+bestTest = bestTest[order(bestTest$auc),]
+bestTrain = train[paste0(rep("tr",7),substr(rownames(bestTest),3,4)),]
+
+
+
+```
+
+
+
+
