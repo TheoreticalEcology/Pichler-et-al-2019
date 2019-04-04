@@ -7,7 +7,8 @@
 #'@param traitsB vector for traitsB
 #'@export
 
-createSpecies = function(NumberA = 20, NumberB = 40, traitsA = c(5,5), traitsB = c(8,8), rangeDiscrete = 2:8,seed = 1337, abundance = 2, speciesClass = NULL, specialist = T, coLin = NULL, sampling = runif){
+createSpecies = function(NumberA = 20, NumberB = 40, traitsA = c(5,5), traitsB = c(8,8), rangeDiscrete = 2:8,seed = 1337, abundance = 2,
+                         speciesClass = NULL, specialist = T, coLin = NULL, sampling = runif, specRange = c(1,2)){
   spec = specialist
 
   if(!is.null(speciesClass)){
@@ -37,8 +38,8 @@ createSpecies = function(NumberA = 20, NumberB = 40, traitsA = c(5,5), traitsB =
   # if(!traitsA[2] == 0) A[,1:traitsA[2] + traitsA[1]] = sapply(1:traitsA[2], function(x, NumberA) return(rnorm(NumberA, 0, sd = 1)), NumberA)
   # if(!traitsB[2] == 0) B[,1:traitsB[2] + traitsB[1]] = sapply(1:traitsB[2], function(x, NumberB) return(rnorm(NumberB, 0, sd = 1)), NumberB)
 
-  if(!traitsA[2] == 0) A[,1:traitsA[2] + traitsA[1]] = sapply(1:traitsA[2], function(x, NumberA) return(sampling(NumberA, -1,1)), NumberA)
-  if(!traitsB[2] == 0) B[,1:traitsB[2] + traitsB[1]] = sapply(1:traitsB[2], function(x, NumberB) return(sampling(NumberB, -1,1)), NumberB)
+  if(!traitsA[2] == 0) A[,1:traitsA[2] + traitsA[1]] = sapply(1:traitsA[2], function(x, NumberA) return(sampling(NumberA, 0,1)), NumberA)
+  if(!traitsB[2] == 0) B[,1:traitsB[2] + traitsB[1]] = sapply(1:traitsB[2], function(x, NumberB) return(sampling(NumberB, 0,1)), NumberB)
 
   if(!is.null(coLin)){
     for(i in 1:length(coLin)){
@@ -74,7 +75,7 @@ createSpecies = function(NumberA = 20, NumberB = 40, traitsA = c(5,5), traitsB =
 
   out$A = A
   out$B = B
-  if(is.logical(spec) && spec)  out$spec = runif(NumberB, 0.3,7) #scales::rescale(rexp(NumberB,1), to = c(1,0.001))
+  if(is.logical(spec) && spec)  out$spec = runif(NumberB, specRange[1],specRange[2]) #scales::rescale(rexp(NumberB,1), to = c(1,0.001))
   else if(is.logical(spec) && !spec)spec = rep(NumberB,1)
   out$traitsA = traitsA
   out$traitsB = traitsB
@@ -83,8 +84,8 @@ createSpecies = function(NumberA = 20, NumberB = 40, traitsA = c(5,5), traitsB =
       out$Aabund <- rep(1,NumberA)
       out$Babund <- rep(1,NumberB)
     } else {
-      out$Aabund <- rexp(NumberA, abundance)
-      out$Babund <- rexp(NumberB, abundance)
+      out$Aabund <- rpois(NumberA, abundance) + 1
+      out$Babund <- rpois(NumberB, abundance) + 1
     }
   } else {
     out$Aabund <- abundance(NumberA, NumberA)
@@ -208,7 +209,7 @@ simulateInteraction = function(species = NULL, main = c("A1", "B9", "B10"), inte
 
         if(sum(whichD) > 1){
           interTraits[[k]]$both = TRUE
-          interTraits[[k]]$interM = matrix(runif(100, -1,1), nrow = 10, ncol = 10) #change 25.3
+          interTraits[[k]]$interM = matrix(runif(100, 0,1), nrow = 10, ncol = 10) #change 25.3
           interTraits[[k]]$weight = weights[["inter"]][k]
         } else {
           interTraits[[k]]$both = FALSE
@@ -248,13 +249,13 @@ simulateInteraction = function(species = NULL, main = c("A1", "B9", "B10"), inte
           }
           else{
             #res[i] = mvtnorm::dmvnorm(c(x[1,inter[i,1]], y[1,inter[i,2]]), mean = interTraits[[i]]$mean, interTraits[[i]]$cov*spec)*interTraits[[i]]$weight
-            res[i] = dnorm(x[1,inter[i,1]]/y[1,inter[i,2]],mean = 1, sd = spec)*interTraits[[i]]$weight #change 25.3
+            res[i] = dnorm(log(x[1,inter[i,1]]/y[1,inter[i,2]]),mean = 0, sd = spec)*interTraits[[i]]$weight #change 25.3
           }
 
         }
         return(prod(res))
       } else {
-        return(0.001)
+        return(1)
       }
     }
 

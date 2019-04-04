@@ -280,7 +280,7 @@ for(i in 1:length(simulation$data)){
                          crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
                                                 inner = list(method = "Holdout", split = 4/5, predict = "both")), 
                          balanceClasses = "None", block = T, parallel = 50, seed = 42, keepModels = T,tuningMetric = "poisson")
-      saveRDS(resultR, file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS")
+      saveRDS(resultR, file = "../Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS")
   }
 }
 
@@ -296,12 +296,12 @@ for(i in 1:length(simulation$data)){
                        crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
                                               inner = list(method = "Holdout", split = 4/5, predict = "both")), 
                        balanceClasses = "None", block = T, parallel = 50, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS")
+    saveRDS(resultC, file = "../Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS")
   }
 }
 
 
-save(simulation, file = "./Results/simulationInterMetaDataSMALL.RData")
+save(simulation, file = "../Results/simulationInterMetaDataSMALL.RData")
 
 
 ```
@@ -312,7 +312,7 @@ save(simulation, file = "./Results/simulationInterMetaDataSMALL.RData")
 ```{r}
 library(TraitMatching)
 set.seed(42)
-resultRegrWoAb = readRDS(file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS")
+resultRegrWoAb = readRDS(file = "../Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS")
 sim_len = sapply(resultRegrWoAb, length)
 ind_matrix = data.frame(ind1 = rep(1:4,sim_len), ind2 = abind::abind(sapply(1:4, function(i) do.call(seq, list(1, sim_len[i])))))
 
@@ -340,7 +340,7 @@ system.time({result_reg_small = snow::parSapply(cl = cl,X = 1:nrow(ind_matrix), 
 
 })
 
-saveRDS(result_reg_small, file = "./Results/res_reg_small.RDS")
+saveRDS(result_reg_small, file = "../Results/res_reg_small.RDS")
 
 ```
 
@@ -348,7 +348,7 @@ saveRDS(result_reg_small, file = "./Results/res_reg_small.RDS")
 ```{r}
 library(TraitMatching)
 set.seed(42)
-resultClassifWoAb = readRDS(file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS")
+resultClassifWoAb = readRDS(file = "../Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS")
 sim_len = sapply(resultClassifWoAb, length)
 ind_matrix = data.frame(ind1 = rep(1:4,sim_len), ind2 = abind::abind(sapply(1:4, function(i) do.call(seq, list(1, sim_len[i])))))
 
@@ -376,7 +376,7 @@ system.time({result_classif_small = snow::parSapply(cl = cl,X = 1:nrow(ind_matri
 
 })
 
-saveRDS(result_classif_small, file = "./Results/res_classif_small.RDS")
+saveRDS(result_classif_small, file = "../Results/res_classif_small.RDS")
 
 ```
 
@@ -403,7 +403,7 @@ for(i in 1:length(simulation$data)){
                          crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
                                                 inner = list(method = "Holdout", split = 4/5, predict = "both")), 
                          balanceClasses = "None", block = T, parallel = 50, seed = 42, keepModels = T,tuningMetric = "poisson")
-      saveRDS(resultR, file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS")
+      saveRDS(resultR, file = "../Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS")
   }
 }
 
@@ -419,7 +419,7 @@ for(i in 1:length(simulation$data)){
                        crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
                                               inner = list(method = "Holdout", split = 4/5, predict = "both")), 
                        balanceClasses = "None", block = T, parallel = 50, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS")
+    saveRDS(resultC, file = "../Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS")
   }
 }
 
@@ -427,7 +427,7 @@ for(i in 1:length(simulation$data)){
 
 
 
-save(simulation, file = "./Results/simulationInterMetaDataSMIDDLE.RData")
+save(simulation, file = "../Results/simulationInterMetaDataSMIDDLE.RData")
 
 
 ```
@@ -437,7 +437,7 @@ save(simulation, file = "./Results/simulationInterMetaDataSMIDDLE.RData")
 ```{r}
 library(TraitMatching)
 set.seed(42)
-resultRegrWoAb = readRDS(file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS")
+resultRegrWoAb = readRDS(file = "../Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS")
 sim_len = sapply(resultRegrWoAb, length)
 ind_matrix = data.frame(ind1 = rep(1:4,sim_len), ind2 = abind::abind(sapply(1:4, function(i) do.call(seq, list(1, sim_len[i])), simplify = F) ))
 
@@ -466,14 +466,14 @@ system.time({result_reg_small = snow::parSapply(cl = cl,X = 1:nrow(ind_matrix), 
 
 })
 
-saveRDS(result_reg_small, file = "./Results/res_reg_middle.RDS")
+saveRDS(result_reg_small, file = "../Results/res_reg_middle.RDS")
 
 ```
 
 ```{r}
 library(TraitMatching)
 set.seed(42)
-resultClassifWoAb = readRDS(file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS")
+resultClassifWoAb = readRDS(file = "../Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS")
 sim_len = sapply(resultClassifWoAb, length)
 ind_matrix = data.frame(ind1 = rep(1:4,sim_len), ind2 = abind::abind(sapply(1:4, function(i) do.call(seq, list(1, sim_len[i])),simplify = F)))
 
@@ -501,20 +501,20 @@ system.time({result_classif_middle = snow::parSapply(cl = cl,X = 1:nrow(ind_matr
 
 })
 
-saveRDS(result_classif_middle, file = "./Results/res_classif_middle.RDS")
+saveRDS(result_classif_middle, file = "../Results/res_classif_middle.RDS")
 
 ```
 
 ### Results
 #### Small
 ```{r}
-regrRes = readRDS(file = "./Results/res_reg_small.RDS")
-classRes = readRDS(file = "./Results/res_classif_small.RDS")
+regrRes = readRDS(file = "../Results/res_reg_small.RDS")
+classRes = readRDS(file = "../Results/res_classif_small.RDS")
 
-studyResReg = readRDS(file = './Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS')
-studyClassReg = readRDS(file = './Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS')
+studyResReg = readRDS(file = '../Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS')
+studyClassReg = readRDS(file = '../Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS')
 
-load(file = './Results/simulationInterMetaDataResultSMALL.RData')
+load(file = '../Results/simulationInterMetaDataResultSMALL.RData')
 
 library(TraitMatching)
 
@@ -563,13 +563,13 @@ resAggSmallClass = aggTrpRep(aggTrp(aggResClass), aggResClass)
 #### Middle
 ```{r}
 
-regrRes = readRDS(file = "./Results/res_reg_middle.RDS")
-classRes = readRDS(file = "./Results/res_classif_middle.RDS")
+regrRes = readRDS(file = "../Results/res_reg_middle.RDS")
+classRes = readRDS(file = "../Results/res_classif_middle.RDS")
 
-studyResReg = readRDS(file = './Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS')
-studyClassReg = readRDS(file = './Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS')
+studyResReg = readRDS(file = '../Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS')
+studyClassReg = readRDS(file = '../Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS')
 
-load(file = './Results/simulationInterMetaDataSMIDDLE.RData')
+load(file = '../Results/simulationInterMetaDataSMIDDLE.RData')
 
 library(TraitMatching)
 
@@ -615,7 +615,7 @@ resAggMiddleClass = aggTrpRep(aggTrp(aggResClass), aggResClass)
 #### Figure
 ```{r}
 
-pdf(file = "./Figures/Fig4.pdf",width = 5.5,height = 3.5)
+pdf(file = "../Figures/Fig4.pdf",width = 5.5,height = 3.5)
 par(mfrow = c(1,2), mar = c(1,2,0.6,0.1)+0.1,oma = c(0.0,0.2,1.2,0.1))
 plotResAgg(resAggSmallReg)
 text(xpd = NA, x = -0.1, y = 1.1, labels = "a)", font = 2)
@@ -640,17 +640,17 @@ dev.off()
 
 ```{r,results=FALSE}
 
-inH = read.csv("./PlantBird/interact_matrix_high.csv")
-inM = read.csv("./PlantBird/interact_matrix_mid.csv")
-inL = read.csv("./PlantBird/interact_matrix_low.csv")
+inH = read.csv("../PlantBird/interact_matrix_high.csv")
+inM = read.csv("../PlantBird/interact_matrix_mid.csv")
+inL = read.csv("../PlantBird/interact_matrix_low.csv")
 
-tbH = read.csv("./PlantBird/traitbird_high.csv",col.names = c("Hummingbird", "Bill.Length", "Bill.Curvature", "Body.Mass", "Wing", "Tail")) %>% normalizeFeatures(method = "center")
-tbM = read.csv("./PlantBird/traitbird_mid.csv",col.names = c("Hummingbird", "Bill.Length", "Bill.Curvature", "Body.Mass", "Wing", "Tail")) %>% normalizeFeatures(method = "center")
-tbL = read.csv("./PlantBird/traitbird_low.csv",col.names = c("Hummingbird", "Bill.Length", "Bill.Curvature", "Body.Mass", "Wing", "Tail")) %>% normalizeFeatures(method = "center")
+tbH = read.csv("../PlantBird/traitbird_high.csv",col.names = c("Hummingbird", "Bill.Length", "Bill.Curvature", "Body.Mass", "Wing", "Tail")) %>% normalizeFeatures(method = "center")
+tbM = read.csv("../PlantBird/traitbird_mid.csv",col.names = c("Hummingbird", "Bill.Length", "Bill.Curvature", "Body.Mass", "Wing", "Tail")) %>% normalizeFeatures(method = "center")
+tbL = read.csv("../PlantBird/traitbird_low.csv",col.names = c("Hummingbird", "Bill.Length", "Bill.Curvature", "Body.Mass", "Wing", "Tail")) %>% normalizeFeatures(method = "center")
 
-tpH = read.csv("./PlantBird/traitplant_high.csv", col.names = c("Plant", "Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter", "NumIndividuals")) %>% normalizeFeatures(method = "center", cols = c("Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter"))
-tpM = read.csv("./PlantBird/traitplant_mid.csv", col.names = c("Plant", "Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter", "NumIndividuals")) %>% normalizeFeatures(method = "center", cols = c("Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter"))
-tpL = read.csv("./PlantBird/traitplant_low.csv", col.names = c("Plant", "Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter", "NumIndividuals")) %>% normalizeFeatures(method = "center", cols = c("Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter"))
+tpH = read.csv("../PlantBird/traitplant_high.csv", col.names = c("Plant", "Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter", "NumIndividuals")) %>% normalizeFeatures(method = "center", cols = c("Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter"))
+tpM = read.csv("../PlantBird/traitplant_mid.csv", col.names = c("Plant", "Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter", "NumIndividuals")) %>% normalizeFeatures(method = "center", cols = c("Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter"))
+tpL = read.csv("../PlantBird/traitplant_low.csv", col.names = c("Plant", "Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter", "NumIndividuals")) %>% normalizeFeatures(method = "center", cols = c("Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter"))
 
 
 rownames(inH) = as.character(inH$X)

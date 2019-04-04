@@ -58,8 +58,7 @@ parallel = 30
 run = TRUE
 crossValidation = list(outer = list(method = "SpCV", iters = 5, predict = "both"), 
                                  inner = list(method = "SpCV", iters = 3))
-# crossValidation = list(outer = list(method = "Holdout", predict = "both"), 
-#                                  inner = list(method = "Holdout"))
+
 run = TRUE
 ```
 
@@ -71,17 +70,17 @@ set.seed(42)
 simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
                                                                    "A2", "B2",
                                                                    "A3", "B3"), ncol = 2, byrow = T),
-                              weights = list(inter = c(4,1,1)),
+                              weights = list(inter = c(200,200,200)),
                               NumberA = 100, NumberB = 200, traitsA = c(0,6), 
-                              traitsB = c(0,6),abundance = 2, rangeDiscrete = 2:5)
+                              traitsB = c(0,6),abundance = function(a,b) return(rexp(a, 2)), specRange = c(0.5,1.2))
 
 ```
 
 I tested the influence of three sizes on the performance. I set the observation time $=4e3$ to get for alomost all species at least one interaction. I sampled 25 \%, 50 \% and 100 \% of the species to get three network sizes of:
 
 ```{r,results=FALSE}
-interBaseP = minOneInter(simulatedData$poisson(4e3))
-interBaseC = minOneInter(simulatedData$binar(4e3))
+interBaseP = minOneInter(simulatedData$poisson(2e-4))
+interBaseC = minOneInter(simulatedData$binar(2e-4))
 smallP = interBaseP[sample(rownames(interBaseP), 0.25*length(rownames(interBaseP))),
                     sample(colnames(interBaseP), 0.25*length(colnames(interBaseP)))]
 smallC = interBaseC[rownames(smallP), colnames(smallP)]
@@ -95,7 +94,6 @@ largeC = interBaseC
 
 sizeC = list(smallC = smallC, midC = midC, largeC = largeC)
 sizeR = list(smallP = smallP, midP = midP, largeP = largeP)
-
 
 
 ```
@@ -145,17 +143,17 @@ set.seed(42)
 simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
                                                                    "A2", "B2",
                                                                    "A3", "B3"), ncol = 2, byrow = T),
-                              weights = list(inter = c(4,1,1)),
-                              NumberA = 50, NumberB = 100, traitsA = c(0,6), 
-                              traitsB = c(0,6),abundance = 2, rangeDiscrete = 2:5)
+                              weights = list(inter = c(200,200,200)),
+                              NumberA = 100, NumberB = 200, traitsA = c(0,6), 
+                              traitsB = c(0,6),abundance = FALSE, specRange = c(0.5,1.2))
 
-obsC = list(low = minOneInter(simulatedData$binar(2e2)), 
-            mid = minOneInter(simulatedData$binar(1e3)), 
-            high = minOneInter(simulatedData$binar(10e3)))
+obsC = list(low = minOneInter(simulatedData$binar(1e-6)), 
+            mid = minOneInter(simulatedData$binar(3e-6)), 
+            high = minOneInter(simulatedData$binar(1.3e-5)))
 
-obsR = list(low = minOneInter(simulatedData$poisson(2e2)), 
-            mid = minOneInter(simulatedData$poisson(1e3)), 
-            high = minOneInter(simulatedData$poisson(10e3)))
+obsR = list(low = minOneInter(simulatedData$poisson(1e-6)), 
+            mid = minOneInter(simulatedData$poisson(3e-6)), 
+            high = minOneInter(simulatedData$poisson(1.3e-5)))
 ```
 
 
@@ -204,11 +202,11 @@ set.seed(42)
 simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
                                                                    "A2", "B2",
                                                                    "A3", "B3"), ncol = 2, byrow = T),
-                              weights = list(inter = c(4,1,1)),
+                              weights = list(inter = c(200,200,200)),
                               NumberA = 100, NumberB = 200, traitsA = c(0,6), 
-                              traitsB = c(0,6),abundance = FALSE, rangeDiscrete = 2:5)
-interBaseP = minOneInter(simulatedData$poisson(4e3))
-interBaseC = minOneInter(simulatedData$binar(4e3))
+                              traitsB = c(0,6),abundance = FALSE, specRange = c(0.5,1.2))
+interBaseP = minOneInter(simulatedData$poisson(1.3e-5))
+interBaseC = minOneInter(simulatedData$binar(1.3e-5))
 smallP = interBaseP[sample(rownames(interBaseP), 0.25*length(rownames(interBaseP))),
                     sample(colnames(interBaseP), 0.25*length(colnames(interBaseP)))]
 smallC = interBaseC[rownames(smallP), colnames(smallP)]
