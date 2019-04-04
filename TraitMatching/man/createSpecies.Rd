@@ -6,7 +6,8 @@
 \usage{
 createSpecies(NumberA = 20, NumberB = 40, traitsA = c(5, 5),
   traitsB = c(8, 8), rangeDiscrete = 2:8, seed = 1337, abundance = 2,
-  speciesClass = NULL, specialist = T, coLin = NULL)
+  speciesClass = NULL, specialist = T, coLin = NULL, sampling = runif,
+  specRange = c(1, 2))
 }
 \arguments{
 \item{NumberA}{number of A}

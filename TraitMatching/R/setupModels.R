@@ -12,7 +12,7 @@ getLearner <- function(method, balanceClasses, predict.type = "prob", predict.tr
   if(balanceClasses == "Regression"){
 
     if(method == "RF") learner = do.call(mlr::makeLearner, c(list(cl = "regr.randomForest", predict.type = "se", importance = TRUE), extra))
-    else if(method == "SVM") learner = do.call(mlr::makeLearner, c(list(cl = "regr.svm"), extra))
+    else if(method == "SVM") learner = do.call(mlr::makeLearner, c(list(cl = "regr.liquidSVM"), extra))
     else if(method == "knn") learner = do.call(mlr::makeLearner, c(list(cl = "regr.kknn"), extra))
     else if(method == "dnn") learner = do.call(mlr::makeLearner, c(list(cl = "regr.keras_seq"), extra))
     else if(method == "RFranger") learner = do.call(mlr::makeLearner, c(list(cl = "regr.ranger", predict.type = "se"), extra))
@@ -31,7 +31,7 @@ getLearner <- function(method, balanceClasses, predict.type = "prob", predict.tr
 
   } else {
     if(method == "RF") learner = do.call(mlr::makeLearner, c(list(cl = "classif.randomForest", predict.type = predict.type, importance = TRUE), extra))
-    else if(method == "SVM") learner = do.call(mlr::makeLearner, c(list(cl = "classif.svm", predict.type = predict.type), extra))
+    else if(method == "SVM") learner = do.call(mlr::makeLearner, c(list(cl = "classif.liquidSVM_self", predict.type = predict.type), extra))
     else if(method == "knn") learner = do.call(mlr::makeLearner, c(list(cl = "classif.kknn", predict.type = predict.type), extra))
     else if(method == "naive") learner = do.call(mlr::makeLearner, c(list(cl = "classif.naiveBayes", predict.type = predict.type), extra))
     else if(method == "dnn") learner = do.call(mlr::makeLearner, c(list(cl = "classif.keras_seq", predict.type = predict.type), extra))
@@ -114,9 +114,14 @@ getPars <- function(method, settings = NULL, extra = NULL){
                                                              ParamHelpers::makeIntegerParam("nodesize",lower = 2,upper = 50),
                                                              ParamHelpers::makeLogicalParam("replace",default = TRUE))
 
-  if(method == "SVM") parameter <- ParamHelpers::makeParamSet(ParamHelpers::makeDiscreteParam("kernel", values = c("polynomial", "radial", "sigmoid")),
-                                                              ParamHelpers::makeNumericParam("cost",lower=-5,upper=2, trafo = function(x) 2^x),
-                                                              ParamHelpers::makeNumericParam("gamma",lower=1,upper=20)
+  # if(method == "SVM") parameter <- ParamHelpers::makeParamSet(ParamHelpers::makeDiscreteParam("kernel", values = c("polynomial", "radial", "sigmoid")),
+  #                                                             ParamHelpers::makeNumericParam("cost",lower=-5,upper=2, trafo = function(x) 2^x),
+  #                                                             ParamHelpers::makeNumericParam("gamma",lower=1,upper=20)
+  # )
+
+  if(method == "SVM") parameter <- ParamHelpers::makeParamSet(ParamHelpers::makeDiscreteParam("kernel", values = c("gauss_rbf", "poisson")),
+                                                              ParamHelpers::makeNumericVectorParam("lambdas",len = 1L,lower=0.01,upper=20),
+                                                              ParamHelpers::makeNumericVectorParam("gammas",len = 1L,lower=0.01,upper=20)
   )
 
 

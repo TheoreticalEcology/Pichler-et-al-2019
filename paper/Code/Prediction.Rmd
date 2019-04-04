@@ -52,12 +52,14 @@ knitr::kable(df,caption = "Simulated trait combinations")
 
 ## meta parameter
 ```{r}
-epochs = 50
-iter = 30
-parallel = 30
+epochs = 1
+iter = 1
+parallel = FALSE
 run = TRUE
 crossValidation = list(outer = list(method = "SpCV", iters = 5, predict = "both"), 
                                  inner = list(method = "SpCV", iters = 3))
+crossValidation = list(outer = list(method = "Holdout",  predict = "both"), 
+                                 inner = list(method = "Holdout"))
 
 run = TRUE
 ```

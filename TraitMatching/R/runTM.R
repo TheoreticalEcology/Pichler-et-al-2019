@@ -180,6 +180,7 @@ parallelSetup <- function(settings) {
     if ("cnn" %in% method) parallelMap::parallelExport("trainLearner.classif.keras_conv", "predictLearner.classif.keras_conv", level = "mlr.tuneParams")
     if ("wideDeep" %in% method) parallelMap::parallelExport("trainLearner.classif.wideDeep", "predictLearner.classif.wideDeep", level = "mlr.tuneParams")
     if ("preDnn" %in% method) parallelMap::parallelExport("trainLearner.classif.preKeras", "predictLearner.classif.preKeras", level = "mlr.tuneParams")
+    if ("SVM" %in% method) parallelMap::parallelExport("trainLearner.classif.liquidSVM_self", "predictLearner.classif.liquidSVM_self", level = "mlr.tuneParams")
 
     if ("dnn" %in% method) parallelMap::parallelExport("trainLearner.regr.keras_seq", "predictLearner.regr.keras_seq", level = "mlr.tuneParams")
     if ("cnn" %in% method) parallelMap::parallelExport("trainLearner.regr.keras_conv", "predictLearner.regr.keras_conv", level = "mlr.tuneParams")
