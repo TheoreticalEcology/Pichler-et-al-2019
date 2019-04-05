@@ -12,9 +12,6 @@ output:
     
     
 ---
-\pagenumbering{gobble} 
-
-
 
 
 ```{r setup, include=FALSE}
@@ -63,25 +60,97 @@ crossValidation = list(outer = list(method = "SpCV", iters = 5, predict = "both"
 run = TRUE
 ```
 
+### Without effects and abundances - baseline
+- wide and weak effects (gaussian with sd = 100)
+- no species abundances
+- 50*100 base network size
+```{r,results=FALSE}
+set.seed(42)
+simulatedData = simulateInteraction(main = NULL, inter = matrix(c("A1", "B1"), ncol = 2, byrow = T),
+                              weights = list(inter = 1),
+                              NumberA = 50, NumberB = 100, traitsA = c(0,6), 
+                              traitsB = c(0,6),abundance = FALSE, specRange = c(100,100))
+table(as.matrix(minOneInter(simulatedData$binar(3e2))))
+```
 
-### Network Size with species abundance
+```{r, results=FALSE}
+resultBaselineC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$binar(3e2))), 
+                         method = c("dnn", "cnn", "knn", "naive", "RFranger", "boost", "glm"), 
+          settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
+                          cnn = list(seed = 42, activation = "relu", 
+                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, 
+                       balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultBaselineC, file = "./Results/simBaselineC.RDS")
+
+resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$poisson(3e2))), 
+                         method = c("dnn", "cnn", "knn", "naive", "RFranger", "boost", "glm"), 
+          settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
+                          cnn = list(seed = 42, activation = "relu", 
+                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, 
+                       balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultBaselineC, file = "./Results/simBaselineR.RDS")
+```
+
+### Without effects but with abundances - baseline with abundances
+- wide and weak effects (gaussian with sd = 100)
+- species abundances
+- 50*100 base network size
+```{r,results=FALSE}
+set.seed(42)
+simulatedData = simulateInteraction(main = NULL, inter = matrix(c("A1", "B1"), ncol = 2, byrow = T),
+                              weights = list(inter = 1),
+                              NumberA = 50, NumberB = 100, traitsA = c(0,6), 
+                              traitsB = c(0,6),abundance = function(a,b) return(rexp(a, 2)), specRange = c(100,100))
+table(as.matrix(minOneInter(simulatedData$binar(4e3))))
+```
+```{r, results=FALSE}
+resultAbC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$binar(4e3))), 
+                         method = c("dnn", "cnn", "knn", "naive", "RFranger", "boost", "glm"), 
+          settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
+                          cnn = list(seed = 42, activation = "relu", 
+                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, 
+                       balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultAbC, file = "./Results/simAbC.RDS")
+    
+resultAbR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$binar(4e3))), 
+                         method = c("dnn", "cnn", "knn", "naive", "RFranger", "boost", "glm"), 
+          settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
+                          cnn = list(seed = 42, activation = "relu", 
+                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, 
+                       balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultAbR, file = "./Results/simAbR.RDS")
+```
+
+### With effects and w/o abundances - Network Sizes
+- with strong effects (gaussian with small sd and high interaction weight)
+- without species abundances 
+- varying network sizes
+
 Create Simulation:
 ```{r,results=FALSE}
 set.seed(42)
 simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
                                                                    "A2", "B2",
                                                                    "A3", "B3"), ncol = 2, byrow = T),
-                              weights = list(inter = c(200,200,200)),
+                              weights = list(inter = c(10,10,10)),
                               NumberA = 100, NumberB = 200, traitsA = c(0,6), 
-                              traitsB = c(0,6),abundance = function(a,b) return(rexp(a, 2)), specRange = c(0.5,1.2))
-
+                              traitsB = c(0,6),abundance = FALSE, specRange = c(0.5,1.2))
+table(as.matrix(minOneInter(simulatedData$binar(1.2e-1))))
 ```
 
 I tested the influence of three sizes on the performance. I set the observation time $=4e3$ to get for alomost all species at least one interaction. I sampled 25 \%, 50 \% and 100 \% of the species to get three network sizes of:
 
 ```{r,results=FALSE}
-interBaseP = minOneInter(simulatedData$poisson(2e-4))
-interBaseC = minOneInter(simulatedData$binar(2e-4))
+interBaseP = minOneInter(simulatedData$poisson(1.2e-1))
+interBaseC = minOneInter(simulatedData$binar(1.2e-1))
 smallP = interBaseP[sample(rownames(interBaseP), 0.25*length(rownames(interBaseP))),
                     sample(colnames(interBaseP), 0.25*length(colnames(interBaseP)))]
 smallC = interBaseC[rownames(smallP), colnames(smallP)]
@@ -136,25 +205,26 @@ if(run){
 
 ```
 
-### Observation time
-Varying observation times results in diffrent class distributions (classification). I choose times so, that the positive interaction had class proportions of 10 \%, 20-25 \% and 50 \%:
+### With effects and w/o abundances - Observation time
+Varying observation times results in diffrent class distributions (classification). I choose times so, that the positive interaction had class proportions of 10 \%, 25 \% and 50 \%:
 
 ```{r,results=FALSE}
 set.seed(42)
 simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
                                                                    "A2", "B2",
                                                                    "A3", "B3"), ncol = 2, byrow = T),
-                              weights = list(inter = c(200,200,200)),
+                              weights = list(inter = c(10,10,10)),
                               NumberA = 100, NumberB = 200, traitsA = c(0,6), 
                               traitsB = c(0,6),abundance = FALSE, specRange = c(0.5,1.2))
+table(as.matrix(minOneInter(simulatedData$binar(1.2e-1))))
 
-obsC = list(low = minOneInter(simulatedData$binar(1e-6)), 
-            mid = minOneInter(simulatedData$binar(3e-6)), 
-            high = minOneInter(simulatedData$binar(1.3e-5)))
+obsC = list(low = minOneInter(simulatedData$binar(0.7e-2)), 
+            mid = minOneInter(simulatedData$binar(3.2e-2)), 
+            high = minOneInter(simulatedData$binar(1.2e-1)))
 
-obsR = list(low = minOneInter(simulatedData$poisson(1e-6)), 
-            mid = minOneInter(simulatedData$poisson(3e-6)), 
-            high = minOneInter(simulatedData$poisson(1.3e-5)))
+obsR = list(low = minOneInter(simulatedData$poisson(0.7e-2)), 
+            mid = minOneInter(simulatedData$poisson(3.2e-2)), 
+            high = minOneInter(simulatedData$poisson(1.2e-1)))
 ```
 
 
@@ -194,69 +264,6 @@ resultC = list()
 ```
 
 
-
-
-### Abundance
-We assumed that the observer had no information about abundances. Here, We set abundances to uniform to test whether the performances increases. Algorithms were tested again on the three different network sizes:
-```{r,results=FALSE}
-set.seed(42)
-simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
-                                                                   "A2", "B2",
-                                                                   "A3", "B3"), ncol = 2, byrow = T),
-                              weights = list(inter = c(200,200,200)),
-                              NumberA = 100, NumberB = 200, traitsA = c(0,6), 
-                              traitsB = c(0,6),abundance = FALSE, specRange = c(0.5,1.2))
-interBaseP = minOneInter(simulatedData$poisson(1.3e-5))
-interBaseC = minOneInter(simulatedData$binar(1.3e-5))
-smallP = interBaseP[sample(rownames(interBaseP), 0.25*length(rownames(interBaseP))),
-                    sample(colnames(interBaseP), 0.25*length(colnames(interBaseP)))]
-smallC = interBaseC[rownames(smallP), colnames(smallP)]
-
-midP = interBaseP[sample(rownames(interBaseP), 0.5*length(rownames(interBaseP))),
-                  sample(colnames(interBaseP), 0.5*length(colnames(interBaseP)))]
-midC = interBaseC[rownames(midP), colnames(midP)]
-
-largeP = interBaseP
-largeC = interBaseC
-
-sizeC = list(smallC = smallC, midC = midC, largeC = largeC)
-sizeR = list(smallP = smallP, midP = midP, largeP = largeP)
-
-```
-Fit models with 30 random tuning steps, nested cross-validation (five-fold outer and three-fold inner). SpcCV = Leave out species with all of their interactions. AUC and Spearman evaluated tuning.
-```{r}
-set.seed(42)
-resultC = list()
-if(run){
-  for(i in 1:length(sizeC)){
-    resultC[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeC[[i]]), 
-                         method = c("dnn", "cnn", "knn",  "naive", "RFranger", "boost", "glm"), 
-          settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
-                          cnn = list(seed = 42,   activation = "relu", 
-                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
-                       tune = "random", iters = iter,  fitSpecies = F,
-                       crossValidation = crossValidation, 
-                       balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "./Results/simAbC.RDS")
-  }
-  
-  
-  resultR = list()
-  for(i in 1:length(sizeC)){
-    resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeR[[i]], log = F), 
-                         method = c("negBinDnn", "RFranger",  "knn", "boost", "glm"), 
-          settings = list(negBin = list(seed = 42, nLayer = 3L, batch = 50, 
-                                        distribution = "poisson",  archFunction = "continous", epochs = epochs),
-                          boost = list( objective = "count:poisson"), 
-                          glm = list(family = "poisson")),
-                       tune = "random", iters = iter,  fitSpecies = F,tuningMetric = "spearmanrho",
-          crossValidation = crossValidation,
-                        block = T, parallel = parallel, seed = 42, keepModels = T)
-    
-    saveRDS(resultR, file = "./Results/simAbR.RDS")
-  }
-}
-```
 
 
 

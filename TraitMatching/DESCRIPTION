@@ -16,7 +16,6 @@ Imports:
     parallel,
     parallelMap,
     cluster,
-    dprep,
     cvTools,
     DMwR,
     rowr,

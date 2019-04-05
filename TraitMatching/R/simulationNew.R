@@ -8,7 +8,7 @@
 #'@export
 
 createSpecies = function(NumberA = 20, NumberB = 40, traitsA = c(5,5), traitsB = c(8,8), rangeDiscrete = 2:8,seed = 1337, abundance = 2,
-                         speciesClass = NULL, specialist = T, coLin = NULL, sampling = runif, specRange = c(1,2)){
+                         speciesClass = NULL, specialist = T, coLin = NULL, sampling = function(n) runif(n, 0,1), specRange = c(1,2)){
   spec = specialist
 
   if(!is.null(speciesClass)){
@@ -38,8 +38,15 @@ createSpecies = function(NumberA = 20, NumberB = 40, traitsA = c(5,5), traitsB =
   # if(!traitsA[2] == 0) A[,1:traitsA[2] + traitsA[1]] = sapply(1:traitsA[2], function(x, NumberA) return(rnorm(NumberA, 0, sd = 1)), NumberA)
   # if(!traitsB[2] == 0) B[,1:traitsB[2] + traitsB[1]] = sapply(1:traitsB[2], function(x, NumberB) return(rnorm(NumberB, 0, sd = 1)), NumberB)
 
-  if(!traitsA[2] == 0) A[,1:traitsA[2] + traitsA[1]] = sapply(1:traitsA[2], function(x, NumberA) return(sampling(NumberA, 0,1)), NumberA)
-  if(!traitsB[2] == 0) B[,1:traitsB[2] + traitsB[1]] = sapply(1:traitsB[2], function(x, NumberB) return(sampling(NumberB, 0,1)), NumberB)
+  if(class(sampling) != "function"){
+
+  if(!traitsA[2] == 0) A[,1:traitsA[2] + traitsA[1]] = sapply(1:traitsA[2], function(x, NumberA) return(runif(NumberA, 0,1)), NumberA)
+  if(!traitsB[2] == 0) B[,1:traitsB[2] + traitsB[1]] = sapply(1:traitsB[2], function(x, NumberB) return(runif(NumberB, 0,1)), NumberB)
+
+  } else {
+    if(!traitsA[2] == 0) A[,1:traitsA[2] + traitsA[1]] = sapply(1:traitsA[2], function(x, NumberA) return(sampling(NumberA)), NumberA)
+    if(!traitsB[2] == 0) B[,1:traitsB[2] + traitsB[1]] = sapply(1:traitsB[2], function(x, NumberB) return(sampling(NumberB)), NumberB)
+  }
 
   if(!is.null(coLin)){
     for(i in 1:length(coLin)){
