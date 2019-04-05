@@ -52,14 +52,13 @@ knitr::kable(df,caption = "Simulated trait combinations")
 
 ## meta parameter
 ```{r}
-epochs = 1
-iter = 1
-parallel = FALSE
+epochs = 50L
+iter = 30
+parallel = 30
 run = TRUE
 crossValidation = list(outer = list(method = "SpCV", iters = 5, predict = "both"), 
                                  inner = list(method = "SpCV", iters = 3))
-crossValidation = list(outer = list(method = "Holdout",  predict = "both"), 
-                                 inner = list(method = "Holdout"))
+
 
 run = TRUE
 ```
@@ -108,21 +107,21 @@ if(run){
   resultC = list()
   for(i in 1:length(sizeC)){
     resultC[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeC[[i]]), 
-                         method = c("dnn", "cnn", "knn", "SVM", "naive", "RFranger", "boost", "glm"), 
+                         method = c("dnn", "cnn", "knn", "naive", "RFranger", "boost", "glm"), 
           settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
                           cnn = list(seed = 42, activation = "relu", 
                                      drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "../Results/simSizeC.RDS")
+    saveRDS(resultC, file = "./Results/simSizeC.RDS")
   }
   
   
   resultR = list()
   for(i in 1:length(sizeC)){
     resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeR[[i]], log = F), 
-                         method = c("negBinDnn", "RFranger", "SVM", "knn", "boost", "glm"), 
+                         method = c("negBinDnn", "RFranger", "knn", "boost", "glm"), 
           settings = list(negBin = list(seed = 42, nLayer = 3L, batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"),
@@ -131,7 +130,7 @@ if(run){
           crossValidation = crossValidation,
                         block = T, parallel = parallel, seed = 42, keepModels = T)
     
-    saveRDS(resultR, file = "../Results/simSizeR.RDS")
+    saveRDS(resultR, file = "./Results/simSizeR.RDS")
   }
 }
 
@@ -167,20 +166,20 @@ resultC = list()
     if(i != 3) bc = "Over"
     else bc = "None"
     resultC[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, obsC[[i]]), 
-                         method = c("dnn", "cnn", "knn", "SVM", "naive", "RFranger", "boost", "glm"), 
+                         method = c("dnn", "cnn", "knn",  "naive", "RFranger", "boost", "glm"), 
           settings = list(dnn = list(seed = 42,  activation = "relu",  archFunction = "continous",  epochs = epochs),
                           cnn = list(seed = 42,  activation = "relu", 
                                      drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = bc, block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "../Results/simObsC.RDS")
+    saveRDS(resultC, file = "./Results/simObsC.RDS")
   }
   
   resultR = list()
   for(i in 1:length(obsR)){
       resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, obsR[[i]], log = F), 
-                           method = c("negBinDnn", "RFranger", "SVM", "knn", "boost", "glm"), 
+                           method = c("negBinDnn", "RFranger",  "knn", "boost", "glm"), 
           settings = list(negBin = list(seed = 42, nLayer = 3L, batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"), 
@@ -189,7 +188,7 @@ resultC = list()
           crossValidation = crossValidation,
                         block = T, parallel = parallel, seed = 42, keepModels = T)
     
-    saveRDS(resultR, file = "../Results/simObsR.RDS")
+    saveRDS(resultR, file = "./Results/simObsR.RDS")
   }
 }
 ```
@@ -231,21 +230,21 @@ resultC = list()
 if(run){
   for(i in 1:length(sizeC)){
     resultC[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeC[[i]]), 
-                         method = c("dnn", "cnn", "knn", "SVM", "naive", "RFranger", "boost", "glm"), 
+                         method = c("dnn", "cnn", "knn",  "naive", "RFranger", "boost", "glm"), 
           settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
                           cnn = list(seed = 42,   activation = "relu", 
                                      drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "../Results/simAbC.RDS")
+    saveRDS(resultC, file = "./Results/simAbC.RDS")
   }
   
   
   resultR = list()
   for(i in 1:length(sizeC)){
     resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeR[[i]], log = F), 
-                         method = c("negBinDnn", "RFranger", "SVM", "knn", "boost", "glm"), 
+                         method = c("negBinDnn", "RFranger",  "knn", "boost", "glm"), 
           settings = list(negBin = list(seed = 42, nLayer = 3L, batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"), 
@@ -254,7 +253,7 @@ if(run){
           crossValidation = crossValidation,
                         block = T, parallel = parallel, seed = 42, keepModels = T)
     
-    saveRDS(resultR, file = "../Results/simAbR.RDS")
+    saveRDS(resultR, file = "./Results/simAbR.RDS")
   }
 }
 ```

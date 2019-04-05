@@ -155,7 +155,8 @@ trainLearner.classif.keras_seq <- function(.learner, .task, .subset, .weights = 
             batch_size = batch,
             shuffle = T,
             callbacks = callbacks,
-            class_weight = cw
+            class_weight = cw,
+            verbose = 0
         )
 
 

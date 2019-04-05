@@ -15,7 +15,7 @@ getLearner <- function(method, balanceClasses, predict.type = "prob", predict.tr
     else if(method == "SVM") learner = do.call(mlr::makeLearner, c(list(cl = "regr.liquidSVM"), extra))
     else if(method == "knn") learner = do.call(mlr::makeLearner, c(list(cl = "regr.kknn"), extra))
     else if(method == "dnn") learner = do.call(mlr::makeLearner, c(list(cl = "regr.keras_seq"), extra))
-    else if(method == "RFranger") learner = do.call(mlr::makeLearner, c(list(cl = "regr.ranger", predict.type = "se"), extra))
+    else if(method == "RFranger") learner = do.call(mlr::makeLearner, c(list(cl = "regr.ranger"), extra))
     else if(method == "boost") learner = do.call(mlr::makeLearner, c(list(cl = "regr.xgboost"), extra))
     else if(method == "knnFS") learner <- mlr::makeFilterWrapper(do.call(mlr::makeLearner, c(list(cl = "regr.kknn"), extra)))
     else if(method == "cforest") learner = do.call(mlr::makeLearner, c(list(cl = "regr.cforest"), extra))

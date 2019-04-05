@@ -206,7 +206,8 @@ trainLearner.regr.negBinDnn <- function(.learner, .task, .subset, .weights = NUL
         y = matrix(y,ncol = 1, byrow = T),
         epochs = epochs,
         batch_size = batch,
-        shuffle = T
+        shuffle = T,
+        verbose = 0
     )
 
 
