@@ -80,7 +80,7 @@ buildClassification = function(method, balance, settings){
   parameter <- getPars(method, settings, extra)
   learner   <- getLearner(method, settings$balanceClasses,extra =  extra)
   if(is.null(learner)) return(NULL)
-  tune.threshold <- T
+  tune.threshold <- FALSE
 
   if(settings$tuningMetric$id == "f1") measures <- list(mlr::auc, mlr::bac, mlr::acc,settings$tuningMetric)
   else measures <- list(mlr::auc, mlr::bac, mlr::acc, mlr::f1, settings$tuningMetric)

@@ -84,13 +84,14 @@ resultBaselineC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOne
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
     saveRDS(resultBaselineC, file = "./Results/simBaselineC.RDS")
 
-resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$poisson(3e2))), 
-                         method = c("dnn", "cnn", "knn", "naive", "RFranger", "boost", "glm"), 
-          settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
-                          cnn = list(seed = 42, activation = "relu", 
-                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$poisson(3e2)),log = FALSE ), 
+                         method = c("negBinDnn", "RFranger", "knn", "boost", "glm"), 
+          settings = list(negBin = list(seed = 42, batch = 50, 
+                                        distribution = "poisson",  archFunction = "continous", epochs = epochs),
+                          boost = list( objective = "count:poisson"),
+                          glm = list(family = "poisson")),
                        tune = "random", iters = iter,  fitSpecies = F,
-                       crossValidation = crossValidation, 
+                       crossValidation = crossValidation, tuningMetric = "spearmanrho",
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
     saveRDS(resultBaselineC, file = "./Results/simBaselineR.RDS")
 ```
@@ -118,13 +119,14 @@ resultAbC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
     saveRDS(resultAbC, file = "./Results/simAbC.RDS")
     
-resultAbR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$binar(4e3))), 
-                         method = c("dnn", "cnn", "knn", "naive", "RFranger", "boost", "glm"), 
-          settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
-                          cnn = list(seed = 42, activation = "relu", 
-                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+resultAbR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$binar(4e3)),log = FALSE), 
+                         method = c("negBinDnn", "RFranger", "knn", "boost", "glm"), 
+          settings = list(negBin = list(seed = 42,  batch = 50, 
+                                        distribution = "poisson",  archFunction = "continous", epochs = epochs),
+                          boost = list( objective = "count:poisson"),
+                          glm = list(family = "poisson")),
                        tune = "random", iters = iter,  fitSpecies = F,
-                       crossValidation = crossValidation, 
+                       crossValidation = crossValidation, tuningMetric = "spearmanrho",
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
     saveRDS(resultAbR, file = "./Results/simAbR.RDS")
 ```
@@ -191,7 +193,7 @@ if(run){
   for(i in 1:length(sizeC)){
     resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeR[[i]], log = F), 
                          method = c("negBinDnn", "RFranger", "knn", "boost", "glm"), 
-          settings = list(negBin = list(seed = 42, nLayer = 3L, batch = 50, 
+          settings = list(negBin = list(seed = 42,  batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"),
                           glm = list(family = "poisson")),
@@ -250,7 +252,7 @@ resultC = list()
   for(i in 1:length(obsR)){
       resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, obsR[[i]], log = F), 
                            method = c("negBinDnn", "RFranger",  "knn", "boost", "glm"), 
-          settings = list(negBin = list(seed = 42, nLayer = 3L, batch = 50, 
+          settings = list(negBin = list(seed = 42,  batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"), 
                           glm = list(family = "poisson")),
