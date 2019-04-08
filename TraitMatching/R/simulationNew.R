@@ -379,7 +379,7 @@ simulateInteraction = function(species = NULL, main = c("A1", "B9", "B10"), inte
 #' @export
 
 
-simulate_batch = function(numberTraitsA = 6, numberTraitsB = 6, size = c(4,10), NumberA = 50, NumberB = 100,one_way = TRUE, seed = 42, cutoff = 0.5, strength_range = c(1,10)){
+simulate_batch = function(numberTraitsA = 6, numberTraitsB = 6, size = c(4,10), NumberA = 50, NumberB = 100,one_way = TRUE, seed = 42, cutoff = 0.5, strength_range = c(10,10), abundances = FALSE){
 
   cutoff = 0.5*NumberA*NumberB
 
@@ -421,7 +421,6 @@ simulate_batch = function(numberTraitsA = 6, numberTraitsB = 6, size = c(4,10), 
     matrix(runif(size[2]*x,strength_range[1], strength_range[2]),nrow = size[2])
   }, simplify = F)
 
-  cov = sapply(1:size[1], function(x) matrix(c(1,0,0,1),nrow = 2), simplify = F)
 
   simulatedData = vector("list", size[1])
 
@@ -429,8 +428,7 @@ simulate_batch = function(numberTraitsA = 6, numberTraitsB = 6, size = c(4,10), 
     for(n in 1:size[2]) simulatedData[[i]][[n]] = simulateInteraction(main = NULL, inter = matrix(TraitInter[[i]][n,], ncol = 2, byrow = T),
                                                                       weights = list(inter = TraitStrengths[[i]][n,]),
                                                                       NumberA = NumberA, NumberB = NumberB, traitsA = c(0,numberTraitsA), traitsB = c(0,numberTraitsB),
-                                                                      cov = cov,
-                                                                      abundance = FALSE, rangeDiscrete = 2:3, seed = NULL, setSeed = NULL)
+                                                                      abundance = abundances, rangeDiscrete = 2:3, seed = NULL, setSeed = NULL)
   }
   # balances are set to ~0.4 in all cases:
 

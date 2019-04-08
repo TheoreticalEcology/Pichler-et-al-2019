@@ -119,7 +119,7 @@ resultAbC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
     saveRDS(resultAbC, file = "./Results/simAbC.RDS")
     
-resultAbR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$binar(4e3)),log = FALSE), 
+resultAbR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$poisson(4e3)),log = FALSE), 
                          method = c("negBinDnn", "RFranger", "knn", "boost", "glm"), 
           settings = list(negBin = list(seed = 42,  batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),

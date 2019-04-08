@@ -66,11 +66,11 @@ for(i in 1:length(simulation$data)){
                            method = c("negBinDnn", "RF", "boost", "knn"), 
             settings = list(negBinDnn = list(seed = 42,  activation = "relu",archFunction = "continous", epochs = 60,distribution = "poisson"),
                             boost = list(objective = "count:poisson")),
-                         tune = "random", iters = 50,  fitSpecies = F,
+                         tune = "random", iters = 30,  fitSpecies = F,
                          crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
                                                 inner = list(method = "Holdout", split = 4/5, predict = "both")), 
-                         balanceClasses = "None", block = T, parallel = 50, seed = 42, keepModels = T,tuningMetric = "poisson")
-      saveRDS(resultR, file = "../Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS")
+                         balanceClasses = "None", block = T, parallel = 10, seed = 42, keepModels = T,tuningMetric = "spearmanrho")
+      saveRDS(resultR, file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS")
   }
 }
 
@@ -82,11 +82,11 @@ for(i in 1:length(simulation$data)){
                                              minOneInter(simulation$data[[i]][[n]]$binar(simulation$res[[i]][[n]]))), 
                          method = c("dnn", "RF", "boost", "knn"), 
           settings = list(dnn = list(seed = 42,  activation = "relu",drop = 0.3, archFunction = "continous", epochs = 60)),
-                       tune = "random", iters = 50,  fitSpecies = F,
+                       tune = "random", iters = 30,  fitSpecies = F,
                        crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
                                               inner = list(method = "Holdout", split = 4/5, predict = "both")), 
-                       balanceClasses = "None", block = T, parallel = 50, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "../Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS")
+                       balanceClasses = "None", block = T, parallel = 10, seed = 42, keepModels = T)
+    saveRDS(resultC, file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS")
   }
 }
 
