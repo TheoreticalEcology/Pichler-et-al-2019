@@ -131,80 +131,31 @@ write.table(cbind(round(bestTest2[,-c(6,7,12:14)], digits = 3), method = bestTes
 ## Figure 4
 
 ```{r,results=FALSE}
-load(file = "./Results/InferenceTop4Reg.RData")
-load(file = "./Results/InferenceTop4Class.RData")
+#### Figure
+resAggSmallReg = readRDS(file = "./Results/resAggSmallReg.RDS")
+resAggSmallClass = readRDS(file = "./Results/resAggSmallClass.RDS")
 
-traits =  c("A1.1", "A1.2", "A2", "A3", "A4", "A5", "B1.1", "B1.2", "B2", "B3", "B4", "B5", "B6")
-nPixel = 10
-cexP = 0.9
-cex = 0.9
-groups =list(a = c("A1.1", "A1.2", "A2", "A3", "A4", "A5", "A6"), b= c("B1.1", "B1.2", "B2", "B3", "B4", "B5", "B6"))
-true = c("A1.1:B2", "A1.2:B2", "B2:A1.1", "B2:A1.2", "A2:B3", "B3:A2", "A3:B4", "B4:A3")
+resAggMiddleReg = readRDS(file = "./Results/resAggMiddleReg.RDS")
+resAggMiddleClass = readRDS(file = "./Results/resAggMiddleClass.RDS")
 
-pdf(file = "./Figures/Fig4.pdf",width = 5.5,height = 1.7)
-reset()
-xText = 0.07
-yText = 1.13
-par(mfrow = c(1,3), mar = c(0.3,2.,1.2,1.5)+0.1,oma = c(1.3,0.1,0.5,0.0) ,xaxs = "i", yaxs = "i")
-drawRankingMatrix2(ResultClassifInteractionAb$RF,true = true, groups = groups,  cex = cex, lwd = 0.5)
-text(x = -xText, y = yText, labels = "(a)", cex = cexP, xpd = NA, font = 2)
-points(x = 0.02, y = -0.09, pch = 7, cex = 1.0, xpd = NA)
-text(x = 0.022, y = -0.09,labels = "True Matching Traits",pos = 4,font = 2, cex = cexP, xpd = NA )
-drawRankingMatrix2(ResultClassifInteractionAb$dnn,true = true, groups = groups,   cex = cex, lwd = 0.5, muteY = T)
-text(x = -xText, y = yText, labels = "(b)", cex = cexP, xpd = NA, font = 2)
-for(i in 1:9){
-  rect(ytop = -0.04,ybottom = -0.07,xleft = seq(0.0,1,length.out = 10)[i],xright = seq(0,1,length.out = 10)[i+1], col = RColorBrewer::brewer.pal(9,name = "YlGnBu")[i],border = NA, xpd = NA)
-}
-text(y= -0.07,x = seq(0, seq(0,1,length.out = 10)[9], length.out = 5)+0.03, labels = c("0 %", "25 %", "50 %", "75 %", "100 %"), pos = 1, font = 2, cex = cexP, xpd = NA)
-drawRankingMatrix2(ResultClassifInteractionAb$boost,true = true, groups = groups,cex = cex, lwd = 0.5, muteY = T)
-text(x = -xText, y = yText, labels = "(c)", cex = cexP, xpd = NA, font = 2)
+pdf(file = "./Figures/Fig4.pdf",width = 5.5,height = 3.5)
+par(mfrow = c(1,2), mar = c(1,2,0.6,0.1)+0.1,oma = c(0.0,0.2,1.2,0.1))
+plotResAgg(resAggSmallReg)
+text(xpd = NA, x = -0.1, y = 1.1, labels = "a)", font = 2)
+plotResAgg(resAggSmallClass)
+text(xpd = NA, x = -0.1, y = 1.1, labels = "b)", font = 2)
+dev.off()
+
+plotResAgg(resAggMiddleReg,labels = c("DNN", "BRT"))
+text(xpd = NA, x = -0.1, y = 1.1, labels = "c)", font = 2)
+plotResAgg(resAggMiddleClass,labels = c("DNN", "BRT"))
+text(xpd = NA, x = -0.1, y = 1.1, labels = "d)", font = 2)
 dev.off()
 
 ```
 
-<!-- ## Figure 5 -->
-<!-- ```{r,results=FALSE} -->
-<!-- load(file = "./Results/trueInteractionStructure.RData") -->
-<!-- load(file = "./Results/ALEplotsSim.RData") -->
-
-<!-- cexP = 0.9 -->
-<!-- cexP2 = 0.6 -->
-<!-- reset() -->
-<!-- pdf(file = "./Figures/Fig5.pdf", width = 5.5, height = 3.38) -->
-<!-- par(mfrow= c(3,4),xaxs = "i", yaxs = "i", mar = c(1.2,1.5,1.2,2.2), oma = c(0.0,0.8,0.0,1), mgp = c(2,0.3,0)) -->
-<!-- plotInteractionEffect(nullAbRA2, cuts = 12, heat = viridis::viridis, cexP = cexP2) -->
-
-<!-- axis(1, labels = round(seq(min(nullAbRA2$x.values[[1]]), max(nullAbRA2$x.values[[1]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
-<!--      font = 2, cex.axis = 0.5, mgp = c(2,-0.00,0), tcl = -0.2,lwd.ticks = 0.6) -->
-<!-- axis(2, labels = round(seq(min(nullAbRA2$x.values[[2]]), max(nullAbRA2$x.values[[2]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
-<!--      font = 2, cex.axis = 0.5,mgp = c(2,0.3,0), tcl = -0.2,lwd.ticks = 0.6, las = 2) -->
-<!-- text(x = 0.5, y = -0.08, pos = 1, labels = "A2", xpd = NA, cex = cexP, font = 2) -->
-<!-- text(x = -0.11, y = 0.5, pos = 2, labels = "B3", xpd = NA, cex = cexP, font = 2) -->
-<!-- text(x = 0.04, y = 1.1, labels = "(a)", cex = cexP, xpd = NA, font = 2) -->
-<!-- for(x in 1:3){ -->
-<!--   plotInteractionEffect(A2_B3_Regressor[[x]], cuts = 12, heat = viridis::viridis, cexP = cexP2) -->
-<!--   text(x = 0.04, y = 1.1, labels = c("(b)", "(c)", "(d)")[x], cex = cexP, xpd = NA, font = 2) -->
-<!-- } -->
 
 
-<!-- plotInteractionEffect(nullAbRA3, cuts = 12, heat = viridis::viridis, cexP = cexP2) -->
-<!-- axis(1, labels = round(seq(min(nullAbRA3$x.values[[1]]), max(nullAbRA3$x.values[[1]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
-<!--      font = 2, cex.axis = 0.5, mgp = c(2,0.00,0), tcl = -0.2,lwd.ticks = 0.6) -->
-<!-- axis(2, labels = round(seq(min(nullAbRA3$x.values[[2]]), max(nullAbRA3$x.values[[2]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
-<!--      font = 2, cex.axis = 0.5,mgp = c(2,0.3,0), tcl = -0.2,lwd.ticks = 0.6, las = 2) -->
-<!-- text(x = 0.5, y = -0.10, pos = 1, labels = "A3", xpd = NA, cex = cexP, font = 2) -->
-<!-- text(x = -0.11, y = 0.5, pos = 2, labels = "B4", xpd = NA, cex = cexP, font = 2) -->
-<!-- .s = lapply(A3_B4_Regressor, function(x) plotInteractionEffect(x, cuts = 12, heat = viridis::viridis, cexP = cexP2)) -->
-
-<!-- par(mgp = c(0.5,0.5,0)) -->
-<!-- plotInteractionEffect(nullAbRA1, cuts = 12, heat = viridis::viridis, cexP = cexP2) -->
-<!-- axis(2, labels = round(seq(min(nullAbRA1$x.values[[2]]), max(nullAbRA1$x.values[[2]]), length.out = 8),1),at = seq(0,1, length.out = 8),  -->
-<!--      font = 2, cex.axis = 0.5,mgp = c(2,0.3,0), tcl = -0.2,lwd.ticks = 0.6, las = 2) -->
-<!-- text(x = c(0.25, 0.75), y = 0.02, pos = 1, labels = c("A1.1", "A1.2"), font = 2, cex = cexP, xpd = NA) -->
-<!-- text(x = -0.11, y = 0.5, pos = 2, labels = "B2", xpd = NA, cex = cexP, font = 2) -->
-<!-- .s = lapply(A1_B2_Regressor, function(x) plotInteractionEffect(x, cuts = 12, heat = viridis::viridis, cexP = cexP2)) -->
-<!-- dev.off() -->
-<!-- ``` -->
 
 
 ## Figure 5

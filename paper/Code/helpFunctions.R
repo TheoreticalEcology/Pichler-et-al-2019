@@ -955,7 +955,10 @@ aggregate_interaction_result = function(model_result = NULL, inter_results = NUL
 
 extract_interaction_result = function(model_result, inter_results, trait_inter, trait_strengths){
   
-  if(model_result$Result[[1]]$result$task.desc$type == "regr") perf = "poisson"
+  if(model_result$Result[[1]]$result$task.desc$type == "regr") {
+    perf = "poisson"
+    if(!perf %in%  names(model_result$Result[[1]]$result$measures.test)) perf = "spearmanrho"
+  }
   else perf = "auc"
   
   result = data.frame()

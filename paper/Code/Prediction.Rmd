@@ -93,7 +93,7 @@ resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOne
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, tuningMetric = "spearmanrho",
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultBaselineC, file = "./Results/simBaselineR.RDS")
+    saveRDS(resultBaselineR, file = "./Results/simBaselineR.RDS")
 ```
 
 ### Without effects but with abundances - baseline with abundances
@@ -379,7 +379,7 @@ save(rmse, rmseAB, rmseObs, spear,spearAB,spearGenObs, spearGenSize,tss,tssAB,ts
 ```{r}
 set.seed(42)
 library(dplyr)
-plantPollRaw<-read.csv("../Data/Raw/traits2_florian.csv",sep=";")
+plantPollRaw<-read.csv("./Data/Raw/traits2_florian.csv",sep=";")
 
 plantTraitsRaw<-plantPollRaw[,1:11]
 insectTraitsRaw<-plantPollRaw[,12:ncol(plantPollRaw)]
@@ -393,7 +393,7 @@ interactionMatrix<-as.data.frame.matrix(interactionMatrix)
 
 data = TraitMatching::createCommunity(plantTraitsRaw, insectTraitsRaw, z = interactionMatrix)
 
-saveRDS(data, file = "../Data/plantPoll.RDS")
+saveRDS(data, file = "./Data/plantPoll.RDS")
 
 ```
 
@@ -409,7 +409,7 @@ library(TraitMatching)
 library(tidyverse)
 oldpar = par()
 reset = function() suppressWarnings(do.call(par, oldpar))
-source("../Code/helpFunctions.R")
+source("./Code/helpFunctions.R")
 ```
 
 ### Train models
@@ -425,16 +425,16 @@ if(run){
   
   
   
-  cC = readRDS(file = "../Data/plantPoll.RDS")
+  cC = readRDS(file = "./Data/plantPoll.RDS")
   
   
   result = runTM(cC, tune = "random", iters = iter, tuningMetric = "auc", crossValidation = cv, block = T, parallel = parallel, fitSpecies = F, balanceClasses = c("Over", "SMOTE", "Under"),
-                 method = c("dnn", "cnn", "RFranger", "boost", "SVM", "knn","naive", "glm"),
+                 method = c("dnn", "cnn", "RFranger", "boost", "knn","naive", "glm"),
                  seed = 42,settings =  list(
-                   dnn = list(seed = 42, arch = 30L, opti = "sgd", drop = 0.3, archFunction = "continous",batch = 50L, epochs = epochs),
-                   cnn = list(seed = 42, arch = 30L, opti = "sgd", drop = 0.3, archFunction = "continous",batch = 50L, kernel_size = 2, epochs = epochs)
+                   dnn = list(seed = 42, opti = "sgd", drop = 0.3, archFunction = "continous",batch = 50L, epochs = epochs),
+                   cnn = list(seed = 42, opti = "sgd", drop = 0.3, archFunction = "continous",batch = 50L, kernel_size = 2, epochs = epochs)
                  ))
-  saveRDS(result, file = "../Results/CaseStudy1.RDS")
+  saveRDS(result, file = "./Results/CaseStudy1.RDS")
   
 }
 ```

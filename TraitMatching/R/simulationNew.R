@@ -379,7 +379,8 @@ simulateInteraction = function(species = NULL, main = c("A1", "B9", "B10"), inte
 #' @export
 
 
-simulate_batch = function(numberTraitsA = 6, numberTraitsB = 6, size = c(4,10), NumberA = 50, NumberB = 100,one_way = TRUE, seed = 42, cutoff = 0.5, strength_range = c(10,10), abundances = FALSE){
+simulate_batch = function(numberTraitsA = 6, numberTraitsB = 6, size = c(4,10), NumberA = 50, NumberB = 100,
+                          one_way = TRUE, seed = 42, cutoff = 0.5, strength_range = c(10,10), abundances = FALSE, specRange = c(0.5,1.2)){
 
   cutoff = 0.5*NumberA*NumberB
 
@@ -428,7 +429,7 @@ simulate_batch = function(numberTraitsA = 6, numberTraitsB = 6, size = c(4,10), 
     for(n in 1:size[2]) simulatedData[[i]][[n]] = simulateInteraction(main = NULL, inter = matrix(TraitInter[[i]][n,], ncol = 2, byrow = T),
                                                                       weights = list(inter = TraitStrengths[[i]][n,]),
                                                                       NumberA = NumberA, NumberB = NumberB, traitsA = c(0,numberTraitsA), traitsB = c(0,numberTraitsB),
-                                                                      abundance = abundances, rangeDiscrete = 2:3, seed = NULL, setSeed = NULL)
+                                                                      abundance = abundances, rangeDiscrete = 2:3, seed = NULL, setSeed = NULL, specRange = specRange)
   }
   # balances are set to ~0.4 in all cases:
 
@@ -441,7 +442,7 @@ simulate_batch = function(numberTraitsA = 6, numberTraitsB = 6, size = c(4,10), 
   counter = 1
   for(i in 1:size[1]){
     for(n in 1:size[2]) {
-      testObs = max(strength_range)^-1 * seq(0.1,4000,by = 0.1)
+      testObs = max(strength_range)^-1 * seq(0.0001,4000,length.out = 1e5)
       for(j in testObs) {
         preOpt = optObserv(j,i,n)
         tmp = j
@@ -491,5 +492,8 @@ simulate_batch = function(numberTraitsA = 6, numberTraitsB = 6, size = c(4,10), 
 
 
 
-
+# library(TraitMatching)
+# set.seed(42)
+# simulation = simulate_batch(numberTraitsA = 7, numberTraitsB = 7, one_way = TRUE, NumberA = 25, NumberB = 50,
+#                             cutoff = 0.5, strength_range = c(10,10))
 
