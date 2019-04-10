@@ -269,18 +269,49 @@ resultC = list()
 
 
 
-##  Results
+##  MResults
 ```{r, echo = FALSE,results=FALSE}
 if(run){
-  ResultSizeC = readRDS(file = "../Results/simSizeC.RDS")
-  ResultSizeR = readRDS(file = "../Results/simSizeR.RDS")
+  ResultSizeC = readRDS(file = "./Results/simSizeC.RDS")
+  ResultSizeR = readRDS(file = "./Results/simSizeR.RDS")
   
-  ResultObsC = readRDS(file = "../Results/simObsC.RDS")
-  ResultObsR = readRDS(file = "../Results/simObsR.RDS")
+  ResultObsC = readRDS(file = "./Results/simObsC.RDS")
+  ResultObsR = readRDS(file = "./Results/simObsR.RDS")
   
-  ResultAbC = readRDS(file = "../Results/simAbC.RDS")
-  ResultAbR = readRDS(file = "../Results/simAbR.RDS")
-  source("../Code/helpFunctions.R")
+  ResultAbC = readRDS(file = "./Results/simAbC.RDS")
+  ResultAbR = readRDS(file = "./Results/simAbR.RDS")
+  
+  ResultBaselineC = readRDS(file = "./Results/simBaselineC.RDS")
+  ResultBaselineR = readRDS(file = "./Results/simBaselineR.RDS")
+  
+  ResultSizeC_SVM = readRDS(file = "./Results/simSizeC_SVM.RDS")
+  ResultSizeR_SVM = readRDS(file = "./Results/simSizeR_SVM.RDS")
+  
+  ResultObsC_SVM = readRDS(file = "./Results/simObsC_SVM.RDS")
+  ResultObsR_SVM = readRDS(file = "./Results/simObsR_SVM.RDS")
+  
+  ResultAbC_SVM = readRDS(file = "./Results/simAbC_SVM.RDS")
+  ResultAbR_SVM = readRDS(file = "./Results/simAbR_SVM.RDS")
+  
+  ResultBaselineC_SVM = readRDS(file = "./Results/simBaselineC_SVM.RDS")
+  ResultBaselineR_SVM = readRDS(file = "./Results/simBaselineR_SVM.RDS")
+  source("./Code/helpFunctions.R")
+  
+  for(i in 1:3){
+    ResultSizeC[[i]]$Result[["SVM"]] = ResultSizeC_SVM[[i]]$Result$SVM
+    ResultSizeR[[i]]$Result[["SVM"]] = ResultSizeR_SVM[[i]]$Result$SVM
+    
+    ResultObsC[[i]]$Result[["SVM"]] = ResultObsC_SVM[[i]]$Result$SVM
+    ResultObsR[[i]]$Result[["SVM"]] = ResultObsR_SVM[[i]]$Result$SVM
+  }
+  
+  ResultBaselineC$Result[["SVM"]] = ResultSizeBaselineC_SVM$Result$SVM
+  ResultBaselineR$Result[["SVM"]] = ResultSizeBaselineR_SVM$Result$SVM
+  
+  ResultAbR$Result[["SVM"]] = ResultAbR_SVM$Result$SVM
+  ResultAbC$Result[["SVM"]] = ResultAbC_SVM$Result$SVM
+
+  
 }
 ```
 
@@ -292,22 +323,22 @@ if(run){
                           function(x) return(tune(x, tuneT = tss, bc = "None", onlyTest = F)))
   ResultObsCagg = lapply(ResultObsC, 
                          function(x) return(tune(x, TraitMatching::tss,"None", onlyTest = F)))
-  ResultAbCagg = lapply(ResultAbC, 
-                        function(x) return(tune(x, tuneT = TraitMatching::tss, bc = "None", onlyTest = F)))
+  ResultAbCagg = tune(ResultAbC, tuneT = TraitMatching::tss, bc = "None", onlyTest = F)
+  
+  ResultBaselineCagg = tune(ResultBaselineC, tuneT = TraitMatching::tss, bc = "None", onlyTest = F) 
   
   tune = tuneAndAggregateRegression
   ResultSizeRagg = lapply(ResultSizeR, 
-                          function(x) return(tune(x,
-                                                                        onlyTest = F)))
+                          function(x) return(tune(x,onlyTest = F)))
   ResultObsRagg = lapply(ResultObsR, 
-                         function(x) return(tune(x, 
-                                                                       onlyTest = F)))
-  ResultAbRagg = lapply(ResultAbR, 
-                        function(x) return(tune(x, 
-                                                                      onlyTest = F)))
+                         function(x) return(tune(x, onlyTest = F))
+                         )
+  ResultAbRagg = tune(ResultAbR, onlyTest = F)
+  ResultBaselineRagg = tune(ResultBaselineR, onlyTest = F) 
+
   
-  save(ResultSizeCagg, ResultObsCagg,ResultSizeRagg,ResultObsRagg,ResultAbCagg,ResultAbRagg, 
-       file = "../Results/ResultsSimulationAgg.RData")
+  save(ResultSizeCagg, ResultSizeRagg,ResultObsRagg, ResultObsCagg, ResultAbCagg, ResultAbRagg, ResultBaselineCagg, ResultBaselineRagg,
+       file = "./Results/ResultsSimulationAgg.RData")
 }
 ```
 
@@ -419,7 +450,7 @@ Training was splitted due to high computional cost
 - Nested cross-validation: ten-fold outer and three-fold inner with leaving out insect species+all of their interactions
 
 ```{r,results=FALSE}
-run = TRUE
+set.seed(42)
 if(run){
   cv = list(outer = list(method = "SpCV", iters = 10, predict = "both"), inner = list(method = "SpCV", iters = 5))
   
@@ -430,10 +461,9 @@ if(run){
   
   result = runTM(cC, tune = "random", iters = iter, tuningMetric = "auc", crossValidation = cv, block = T, parallel = parallel, fitSpecies = F, balanceClasses = c("Over", "SMOTE", "Under"),
                  method = c("dnn", "cnn", "RFranger", "boost", "knn","naive", "glm"),
-                 seed = 42,settings =  list(
-                   dnn = list(seed = 42, opti = "sgd", drop = 0.3, archFunction = "continous",batch = 50L, epochs = epochs),
-                   cnn = list(seed = 42, opti = "sgd", drop = 0.3, archFunction = "continous",batch = 50L, kernel_size = 2, epochs = epochs)
-                 ))
+                settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
+                          cnn = list(seed = 42, activation = "relu", drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs))
+                )
   saveRDS(result, file = "./Results/CaseStudy1.RDS")
   
 }

@@ -371,7 +371,7 @@ tuneAndAggregateRegression = function(combinedResults = NULL, measures = list(rm
   ResultsTss = list()
   
   for(n in names(combinedResults$Result)){
-    
+    print(n)
     tmp = getRRPredictions(combinedResults$Result[[n]]$result)
     iter = length(tmp$instance$train.inds )
     train = data.frame(matrix(0,iter,2))
