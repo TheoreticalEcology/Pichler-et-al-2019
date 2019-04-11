@@ -6,7 +6,8 @@
 \usage{
 simulate_batch(numberTraitsA = 6, numberTraitsB = 6, size = c(4, 10),
   NumberA = 50, NumberB = 100, one_way = TRUE, seed = 42,
-  cutoff = 0.5, strength_range = c(1, 10))
+  cutoff = 0.5, strength_range = c(10, 10), abundances = FALSE,
+  specRange = c(0.5, 1.2))
 }
 \arguments{
 \item{numberTraitsA}{number traits a}

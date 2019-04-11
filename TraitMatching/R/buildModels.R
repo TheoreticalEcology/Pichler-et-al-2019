@@ -97,8 +97,9 @@ buildClassification = function(method, balance, settings){
   else resampleValidation <- settings$crossValidation$outer
   mlr::configureMlr(show.info = F)
 
-  if(!method == "glm") learnerR <- mlr::makeTuneWrapper(learner = learner, resampling = tuningValidation, par.set = parameter, control = tuneCtrl, measures = settings$tuningMetric)
-  else learnerR <- mlr::makeFeatSelWrapper(learner = learner, resampling = tuningValidation,  control = mlr::makeFeatSelControlSequential(method = "sfbs"), measures = aic)
+ # if(!method == "glm")
+  learnerR <- mlr::makeTuneWrapper(learner = learner, resampling = tuningValidation, par.set = parameter, control = tuneCtrl, measures = settings$tuningMetric)
+ # else learnerR <- mlr::makeFeatSelWrapper(learner = learner, resampling = tuningValidation,  control = mlr::makeFeatSelControlSequential(method = "sfbs"), measures = aic)
 
   modelFunction <- function(classCommunity) {
     parallelSetup(classCommunity$settings)

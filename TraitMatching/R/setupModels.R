@@ -43,7 +43,7 @@ getLearner <- function(method, balanceClasses, predict.type = "prob", predict.tr
     else if(method == "wideDeep") learner = do.call(mlr::makeLearner, c(list(cl = "classif.wideDeep", predict.type = predict.type), extra))
     else if(method == "preDnn") learner = do.call(mlr::makeLearner, c(list(cl = "classif.preKeras", predict.type = predict.type), extra))
     else if(method == "RFsrc") learner = do.call(mlr::makeLearner, c(list(cl = "classif.randomForestSRC", predict.type = predict.type), extra, list(importance = TRUE, proximity = "all")))
-    else if(method == "glm") learner = do.call(mlr::makeLearner, c(list(cl = "classif.binomial", predict.type = predict.type), extra, model = TRUE))
+    else if(method == "glm") learner = do.call(mlr::makeLearner, c(list(cl = "classif.binomial_self", predict.type = predict.type), extra, model = TRUE))
 
       if(balanceClasses == "Over") return(mlr::makeOversampleWrapper(learner))
       else if(balanceClasses == "Under") return(mlr::makeUndersampleWrapper(learner))
@@ -217,6 +217,10 @@ getPars <- function(method, settings = NULL, extra = NULL){
 
   if(method == "cforest") parameter <- ParamHelpers::makeParamSet(ParamHelpers::makeIntegerParam("mtry",lower = 2,upper = sum(settings$split) - 1),
                                                                   ParamHelpers::makeIntegerParam("minsplit",lower = 5,upper = 50))
+
+  if(method == "glm") parameter = ParamHelpers::makeParamSet(ParamHelpers::makeDiscreteParam("link", values = c("logit", "probit")),
+                                                             ParamHelpers::makeLogicalParam("stepAIC", default = TRUE),
+                                                             ParamHelpers::makeLogicalParam("secondOrderInteractions", default = TRUE))
 
 
   if(!is.null(extra)){
