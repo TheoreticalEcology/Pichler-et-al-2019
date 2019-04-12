@@ -9,7 +9,7 @@
 
 showInfo <- function(learner = NULL, models = T, onlyModels = F, onlyMeasures = F, onlyBC = F){
   info <- list()
-  info$availableModels <- c("RF","glm", "SVM", "gbm","RFsrc","knn", "naive", "knnFS", "dnn", "RFranger", "boost", "cforest", "cnn", "wideDeep","preDnn","negBinDnn", "multiNomDnn", "poissonDnn")
+  info$availableModels <- c("RF","glm", "glm_step","SVM", "gbm","RFsrc","knn", "naive", "knnFS", "dnn", "RFranger", "boost", "cforest", "cnn", "wideDeep","preDnn","negBinDnn", "multiNomDnn", "poissonDnn")
 
   if(onlyBC) return(c("Over", "Under", "SMOTE", "WeightedClasses", "None","Over+WC", "Regression"))
 

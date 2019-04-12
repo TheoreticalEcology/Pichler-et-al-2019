@@ -27,7 +27,9 @@ getLearner <- function(method, balanceClasses, predict.type = "prob", predict.tr
     else if(method == "multiNomDnn") learner = do.call(mlr::makeLearner, c(list(cl = "regr.multiNomDnn"), extra))
     else if(method == "gbm") learner = do.call(mlr::makeLearner, c(list(cl = "regr.gbm"), extra))
     else if(method == "RFsrc") learner = do.call(mlr::makeLearner, c(list(cl = "regr.randomForestSRC"), extra, list(importance = TRUE, proximity = "all")))
-    else if(method == "glm") learner = do.call(mlr::makeLearner, c(list(cl = "regr.glm"), extra, model = TRUE))
+    else if(method == "glm") learner = do.call(mlr::makeLearner, c(list(cl = "regr.glm_self"), extra, model = TRUE))
+    else if(method == "glm_step") learner = do.call(mlr::makeLearner, c(list(cl = "regr.glm_self"), extra, model = TRUE))
+
 
   } else {
     if(method == "RF") learner = do.call(mlr::makeLearner, c(list(cl = "classif.randomForest", predict.type = predict.type, importance = TRUE), extra))
@@ -44,17 +46,19 @@ getLearner <- function(method, balanceClasses, predict.type = "prob", predict.tr
     else if(method == "preDnn") learner = do.call(mlr::makeLearner, c(list(cl = "classif.preKeras", predict.type = predict.type), extra))
     else if(method == "RFsrc") learner = do.call(mlr::makeLearner, c(list(cl = "classif.randomForestSRC", predict.type = predict.type), extra, list(importance = TRUE, proximity = "all")))
     else if(method == "glm") learner = do.call(mlr::makeLearner, c(list(cl = "classif.binomial_self", predict.type = predict.type), extra, model = TRUE))
+    else if(method == "glm_step") learner = do.call(mlr::makeLearner, c(list(cl = "classif.binomial_self", predict.type = predict.type), extra, model = TRUE))
 
-      if(balanceClasses == "Over") return(mlr::makeOversampleWrapper(learner))
-      else if(balanceClasses == "Under") return(mlr::makeUndersampleWrapper(learner))
-      else if(balanceClasses == "SMOTE") return(mlr::makeSMOTEWrapper(learner))
-      else if(balanceClasses == "OverBagging") return(mlr::makeOverBaggingWrapper(getLearner(method, balanceClasses = F, predict.type = "response")))
-      else if(balanceClasses == "WeightedClasses"){
-        if(!method %in% c("knn", "knnFS", "naive", "wideDeep")) return(mlr::makeWeightedClassesWrapper(learner))
-        else return(NULL)
-      }
-      else if(balanceClasses == "Over+WC") return(mlr::makeOversampleWrapper(mlr::makeWeightedClassesWrapper(learner)))
-      else return(learner)
+
+    if(balanceClasses == "Over") return(mlr::makeOversampleWrapper(learner))
+    else if(balanceClasses == "Under") return(mlr::makeUndersampleWrapper(learner))
+    else if(balanceClasses == "SMOTE") return(mlr::makeSMOTEWrapper(learner))
+    else if(balanceClasses == "OverBagging") return(mlr::makeOverBaggingWrapper(getLearner(method, balanceClasses = F, predict.type = "response")))
+    else if(balanceClasses == "WeightedClasses"){
+      if(!method %in% c("knn", "knnFS", "naive", "wideDeep")) return(mlr::makeWeightedClassesWrapper(learner))
+      else return(NULL)
+    }
+    else if(balanceClasses == "Over+WC") return(mlr::makeOversampleWrapper(mlr::makeWeightedClassesWrapper(learner)))
+    else return(learner)
   }
 
 }
@@ -82,33 +86,33 @@ getPars <- function(method, settings = NULL, extra = NULL){
   )
 
   if(method == "negBinDnn") parameter <- ParamHelpers::makeParamSet(
-                                              ParamHelpers::makeNumericParam("lr", 0.00001, 0.01),
-                                              ParamHelpers::makeIntegerParam("arch",  lower = 5, upper = 50L),
-                                              ParamHelpers::makeIntegerParam("nLayer", lower = 1L, upper  = 6L),
-                                              ParamHelpers::makeLogicalParam("bias", default = TRUE),
-                                              ParamHelpers::makeDiscreteParam(id = "archFunction", values = c("negExp", "continous")),
-                                              ParamHelpers::makeIntegerParam(id = "batch", lower = 5, upper = 200),
-                                              ParamHelpers::makeDiscreteParam(id = "opti", values = c("rmsprop", "adam")),
-                                              ParamHelpers::makeDiscreteParam(id = "distribution", values = c("poisson", "negBin")),
-                                              ParamHelpers::makeLogicalParam(id = "Link", default = TRUE)
+    ParamHelpers::makeNumericParam("lr", 0.00001, 0.01),
+    ParamHelpers::makeIntegerParam("arch",  lower = 5, upper = 50L),
+    ParamHelpers::makeIntegerParam("nLayer", lower = 1L, upper  = 6L),
+    ParamHelpers::makeLogicalParam("bias", default = TRUE),
+    ParamHelpers::makeDiscreteParam(id = "archFunction", values = c("negExp", "continous")),
+    ParamHelpers::makeIntegerParam(id = "batch", lower = 5, upper = 200),
+    ParamHelpers::makeDiscreteParam(id = "opti", values = c("rmsprop", "adam")),
+    ParamHelpers::makeDiscreteParam(id = "distribution", values = c("poisson", "negBin")),
+    ParamHelpers::makeLogicalParam(id = "Link", default = TRUE)
 
   )
   if(method == "multiNomDnn") parameter <- ParamHelpers::makeParamSet(
-                                                  ParamHelpers::makeNumericParam("lr", 0.0001, 0.01),
-                                                  ParamHelpers::makeIntegerParam("arch",  lower = 5, upper = 30),
-                                                  ParamHelpers::makeNumericParam("drop",  lower = 0.2, upper = 0.5),
-                                                  ParamHelpers::makeIntegerParam("nLayer", lower = 1L, upper  = 5L),
-                                                  ParamHelpers::makeLogicalParam("bias", default = TRUE),
-                                                  ParamHelpers::makeDiscreteParam(id = "archFunction", values = c("negExp", "continous")),
-                                                  ParamHelpers::makeIntegerParam(id = "batch", lower = 1, upper = 30),
-                                                  ParamHelpers::makeDiscreteParam(id = "opti", values = c("rmsprop", "adam")),
-                                                  ParamHelpers::makeLogicalParam(id = "correct", default = FALSE)
+    ParamHelpers::makeNumericParam("lr", 0.0001, 0.01),
+    ParamHelpers::makeIntegerParam("arch",  lower = 5, upper = 30),
+    ParamHelpers::makeNumericParam("drop",  lower = 0.2, upper = 0.5),
+    ParamHelpers::makeIntegerParam("nLayer", lower = 1L, upper  = 5L),
+    ParamHelpers::makeLogicalParam("bias", default = TRUE),
+    ParamHelpers::makeDiscreteParam(id = "archFunction", values = c("negExp", "continous")),
+    ParamHelpers::makeIntegerParam(id = "batch", lower = 1, upper = 30),
+    ParamHelpers::makeDiscreteParam(id = "opti", values = c("rmsprop", "adam")),
+    ParamHelpers::makeLogicalParam(id = "correct", default = FALSE)
 
   )
   if(method == "RFsrc") parameter = ParamHelpers::makeParamSet(ParamHelpers::makeIntegerParam("mtry" , lower = 2,upper = length(settings$fitVariables) - 1 ),
                                                                ParamHelpers::makeIntegerParam("nodesize",lower = 2,upper = 50),
                                                                ParamHelpers::makeIntegerParam("nodedepth",lower = 2,upper = 50)
-                                                               )
+  )
 
   if(method == "RF") parameter <- ParamHelpers::makeParamSet(ParamHelpers::makeIntegerParam("mtry",lower = 2,upper = length(settings$fitVariables) - 1),         #Parameter zu tunen
                                                              ParamHelpers::makeIntegerParam("nodesize",lower = 2,upper = 50),
@@ -134,56 +138,56 @@ getPars <- function(method, settings = NULL, extra = NULL){
 
   if(method == "dnn") {
     if(settings$balanceClasses != "Regression") parameter <- ParamHelpers::makeParamSet(
-                                                              ParamHelpers::makeNumericParam("lr", 0.0001, 0.01),
-                                                                ParamHelpers::makeIntegerParam("arch",  lower = 5, upper = 50L),
-                                                                ParamHelpers::makeNumericParam("drop",  lower = 0.2, upper = 0.5),
-                                                                ParamHelpers::makeIntegerParam("nLayer", lower = 1L, upper  = 5L),
-                                                              ParamHelpers::makeLogicalParam("bias", default = TRUE),
-                                                                ParamHelpers::makeDiscreteParam("activation", values = c("relu", "elu", "LeakyRelu")),
-                                                                ParamHelpers::makeDiscreteParam(id = "archFunction", values = c("negExp", "continous")),
-                                                              ParamHelpers::makeIntegerParam(id = "batch", lower = 30, upper = 100),
-                                                              ParamHelpers::makeNumericParam(id = "decay", lower = 0.9,  0.99),
-                                                              ParamHelpers::makeNumericParam(id = "alpha", lower = 0.05,  0.3),
-                                                              ParamHelpers::makeDiscreteParam(id = "opti", values = c("sgd", "adamax"))
+      ParamHelpers::makeNumericParam("lr", 0.0001, 0.01),
+      ParamHelpers::makeIntegerParam("arch",  lower = 5, upper = 50L),
+      ParamHelpers::makeNumericParam("drop",  lower = 0.2, upper = 0.5),
+      ParamHelpers::makeIntegerParam("nLayer", lower = 1L, upper  = 5L),
+      ParamHelpers::makeLogicalParam("bias", default = TRUE),
+      ParamHelpers::makeDiscreteParam("activation", values = c("relu", "elu", "LeakyRelu")),
+      ParamHelpers::makeDiscreteParam(id = "archFunction", values = c("negExp", "continous")),
+      ParamHelpers::makeIntegerParam(id = "batch", lower = 30, upper = 100),
+      ParamHelpers::makeNumericParam(id = "decay", lower = 0.9,  0.99),
+      ParamHelpers::makeNumericParam(id = "alpha", lower = 0.05,  0.3),
+      ParamHelpers::makeDiscreteParam(id = "opti", values = c("sgd", "adamax"))
 
-                                                                )
+    )
     else parameter <- ParamHelpers::makeParamSet(
-                                                  ParamHelpers::makeNumericParam("lr", 0.0001, 0.01),
-                                                  ParamHelpers::makeIntegerParam("arch",  lower = 5L, upper = 30L),
-                                                  ParamHelpers::makeNumericParam("drop",  lower = 0.2, upper = 0.5),
-                                                  ParamHelpers::makeIntegerParam("nLayer", lower = 1L, upper  = 5L),
-                                                  ParamHelpers::makeLogicalParam("bias", default = TRUE),
-                                                  ParamHelpers::makeDiscreteParam(id = "archFunction", values = c("negExp", "continous")),
-                                                  ParamHelpers::makeIntegerParam(id = "batch", lower = 5, upper = 50),
-                                                  ParamHelpers::makeDiscreteParam(id = "opti", values = c("sgd", "adamax", "rmsprop")),
-                                                  ParamHelpers::makeLogicalParam(id = "logTarget", default = FALSE)
-                                                )
+      ParamHelpers::makeNumericParam("lr", 0.0001, 0.01),
+      ParamHelpers::makeIntegerParam("arch",  lower = 5L, upper = 30L),
+      ParamHelpers::makeNumericParam("drop",  lower = 0.2, upper = 0.5),
+      ParamHelpers::makeIntegerParam("nLayer", lower = 1L, upper  = 5L),
+      ParamHelpers::makeLogicalParam("bias", default = TRUE),
+      ParamHelpers::makeDiscreteParam(id = "archFunction", values = c("negExp", "continous")),
+      ParamHelpers::makeIntegerParam(id = "batch", lower = 5, upper = 50),
+      ParamHelpers::makeDiscreteParam(id = "opti", values = c("sgd", "adamax", "rmsprop")),
+      ParamHelpers::makeLogicalParam(id = "logTarget", default = FALSE)
+    )
   }
   if(method == "cnn") parameter <- ParamHelpers::makeParamSet(
-                                                              ParamHelpers::makeNumericParam("lr",lower =  0.0001, upper =  0.01),
-                                                                ParamHelpers::makeIntegerParam("arch",  lower = 10, upper = 80),
-                                                                ParamHelpers::makeNumericParam("drop",  lower = 0.2, upper = 0.5),
-                                                                ParamHelpers::makeIntegerParam("filter", lower = 8,upper = 30),
-                                                                ParamHelpers::makeLogicalParam("bias", default = TRUE),
-                                                                ParamHelpers::makeDiscreteParam(id = "pool", values = c("max", "average")),
-                                                              ParamHelpers::makeIntegerParam(id = "nLayer", lower = 1L, upper  = 1L),
-                                                              ParamHelpers::makeIntegerParam(id = "nConv", lower = 1, upper = 2),
-                                                              ParamHelpers::makeDiscreteParam("activation", values = c("relu", "elu")),
-                                                              ParamHelpers::makeDiscreteParam(id = "archFunction", values = c("negExp",  "continous")),
-                                                              ParamHelpers::makeIntegerParam(id = "batch", lower = 30, upper = 100),
-                                                              ParamHelpers::makeNumericParam(id = "decay", lower = 0.9,  0.99),
-                                                              ParamHelpers::makeDiscreteParam(id = "opti", values = c("sgd", "adamax"))
-                                                              )
+    ParamHelpers::makeNumericParam("lr",lower =  0.0001, upper =  0.01),
+    ParamHelpers::makeIntegerParam("arch",  lower = 10, upper = 80),
+    ParamHelpers::makeNumericParam("drop",  lower = 0.2, upper = 0.5),
+    ParamHelpers::makeIntegerParam("filter", lower = 8,upper = 30),
+    ParamHelpers::makeLogicalParam("bias", default = TRUE),
+    ParamHelpers::makeDiscreteParam(id = "pool", values = c("max", "average")),
+    ParamHelpers::makeIntegerParam(id = "nLayer", lower = 1L, upper  = 1L),
+    ParamHelpers::makeIntegerParam(id = "nConv", lower = 1, upper = 2),
+    ParamHelpers::makeDiscreteParam("activation", values = c("relu", "elu")),
+    ParamHelpers::makeDiscreteParam(id = "archFunction", values = c("negExp",  "continous")),
+    ParamHelpers::makeIntegerParam(id = "batch", lower = 30, upper = 100),
+    ParamHelpers::makeNumericParam(id = "decay", lower = 0.9,  0.99),
+    ParamHelpers::makeDiscreteParam(id = "opti", values = c("sgd", "adamax"))
+  )
   if(method == "preDnn")parameter <- ParamHelpers::makeParamSet(
-                                                                ParamHelpers::makeNumericParam("lr", 0.0001, 0.01),
-                                                                ParamHelpers::makeLogicalParam("bias", default = TRUE),
-                                                                    ParamHelpers::makeIntegerParam("arch",  lower = 5, upper = 50),
-                                                                    ParamHelpers::makeIntegerParam("nLayer", lower = 1L, upper  = 3L),
-                                                                    ParamHelpers::makeDiscreteParam("activation", values = c("relu", "elu", "LeakyRelu")),
-                                                                   # ParamHelpers::makeDiscreteParam(id = "archFunction", values = c("negExp", "parable", "continous")),
-                                                                ParamHelpers::makeIntegerParam(id = "batch", lower = 10, upper = 50),
-                                                                ParamHelpers::makeNumericParam(id = "decay", lower = 0.9,  0.99),
-                                                                ParamHelpers::makeNumericParam(id = "alpha", lower = 0.05,  0.3)
+    ParamHelpers::makeNumericParam("lr", 0.0001, 0.01),
+    ParamHelpers::makeLogicalParam("bias", default = TRUE),
+    ParamHelpers::makeIntegerParam("arch",  lower = 5, upper = 50),
+    ParamHelpers::makeIntegerParam("nLayer", lower = 1L, upper  = 3L),
+    ParamHelpers::makeDiscreteParam("activation", values = c("relu", "elu", "LeakyRelu")),
+    # ParamHelpers::makeDiscreteParam(id = "archFunction", values = c("negExp", "parable", "continous")),
+    ParamHelpers::makeIntegerParam(id = "batch", lower = 10, upper = 50),
+    ParamHelpers::makeNumericParam(id = "decay", lower = 0.9,  0.99),
+    ParamHelpers::makeNumericParam(id = "alpha", lower = 0.05,  0.3)
   )
   if(method == "wideDeep") parameter <- ParamHelpers::makeParamSet(      ParamHelpers::makeIntegerParam(id = "arch", lower = 10, upper = 200L),
                                                                          ParamHelpers::makeIntegerParam(id = "nLayer", lower = 2L, upper = 6L),
@@ -217,11 +221,15 @@ getPars <- function(method, settings = NULL, extra = NULL){
 
   if(method == "cforest") parameter <- ParamHelpers::makeParamSet(ParamHelpers::makeIntegerParam("mtry",lower = 2,upper = sum(settings$split) - 1),
                                                                   ParamHelpers::makeIntegerParam("minsplit",lower = 5,upper = 50))
-
-  if(method == "glm") parameter = ParamHelpers::makeParamSet(ParamHelpers::makeDiscreteParam("link", values = c("logit", "probit")),
-                                                             ParamHelpers::makeLogicalParam("stepAIC", default = TRUE),
-                                                             ParamHelpers::makeLogicalParam("secondOrderInteractions", default = TRUE))
-
+  if(method == "glm" ){
+    if(settings$balanceClasses != "Regression") {
+       parameter = ParamHelpers::makeParamSet(ParamHelpers::makeDiscreteParam("link", values = c("logit", "probit")),
+                                                                                         ParamHelpers::makeLogicalParam("secondOrderInteractions", default = TRUE))
+    } else {
+      parameter = ParamHelpers::makeParamSet(ParamHelpers::makeDiscreteParam("poisson.link", values = c("log","sqrt")),
+                                                                                         ParamHelpers::makeLogicalParam("secondOrderInteractions", default = TRUE))
+    }
+  }
 
   if(!is.null(extra)){
     for(n in names(extra))parameter$pars[[n]] = NULL
@@ -232,44 +240,44 @@ getPars <- function(method, settings = NULL, extra = NULL){
   if(!is.null(modelSettings) && "tune" %in% names(modelSettings[[method]])) parameter$pars <- parameter$pars[modelSettings[[method]]$tune]
 
 
-    if(balanceClasses == "Over"){
-      parameter$pars[["osw.rate"]] <- ParamHelpers::makeNumericParam("osw.rate", lower = 4, upper = 10)
-      return(parameter)
-      }
-    else if(balanceClasses == "Under") {
-      parameter$pars[["usw.rate"]] <- ParamHelpers::makeNumericParam("usw.rate", lower = 0, upper = 1)
+  if(balanceClasses == "Over"){
+    parameter$pars[["osw.rate"]] <- ParamHelpers::makeNumericParam("osw.rate", lower = 4, upper = 10)
+    return(parameter)
+  }
+  else if(balanceClasses == "Under") {
+    parameter$pars[["usw.rate"]] <- ParamHelpers::makeNumericParam("usw.rate", lower = 0, upper = 1)
+    return(parameter)
+  }
+  else if(balanceClasses == "SMOTE") {
+    {
+      parameter$pars[["sw.rate"]] <- ParamHelpers::makeNumericParam("sw.rate", lower = 2, upper = 5)
+      parameter$pars[["sw.nn"]]   <- ParamHelpers::makeIntegerParam("sw.nn", lower = 3, upper = 5)
       return(parameter)
     }
-    else if(balanceClasses == "SMOTE") {
-      {
-        parameter$pars[["sw.rate"]] <- ParamHelpers::makeNumericParam("sw.rate", lower = 2, upper = 5)
-        parameter$pars[["sw.nn"]]   <- ParamHelpers::makeIntegerParam("sw.nn", lower = 3, upper = 5)
-        return(parameter)
-      }
-    } else if(balanceClasses == "OverBagging"){
-        parameter$pars[["obw.iters"]]  <- ParamHelpers::makeIntegerParam("obw.iters", lower = 5, upper = 40)
-        parameter$pars[["obw.rate"]]   <- ParamHelpers::makeNumericParam("obw.rate", lower = 1, upper = 10)
-        return(parameter)
+  } else if(balanceClasses == "OverBagging"){
+    parameter$pars[["obw.iters"]]  <- ParamHelpers::makeIntegerParam("obw.iters", lower = 5, upper = 40)
+    parameter$pars[["obw.rate"]]   <- ParamHelpers::makeNumericParam("obw.rate", lower = 1, upper = 10)
+    return(parameter)
 
-    } else if(balanceClasses == "WeightedClasses"){
-      if(!method %in% c("knn", "knnFS", "naive")) {
-       parameter$pars[["wcw.weight"]] <- ParamHelpers::makeNumericParam("wcw.weight", lower = 1.3, upper = 10)
-       return(parameter)
-      }
-      else{
-        stop("Error. Selected algorithms are not compartible with Weighted Classes",call. = F)
-        tmp <- settings
-        tmp$balanceClasses <- "Over"
-        return(getPars(method, tmp))
-        }
-    } else if(balanceClasses == "Over+WC"){
-      if(!method %in% c("knn", "knnFS", "naive"))
-        parameter$pars[["wcw.weight"]] <- ParamHelpers::makeNumericParam("wcw.weight", lower = 1.3, upper = 10)
-      else stop("Error. Selected algorithms are not compartible with Weighted Classes",call. = F)
-      parameter$pars[["osw.rate"]] <- ParamHelpers::makeNumericParam("osw.rate", lower = 4, upper = 10)
+  } else if(balanceClasses == "WeightedClasses"){
+    if(!method %in% c("knn", "knnFS", "naive")) {
+      parameter$pars[["wcw.weight"]] <- ParamHelpers::makeNumericParam("wcw.weight", lower = 1.3, upper = 10)
       return(parameter)
     }
-    else return(parameter)
+    else{
+      stop("Error. Selected algorithms are not compartible with Weighted Classes",call. = F)
+      tmp <- settings
+      tmp$balanceClasses <- "Over"
+      return(getPars(method, tmp))
+    }
+  } else if(balanceClasses == "Over+WC"){
+    if(!method %in% c("knn", "knnFS", "naive"))
+      parameter$pars[["wcw.weight"]] <- ParamHelpers::makeNumericParam("wcw.weight", lower = 1.3, upper = 10)
+    else stop("Error. Selected algorithms are not compartible with Weighted Classes",call. = F)
+    parameter$pars[["osw.rate"]] <- ParamHelpers::makeNumericParam("osw.rate", lower = 4, upper = 10)
+    return(parameter)
+  }
+  else return(parameter)
 
 }
 

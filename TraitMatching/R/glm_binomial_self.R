@@ -7,7 +7,6 @@ makeRLearner.classif.binomial_self = function() {
       makeDiscreteLearnerParam("link", values = c("logit", "probit", "cloglog", "cauchit", "log"),
                                default = "logit"),
       makeLogicalLearnerParam("model", default = TRUE, tunable = FALSE),
-      makeLogicalLearnerParam("stepAIC", default = TRUE),
       makeLogicalLearnerParam("secondOrderInteractions", default = TRUE)
     ),
     par.vals = list(
@@ -22,16 +21,12 @@ makeRLearner.classif.binomial_self = function() {
 }
 
 #' @export
-trainLearner.classif.binomial_self = function(.learner, .task, .subset, .weights = NULL, link = "logit", stepAIC = TRUE,secondOrderInteractions = TRUE, ...) {
+trainLearner.classif.binomial_self = function(.learner, .task, .subset, .weights = NULL, link = "logit", secondOrderInteractions = TRUE, ...) {
   data = mlr::getTaskData(.task, .subset)
   target = mlr::getTaskTargetNames(.task)
   if(secondOrderInteractions) f = formula(paste0(target,"~."))
   else f = formula(paste0(target,"~.^2"))
   m = stats::glm(f, data = data, family = stats::binomial(link = link), weights = .weights, ...)
-  if(stepAIC) {
-    require(MASS)
-    m = MASS::stepAIC(m, direction = "both", trace = FALSE, scope = list(upper=f, lower = ~1))
-  }
   return(m)
 }
 

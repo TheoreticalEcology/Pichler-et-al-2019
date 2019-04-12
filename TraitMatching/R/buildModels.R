@@ -29,8 +29,9 @@ buildRegression = function(method, settings){
   if(method == "multiNomDnn") speciesNames = TRUE
   else speciesNames = FALSE
 
-  if(!method == "glm") learnerR <- mlr::makeTuneWrapper(learner = learner, resampling = tuningValidation, par.set = parameter, control = tuneCtrl, measures = settings$tuningMetric)
-  else learnerR <- mlr::makeFeatSelWrapper(learner = learner, resampling = tuningValidation,  control = mlr::makeFeatSelControlSequential(method = "sfbs"), measures = aic)
+  if(method == "glm_step") learnerR = mlr::makeFeatSelWrapper(learner = learner, resampling = tuningValidation,  control = mlr::makeFeatSelControlSequential(method = "sfbs"), measures = aic)
+  else learnerR <- mlr::makeTuneWrapper(learner = learner, resampling = tuningValidation, par.set = parameter, control = tuneCtrl, measures = settings$tuningMetric)
+  #else learnerR <- mlr::makeFeatSelWrapper(learner = learner, resampling = tuningValidation,  control = mlr::makeFeatSelControlSequential(method = "sfbs"), measures = aic)
 
   modelFunction <- function(classCommunity) {
     if(!is.null(classCommunity$settings$seed)) set.seed(classCommunity$settings$seed)
@@ -49,7 +50,7 @@ buildRegression = function(method, settings){
     # if(method %in% c("dnn", "cnn", "wideDeep","preDnn")) task <- mlr::normalizeFeatures(task, method = "range")
     if(classCommunity$settings$normalize) task <- mlr::normalizeFeatures(task, method = "standardize")
 
-    if(!method == "glm")result <- tryCatch(mlr::resample(learnerR, task, resampleValidation, measures = measures,extract = getTuneResult, models = classCommunity$settings$keepModels),
+    if(!method == "glm_step")result <- tryCatch(mlr::resample(learnerR, task, resampleValidation, measures = measures,extract = getTuneResult, models = classCommunity$settings$keepModels),
                        error = function(err) return(err))
     else result <- tryCatch(mlr::resample(learnerR, task, resampleValidation, measures = measures, models = classCommunity$settings$keepModels),
                        error = function(err) return(err))
@@ -97,11 +98,12 @@ buildClassification = function(method, balance, settings){
   else resampleValidation <- settings$crossValidation$outer
   mlr::configureMlr(show.info = F)
 
- # if(!method == "glm")
-  learnerR <- mlr::makeTuneWrapper(learner = learner, resampling = tuningValidation, par.set = parameter, control = tuneCtrl, measures = settings$tuningMetric)
- # else learnerR <- mlr::makeFeatSelWrapper(learner = learner, resampling = tuningValidation,  control = mlr::makeFeatSelControlSequential(method = "sfbs"), measures = aic)
+  if(method == "glm_step") learnerR = mlr::makeFeatSelWrapper(learner = learner, resampling = tuningValidation,  control = mlr::makeFeatSelControlSequential(method = "sfbs"), measures = aic)
+  else learnerR <- mlr::makeTuneWrapper(learner = learner, resampling = tuningValidation, par.set = parameter, control = tuneCtrl, measures = settings$tuningMetric)
+  # else learnerR <- mlr::makeFeatSelWrapper(learner = learner, resampling = tuningValidation,  control = mlr::makeFeatSelControlSequential(method = "sfbs"), measures = aic)
 
   modelFunction <- function(classCommunity) {
+    if(!is.null(classCommunity$settings$seed)) set.seed(classCommunity$settings$seed)
     parallelSetup(classCommunity$settings)
     fitVariables = classCommunity$settings$fitVariables
     data = classCommunity$data
@@ -114,7 +116,7 @@ buildClassification = function(method, balance, settings){
     # if(method %in% c("dnn", "cnn", "wideDeep","preDnn")) task <- mlr::normalizeFeatures(task, method = "range")
     if(classCommunity$settings$normalize) task <- mlr::normalizeFeatures(task, method = "standardize")
 
-    if(!method == "glm") result <- tryCatch(mlr::resample(learnerR, task, resampleValidation, measures = measures,extract = getTuneResult, models = classCommunity$settings$keepModels),
+    if(!method == "glm_step") result <- tryCatch(mlr::resample(learnerR, task, resampleValidation, measures = measures,extract = getTuneResult, models = classCommunity$settings$keepModels),
                        error = function(err) return(err))
     else  result <- tryCatch(mlr::resample(learnerR, task, resampleValidation, measures = measures, models = classCommunity$settings$keepModels),
                              error = function(err) return(err))
