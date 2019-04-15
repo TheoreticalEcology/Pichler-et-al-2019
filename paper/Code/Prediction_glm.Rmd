@@ -51,7 +51,7 @@ knitr::kable(df,caption = "Simulated trait combinations")
 ```{r}
 epochs = 50L
 iter = 30
-parallel = 30
+parallel = 10L
 run = TRUE
 crossValidation = list(outer = list(method = "SpCV", iters = 5, predict = "both"), 
                                  inner = list(method = "SpCV", iters = 3))
@@ -75,17 +75,17 @@ table(as.matrix(minOneInter(simulatedData$binar(3e2))))
 
 ```{r, results=FALSE}
 resultBaselineC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$binar(3e2))), 
-                         method = c("dnn", "cnn", "knn", "naive", "RFranger", "boost", "glm"), 
+                         method = c( "glm", "glm_step"), 
           settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
                           cnn = list(seed = 42, activation = "relu", 
                                      drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultBaselineC, file = "./Results/simBaselineC.RDS")
+    saveRDS(resultBaselineC, file = "./Results/simBaselineC_GLM.RDS")
 
 resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$poisson(3e2)),log = FALSE ), 
-                         method = c("negBinDnn", "RFranger", "knn", "boost", "glm"), 
+                         method =  c( "glm", "glm_step"), 
           settings = list(negBin = list(seed = 42, batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"),
@@ -93,7 +93,7 @@ resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOne
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, tuningMetric = "spearmanrho",
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultBaselineR, file = "./Results/simBaselineR.RDS")
+    saveRDS(resultBaselineR, file = "./Results/simBaselineR_GLM.RDS")
 ```
 
 ### Without effects but with abundances - baseline with abundances
@@ -110,17 +110,17 @@ table(as.matrix(minOneInter(simulatedData$binar(4e3))))
 ```
 ```{r, results=FALSE}
 resultAbC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$binar(4e3))), 
-                         method = c("dnn", "cnn", "knn", "naive", "RFranger", "boost", "glm"), 
+                         method =  c( "glm", "glm_step"), 
           settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
                           cnn = list(seed = 42, activation = "relu", 
                                      drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultAbC, file = "./Results/simAbC.RDS")
+    saveRDS(resultAbC, file = "./Results/simAbC_GLM.RDS")
     
 resultAbR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$poisson(4e3)),log = FALSE), 
-                         method = c("negBinDnn", "RFranger", "knn", "boost", "glm"), 
+                         method =  c( "glm", "glm_step"),  
           settings = list(negBin = list(seed = 42,  batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"),
@@ -128,7 +128,7 @@ resultAbR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, tuningMetric = "spearmanrho",
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultAbR, file = "./Results/simAbR.RDS")
+    saveRDS(resultAbR, file = "./Results/simAbR_GLM.RDS")
 ```
 
 ### With effects and w/o abundances - Network Sizes
@@ -178,21 +178,21 @@ if(run){
   resultC = list()
   for(i in 1:length(sizeC)){
     resultC[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeC[[i]]), 
-                         method = c("dnn", "cnn", "knn", "naive", "RFranger", "boost", "glm"), 
+                         method =  c( "glm", "glm_step"),  
           settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
                           cnn = list(seed = 42, activation = "relu", 
                                      drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "./Results/simSizeC.RDS")
+    saveRDS(resultC, file = "./Results/simSizeC_GLM.RDS")
   }
   
   
   resultR = list()
   for(i in 1:length(sizeC)){
     resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeR[[i]], log = F), 
-                         method = c("negBinDnn", "RFranger", "knn", "boost", "glm"), 
+                         method =  c( "glm", "glm_step"),  
           settings = list(negBin = list(seed = 42,  batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"),
@@ -201,7 +201,7 @@ if(run){
           crossValidation = crossValidation,
                         block = T, parallel = parallel, seed = 42, keepModels = T)
     
-    saveRDS(resultR, file = "./Results/simSizeR.RDS")
+    saveRDS(resultR, file = "./Results/simSizeR_GLM.RDS")
   }
 }
 
@@ -238,20 +238,20 @@ resultC = list()
     if(i != 3) bc = "Over"
     else bc = "None"
     resultC[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, obsC[[i]]), 
-                         method = c("dnn", "cnn", "knn",  "naive", "RFranger", "boost", "glm"), 
+                         method =  c( "glm", "glm_step"),  
           settings = list(dnn = list(seed = 42,  activation = "relu",  archFunction = "continous",  epochs = epochs),
                           cnn = list(seed = 42,  activation = "relu", 
                                      drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = bc, block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "./Results/simObsC.RDS")
+    saveRDS(resultC, file = "./Results/simObsC_GLM.RDS")
   }
   
   resultR = list()
   for(i in 1:length(obsR)){
       resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, obsR[[i]], log = F), 
-                           method = c("negBinDnn", "RFranger",  "knn", "boost", "glm"), 
+                           method =  c( "glm", "glm_step"),  
           settings = list(negBin = list(seed = 42,  batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"), 
@@ -260,7 +260,7 @@ resultC = list()
           crossValidation = crossValidation,
                         block = T, parallel = parallel, seed = 42, keepModels = T)
     
-    saveRDS(resultR, file = "./Results/simObsR.RDS")
+    saveRDS(resultR, file = "./Results/simObsR_GLM.RDS")
   }
 }
 ```
@@ -295,19 +295,6 @@ if(run){
   
   ResultBaselineC_SVM = readRDS(file = "./Results/simBaselineC_SVM.RDS")
   ResultBaselineR_SVM = readRDS(file = "./Results/simBaselineR_SVM.RDS")
-  
-    
-  ResultSizeC_GLM = readRDS(file = "./Results/simSizeC_GLM.RDS")
-  ResultSizeR_GLM = readRDS(file = "./Results/simSizeR_GLM.RDS")
-  
-  ResultObsC_GLM = readRDS(file = "./Results/simObsC_GLM.RDS")
-  ResultObsR_GLM = readRDS(file = "./Results/simObsR_GLM.RDS")
-  
-  ResultAbC_GLM = readRDS(file = "./Results/simAbC_GLM.RDS")
-  ResultAbR_GLM = readRDS(file = "./Results/simAbR_GLM.RDS")
-  
-  ResultBaselineC_GLM = readRDS(file = "./Results/simBaselineC_GLM.RDS")
-  ResultBaselineR_GLM = readRDS(file = "./Results/simBaselineR_GLM.RDS")
   source("./Code/helpFunctions.R")
   
   for(i in 1:3){
@@ -316,18 +303,6 @@ if(run){
     
     ResultObsC[[i]]$Result[["SVM"]] = ResultObsC_SVM[[i]]$Result$SVM
     ResultObsR[[i]]$Result[["SVM"]] = ResultObsR_SVM[[i]]$Result$SVM
-    
-    ResultSizeC[[i]]$Result[["glm"]] = ResultSizeC_GLM[[i]]$Result$glm
-    ResultSizeR[[i]]$Result[["glm"]] = ResultSizeR_GLM[[i]]$Result$glm
-    
-    ResultObsC[[i]]$Result[["glm"]] = ResultObsC_GLM[[i]]$Result$glm
-    ResultObsR[[i]]$Result[["glm"]] = ResultObsR_GLM[[i]]$Result$glm
-    
-    ResultSizeC[[i]]$Result[["glm_step"]] = ResultSizeC_GLM[[i]]$Result$glm_step
-    ResultSizeR[[i]]$Result[["glm_step"]] = ResultSizeR_GLM[[i]]$Result$glm_step
-    
-    ResultObsC[[i]]$Result[["glm_step"]] = ResultObsC_GLM[[i]]$Result$glm_step
-    ResultObsR[[i]]$Result[["glm_step"]] = ResultObsR_GLM[[i]]$Result$glm_step
   }
   
   ResultBaselineC$Result[["SVM"]] = ResultSizeBaselineC_SVM$Result$SVM
@@ -335,19 +310,7 @@ if(run){
   
   ResultAbR$Result[["SVM"]] = ResultAbR_SVM$Result$SVM
   ResultAbC$Result[["SVM"]] = ResultAbC_SVM$Result$SVM
-  
-  ResultBaselineC$Result[["glm"]] = ResultSizeBaselineC_GLM$Result$glm
-  ResultBaselineR$Result[["glm"]] = ResultSizeBaselineR_GLM$Result$glm
-  
-  ResultAbR$Result[["glm"]] = ResultAbR_GLM$Result$glm
-  ResultAbC$Result[["glm"]] = ResultAbC_GLM$Result$glm
-  
-  ResultBaselineC$Result[["glm_step"]] = ResultSizeBaselineC_GLM$Result$glm_step
-  ResultBaselineR$Result[["glm_step"]] = ResultSizeBaselineR_GLM$Result$glm_step
-  
-  ResultAbR$Result[["glm_step"]] = ResultAbR_GLM$Result$glm_step
-  ResultAbC$Result[["glm_step"]] = ResultAbC_GLM$Result$glm_step
-  
+
   
 }
 ```
@@ -375,14 +338,14 @@ if(run){
 
   
   save(ResultSizeCagg, ResultSizeRagg,ResultObsRagg, ResultObsCagg, ResultAbCagg, ResultAbRagg, ResultBaselineCagg, ResultBaselineRagg,
-       file = "./Results/ResultsSimulationAgg.RData")
+       file = "./Results/ResultsSimulationAgg_GLM.RData")
 }
 ```
 
 
 We computed tss, auc (rmse, spearman) for testing and training splits: 
 ```{r,results=FALSE}
-load(file = "../Results/ResultsSimulationAgg.RData")
+load(file = "./Results/ResultsSimulationAgg.RData")
 tss = auc =  tssObs = aucObs = aucGenSize = data.frame(matrix(0,3,7))
 tssGenSize = aucAB = tssAB = data.frame(matrix(0,3,7))
 rmse = spear = rmseObs = spearObs = spearGenSize = data.frame(matrix(0, 3, 5))
@@ -435,7 +398,7 @@ auc = as.data.frame(lapply(auc, function(x) ifelse(x < 0.5, 1-x, x)))
 aucAB = as.data.frame(lapply(aucAB, function(x) ifelse(x < 0.5, 1-x, x)))
 aucObs = as.data.frame(lapply(aucObs, function(x) ifelse(x < 0.5, 1-x, x)))
 
-save(rmse, rmseAB, rmseObs, spear,spearAB,spearGenObs, spearGenSize,tss,tssAB,tssGenSize,tssObs,auc,aucAB,aucObs,aucGenSize, file = "../Results/SimulationAggreationFig2.RData")
+save(rmse, rmseAB, rmseObs, spear,spearAB,spearGenObs, spearGenSize,tss,tssAB,tssGenSize,tssObs,auc,aucAB,aucObs,aucGenSize, file = "./Results/SimulationAggreationFig2.RData")
 
 ```
 
@@ -497,11 +460,11 @@ if(run){
   
   
   result = runTM(cC, tune = "random", iters = iter, tuningMetric = "auc", crossValidation = cv, block = T, parallel = parallel, fitSpecies = F, balanceClasses = c("Over", "SMOTE", "Under"),
-                 method = c("dnn", "cnn", "RFranger", "boost", "knn","naive", "glm"),
+                 method =  c( "glm", "glm_step"),  
                 settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
                           cnn = list(seed = 42, activation = "relu", drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs))
                 )
-  saveRDS(result, file = "./Results/CaseStudy1.RDS")
+  saveRDS(result, file = "./Results/CaseStudy1_GLM.RDS")
   
 }
 ```

@@ -263,7 +263,7 @@ saveRDS(result_reg_small, file = "./Results/res_reg_middle.RDS")
 ```{r}
 library(TraitMatching)
 set.seed(42)
-resultClassifWoAb = readRDS(file = "../Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS")
+resultClassifWoAb = readRDS(file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS")
 sim_len = sapply(resultClassifWoAb, length)
 ind_matrix = data.frame(ind1 = rep(1:4,sim_len), ind2 = abind::abind(sapply(1:4, function(i) do.call(seq, list(1, sim_len[i])),simplify = F)))
 
@@ -281,7 +281,7 @@ system.time({result_classif_middle = snow::parSapply(cl = cl,X = 1:nrow(ind_matr
     model = resultClassifWoAb[[inds[1]]][[inds[2]]]$Result[[m]]$result$models[[1]]
     out[[m]] = get_Interaction_Strengths(data, model, any = FALSE, depth = 7L,
                               groups = c("A", "B"), grid_size = 500L, 
-                              target = "target", parallel = 3L
+                              target = "target", parallel = 7L
                                )
     gc()
   }
@@ -291,7 +291,7 @@ system.time({result_classif_middle = snow::parSapply(cl = cl,X = 1:nrow(ind_matr
 
 })
 
-saveRDS(result_classif_middle, file = "../Results/res_classif_middle.RDS")
+saveRDS(result_classif_middle, file = "./Results/res_classif_middle.RDS")
 
 ```
 
@@ -355,13 +355,13 @@ save(resAggSmallClass, file = "./Results/resAggMiddleReg.RDS")
 #### Middle
 ```{r}
 
-regrRes = readRDS(file = "../Results/res_reg_middle.RDS")
-classRes = readRDS(file = "../Results/res_classif_middle.RDS")
+regrRes = readRDS(file = "./Results/res_reg_middle.RDS")
+classRes = readRDS(file = "./Results/res_classif_middle.RDS")
 
-studyResReg = readRDS(file = '../Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS')
-studyClassReg = readRDS(file = '../Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS')
+studyResReg = readRDS(file = './Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS')
+studyClassReg = readRDS(file = './Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS')
 
-load(file = '../Results/simulationInterMetaDataSMIDDLE.RData')
+load(file = './Results/simulationInterMetaDataSMIDDLE.RData')
 
 library(TraitMatching)
 
@@ -402,7 +402,7 @@ aggResClass$repetition = rep(unlist(apply(ind_matrix, 1, function(x) rep(x[2], x
 resAggMiddleReg = aggTrpRep(aggTrp(aggResRegr), aggResRegr)
 resAggMiddleClass = aggTrpRep(aggTrp(aggResClass), aggResClass)
 save(resAggMiddleReg, file = "./Results/resAggMiddleReg.RDS")
-save(resAggMiddleClass, file = "./Results/resAggMiddleReg.RDS")
+save(resAggMiddleClass, file = "./Results/resAggMiddleClass.RDS")
 
 ```
 
