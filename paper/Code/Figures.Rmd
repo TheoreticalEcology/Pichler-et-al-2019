@@ -16,69 +16,367 @@ source("./Code/helpFunctions.R")
 ```
 
 
-## Figure 2
-```{r,results=FALSE}
-load(file = "./Results/SimulationAggreationFig2.RData")
-cols =c( "#C0B9B2" ,"#CC0744" ,"#001E09" ,"#C2FF99" ,"#A079BF" ,"#00489C" ,"#6F0062" )
-names(cols) = c("dnn","cnn","knn","SVM","naive","RF","boost")
-tck = -0.04
-plotSim = function(df, labels = c("20*50","50*100", "100*200"), cex.axis = 0.8,
-                   cex.lab=0.8, ylab = "AUC", cols, ylim = c(0,1), 
-                   cexP = 0.8, axisY = NULL,xlab = "A x B Individuals", xpd = NA){
-  par(mgp = c(1.7,0.2,0))
-  plot(NULL, NULL, xlim = c(0,1), ylim = ylim, axes = F,xlab ="", 
-       ylab = ylab, font.lab = 2, cex.lab = cex.lab, xpd = NA)
-    par(mgp = c(1.3,0.2,0))
-  text(x = 0.5, y = -0.25*max(ylim), pos = 1, labels = xlab, font = 2, cex = cex.lab, xpd = NA)
-  axis(1,at = seq(0,1, length.out = 3),labels = labels,cex.axis = cex.axis, xpd = NA, tck = tck)
-  par(mgp = c(3,0.4,0))
-  if(is.null(axisY)) axis(2,cex.axis = cex.axis, las = 2, tck = tck)
-  else axis(at = seq(0, max(ylim),0.1),2,cex.axis = cex.axis, labels = axisY, las = 2, tck = tck)
-  par(mgp = c(1.7,0.2,0))
-  for(i in 1:ncol(df)){
-    lines(x = seq(0,1, length.out = 3), y = df[,i], type = "o", col = cols[i], pch = 21, cex = cexP, bg = "white")
+## Figure 2 new
+```{r}
+
+
+comparePlot = function(data = NULL, dataTop = NULL, cols = RColorBrewer::brewer.pal(8, "Accent"), 
+                       sk = 0.3, alpha1 = 0.3, xlab = "", ylab = "", neg = TRUE, bValues = FALSE){
+  nr = ncol(data)
+  ak = 1-(nrow(data))*sk
+  xCb = c(0, sk+ak/2, 1-sk)
+  ik = sk/nr*0.9
+  jk = sk/nr*0.1
+  plot(NULL, NULL, axes = FALSE, xlim = c(0,1), ylim = c(0,1), ylab = ylab, xlab = xlab)
+  out = list()
+  for(k in 1:nrow(data)){
+    stepX = xCb[k]
+    for(i in 1:(nr-1)){
+      stepX[i+1] = stepX[i] + ik+jk
+    }
+    xC = matrix(c(stepX, stepX+ik), ncol = 2)
+    if(!neg){
+      for(i in 1:nr){
+        rect(xleft = xC[i,1], xright = xC[i,2], ybottom = 0, ytop = data[k,i], col = addA(cols[i], alpha1))
+      }
+    } 
+    for(i in 1:nr){
+      if(dataTop[k,i]>0) {
+        rect(xleft = xC[i,1], xright = xC[i,2], ybottom = (data-dataTop)[k,i], 
+                              ytop = (data-dataTop)[k,1]+ dataTop[k,i], col = addA(cols[i], 1))
+                 if(bValues) text(x = mean(xC[i,1:2]), y = (data)[k,i], pos = 3, 
+                      labels = paste0("+", round(dataTop[k,i],digits = 2)), cex = 0.9, xpd = NA)
+
+      }
+      if(neg){
+        if(dataTop[k,i]<0) {
+          rect(xleft = xC[i,1], xright = xC[i,2], ybottom = (data)[k,i], 
+                              ytop = max((data-dataTop)[k,1]), col = addA(cols[i], alpha1))
+         if(bValues) text(x = mean(xC[i,1:2]), y = (data)[k,i], pos = 1, labels = paste0(round(dataTop[k,i],2)), cex = 0.9, xpd = NA)
+        }
+      }
+      
+    }
+    out[[k]] = xC
+    segments(y1 =max((data-dataTop)[k,1]),  y0 = max((data-dataTop)[k,1]), x0 = min(xC[,1])-ak/5, x1 = max(xC[,2])+ak/5, col = "darkgrey", xpd = NA)
   }
+  return(out)
 }
+load(file = "./Results/SimulationAggreationFig2.RData")
+cols =c("#bfa23d",
+"#5d3686",
+"#6ca24d",
+"#c26abb",
+"#46c19a",
+"#ba496b",
+"#6c7ed7",
+"#b55c36")
+names(cols) = c("dnn","cnn","knn","SVM","naive","RFranger","boost", "glm_step")
 cexP = 0.9
 cexA = 0.7
 nPixel = 10
-pdf(file = "./Figures/Fig2.pdf", width = 5.50, height = 2.40)
-par(mfrow = c(2,4), mar = c(2.3,2.4,1,2.0)-0.2, oma = c(0.33,0.4,0.5,1.4), mgp = c(1.7,0.5,0))
-names(cols) = colnames(auc)
-xText = -.59
-plotSim(auc, labels = NA, cols = cols, ylab = "AUC", ylim = c(0.5,1),xlab = "", cex.axis = cexA, cex.lab = cexP)
-text(labels  = "(a)",x = xText, y = 1.09,pos = 4, xpd = NA,font = 2,cex = cexP)
-plotSim(aucAB, labels = NA, cols = cols, ylab = "AUC", ylim = c(0.5,1), xlab = "", cex.axis = cexA, cex.lab = cexP)
-text(labels  = "(b)",x = xText, y = 1.09,pos = 4, xpd = NA,font = 2,cex = cexP)
-plotSim(aucGenSize, labels = NA, cols = cols, ylab = "Error", ylim = c(0.,0.5), 
-        axisY = paste0(seq(0,50,10), "%"), xlab = "", cex.axis = cexA, cex.lab = cexP)
-text(labels  = "(c)",x = xText, y = .59,pos = 4, xpd = NA,font = 2,cex = 0.7)
-plotSim(aucObs, labels = NA, xlab = "",cols = cols, ylab = "AUC", ylim = c(0.5,1), cex.axis = cexA, cex.lab = cexP)
-text(labels  = "(d)",x = xText, y = 1.09,pos = 4, xpd = NA,font = 2,cex = cexP)
+xText = -.23
+yText = 1.15
+font = 1
 
-legend(x=1.05, y = 0.8,col = cols, legend = c("DNN","CNN","kNN","SVM","naive","RF","BRT"), pch = 16, 
-       xpd = NA, bty = "n", cex = cexP, text.font = 2, y.intersp = 1.7, x.intersp = 0.7,horiz = F, pt.cex = 0.9)
+
+pdf(file = "./Figures/Fig2.pdf", width = 5.50, height = 4.40)
+
+par(mfrow = c(3,2), mar = c(2.3,3,0.5,0.4), oma = c(2.33,0.1,0.75,0.0), mgp = c(2.2,0.9,0))
+cols = cols[sapply(colnames(tss)[-which(colnames(tss) == "glm", arr.ind = TRUE)], function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
+
+dataTop = (tss - tss$glm)[1,-7]
+data = tss[1,-7]
+coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = TRUE, sk = 1, ylab = "TSS", alpha1 = 1)
+axis(2, las = 2, font = font, cex.axis = cexP)
+text(labels  = "(a)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+text(labels = c("Network Size: 20*50"), x = sapply(coords, mean, simplify = TRUE)[1],y = 0, 
+     pos = 1, xpd = NA,cex = 0.9, font = font)
+text(cex = cexP, labels = paste0("GLM: ", round(tss$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
+
+dataTop = (tssAB - tssAB$glm)[,-7]
+data = tssAB[,-7]
+coords = comparePlot(data, dataTop, cols = cols, sk = 1, bValues = TRUE, ylab = "TSS", alpha1 = 1)
+axis(2, las = 2, font = font, cex.axis = cexP)
+text(labels  = "(b)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+text(labels = c("Abundance"), x = mean(coords[[1]]),y = 0, 
+     pos = 1, xpd = NA,cex = 0.9, font = font)
+text(cex = cexP, labels = paste0("GLM: ", round(tssAB$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
+
 namesSpear = colnames(spear)
+namesSpear = namesSpear[-which((namesSpear) == "glm",arr.ind = TRUE)]
 namesSpear[1] = "dnn"
 which(names(cols) %in% namesSpear, arr.ind = T)
-colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T))]
+colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
+
+dataTop = (spear - spear$glm)[1,-5]
+data = spear[1,-5]
+coords = comparePlot(data, dataTop, cols = colsReg, neg = TRUE, sk = 1, bValues = TRUE, ylab = "Spearman", alpha1 = 1)
+axis(2, las = 2, font = font, cex.axis = cexP)
+text(labels  = "(c)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+text(labels = c("Network Size: 20*50"), x = sapply(coords, mean, simplify = TRUE)[1],y = 0, 
+     pos = 1, xpd = NA,cex = 0.9, font = font)
+text(cex = cexP, labels = paste0("GLM: ", round(spear$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
 
 
-plotSim(spear, labels = c("20*50","50*100", "100*200"), cols = colsReg, 
-        ylab = "Spearman", ylim = c(0.,1), cex.axis = cexA, cex.lab = cexP)
-text(labels  = "(e)",x = xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP)
-plotSim(spearAB, labels = c("20*50","50*100", "100*200"), cols = colsReg, 
-        ylab = "Spearman", ylim = c(0.,1), cex.axis = cexA, cex.lab = cexP)
-text(labels  = "(f)",x = xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP)
-plotSim(spearGenSize, labels = c("20*50","50*100", "100*200"), cols = colsReg, 
-        ylab = "Error", ylim = c(0.,0.8), axisY = paste0(seq(0,80,10), "%"), cex.axis = cexA, cex.lab = cexP)
-text(labels  = "(g)",x = xText, y =  0.944,pos = 4, xpd = NA,font = 2,cex = cexP)
-plotSim(spearObs, labels = c("50","500", "2000"), xlab = "Observation time", cols = colsReg, 
-        ylab = "Spearman", ylim = c(0.,1), cex.axis = cexA, cex.lab = cexP)
-text(labels  = "(h)",x = xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP)
+dataTop = (spearAB - spearAB$glm)[,-5]
+data = spearAB[,-5]
+coords = comparePlot(data, dataTop, cols = colsReg, sk = 1, bValues = TRUE, ylab = "Spearman", alpha1 = 1)
+axis(2, las = 2, font = font, cex.axis = cexP)
+text(labels  = "(d)",x = xText, y =  yText,pos = 4, xpd = NA,font = font,cex = cexP)
+mean(coords[[1]])
+text(labels = c("Abundance"), x = mean(coords[[1]]),y = 0, 
+     pos = 1, xpd = NA,cex = 0.9, font = font)
+text(cex = cexP, labels = paste0("GLM: ", round(spearAB$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
+
+
+plot(NULL, NULL, axes = FALSE, xlim = c(0,1), ylim = c(0,1), ylab = "TSS", xlab = "")
+for(i in 1:4) lines(x = seq(0,1, length.out = 3), y = tssObs[,c(1,5,6,7)][,i], type = "o", col = c(cols[names(tssObs[,c(1,5,6)])], "dimgray")[i], pch = 21, cex = cexP, bg = "white")
+axis(2, las = 2, font = font, cex.axis = cexP)
+axis(1,at = seq(0,1, length.out = 3),labels = c("0.007", "0.032", "0.12"), font = font, cex.axis = cexP)
+text(labels  = "(e)",x = xText, y =  yText,pos = 4, xpd = NA,font = font,cex = cexP)
+text(labels = c("Observation time"), x = 0.5,y = -0.28, 
+     pos = 1, xpd = NA,cex = cexP, font = font)
+legend(x=0.0, y = -0.4,col = cols, legend = c("DNN","CNN","kNN","naive", "RF","BRT","SVM", "GLMstep"), pch = 16,
+       xpd = NA, bty = "n", cex = cexP, text.font = 1, y.intersp = 1.7, x.intersp = 0.7,horiz = T, pt.cex = 0.9)
+
+spearObs[,c(1,2,4,5)]
+plot(NULL, NULL, axes = FALSE, xlim = c(0,1), ylim = c(0,1), ylab = "Spearman", xlab = "")
+for(i in 1:4) lines(x = seq(0,1, length.out = 3), y = spearObs[,c(1,2,4,5)][,i], type = "o", col = c(colsReg[c("dnn", "RFranger", "boost")], "dimgray")[i], pch = 21, cex = cexP, bg = "white")
+axis(2, las = 2, font = font, cex.axis = cexP)
+axis(1,at = seq(0,1, length.out = 3),labels = c("0.007", "0.032", "0.12"), font = font, cex.axis = cexP)
+text(labels  = "(f)",x = xText, y =  yText,pos = 4, xpd = NA,font = font,cex = cexP)
+text(labels = c("Observation time"), x = 0.5,y = -0.28, 
+     pos = 1, xpd = NA,cex = cexP, font = font)
+dev.off()
+
+
+```
+
+
+## Figure S1
+```{r}
+
+comparePlot = function(data = NULL, dataTop = NULL, cols = RColorBrewer::brewer.pal(8, "Accent"), 
+                       sk = 0.3, alpha1 = 0.3, xlab = "", ylab = "", neg = TRUE, bValues = FALSE){
+  nr = ncol(data)
+  ak = 1-(nrow(data))*sk
+  xCb = c(0, sk+ak/2, 1-sk)
+  ik = sk/nr*0.9
+  jk = sk/nr*0.1
+  plot(NULL, NULL, axes = FALSE, xlim = c(0,1), ylim = c(0,1), ylab = ylab, xlab = xlab)
+  out = list()
+  for(k in 1:nrow(data)){
+    stepX = xCb[k]
+    for(i in 1:(nr-1)){
+      stepX[i+1] = stepX[i] + ik+jk
+    }
+    xC = matrix(c(stepX, stepX+ik), ncol = 2)
+    if(!neg){
+      for(i in 1:nr){
+        rect(xleft = xC[i,1], xright = xC[i,2], ybottom = 0, ytop = data[k,i], col = addA(cols[i], alpha1))
+      }
+    } 
+    for(i in 1:nr){
+      if(dataTop[k,i]>0) {
+        rect(xleft = xC[i,1], xright = xC[i,2], ybottom = (data-dataTop)[k,i], 
+                              ytop = (data-dataTop)[k,1]+ dataTop[k,i], col = addA(cols[i], 1))
+                 if(bValues) text(x = mean(xC[i,1:2]), y = (data)[k,i], pos = 3, 
+                      labels = paste0("+", round(dataTop[k,i],digits = 2)), cex = 0.9, xpd = NA)
+
+      }
+      if(neg){
+        if(dataTop[k,i]<0) {
+          rect(xleft = xC[i,1], xright = xC[i,2], ybottom = (data)[k,i], 
+                              ytop = max((data-dataTop)[k,1]), col = addA(cols[i], alpha1))
+         if(bValues) text(x = mean(xC[i,1:2]), y = (data)[k,i], pos = 1, labels = paste0(round(dataTop[k,i],2)), cex = 0.9, xpd = NA)
+        }
+      }
+      
+    }
+    out[[k]] = xC
+    segments(y1 =max((data-dataTop)[k,1]),  y0 = max((data-dataTop)[k,1]), x0 = min(xC[,1])-ak/5, x1 = max(xC[,2])+ak/5, col = "darkgrey", xpd = NA)
+  }
+  return(out)
+}
+load(file = "./Results/SimulationAggreationFig2.RData")
+cols =c("#bfa23d",
+"#5d3686",
+"#6ca24d",
+"#c26abb",
+"#46c19a",
+"#ba496b",
+"#6c7ed7",
+"#b55c36")
+names(cols) = c("dnn","cnn","knn","SVM","naive","RFranger","boost", "glm_step")
+cexP = 0.9
+cexA = 0.7
+nPixel = 10
+xText = -.03
+yText = 1.15
+font = 1
+namesSpear = colnames(spear)
+namesSpear = namesSpear[-which((namesSpear) == "glm",arr.ind = TRUE)]
+namesSpear[1] = "dnn"
+which(names(cols) %in% namesSpear, arr.ind = T)
+colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
+
+pdf(file = "./Figures/FigS1.pdf", width = 5.50, height = 6.40)
+
+par(mfrow = c(6,1), mar = c(2.1,3,0.9,0.0), oma = c(2.4,0.1,0.75,0.0), mgp = c(2.2,0.9,0))
+cols = cols[sapply(colnames(tss)[-which(colnames(tss) == "glm", arr.ind = TRUE)], function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
+
+# SIZE
+dataTop = (tss - tss$glm)[,-7]
+data = tss[,-7]
+coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = FALSE, sk = 0.32, ylab = "TSS", alpha1 = 1)
+title(main = "Network sizes")
+axis(2, las = 2, font = font, cex.axis = cexP)
+text(labels  = "(a)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+
+text(cex = cexP, labels = paste0("GLM: ", round(tss$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
+
+dataTop = (auc - auc$glm)[,-7]
+data = auc[,-7]
+coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "AUC", alpha1 = 1)
+axis(2, las = 2, font = font, cex.axis = cexP, labels = seq(0.5, 1, length.out = 6), at = seq(0,1, length.out = 6))
+text(labels  = "(b)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+#text(labels = c("20*50", "50*100", "100*200"), x = sapply(coords, mean, simplify = TRUE),y = 0, 
+#     pos = 1, xpd = NA,cex = 0.9, font = font)
+text(cex = cexP, labels = paste0("GLM: ", round(auc$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
+
+dataTop = (spear - spear$glm)[,-5]
+data = spear[,-5]
+coords = comparePlot(data, dataTop, cols = colsReg, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "Spear", alpha1 = 1)
+axis(2, las = 2, font = font, cex.axis = cexP)
+axis(1, at = NULL, labels = F, tck = 0)
+text(labels  = "(c)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+text(labels = c("20*50", "50*100", "100*200"), x = sapply(coords, mean, simplify = TRUE),y = 0, 
+     pos = 1, xpd = NA,cex = 0.9, font = font)
+text(cex = cexP, labels = paste0("GLM: ", round(spear$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
+
+# OBSERVATION TIME
+dataTop = (tssObs - tssObs$glm)[,-7]
+data = tssObs[,-7]
+coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "TSS", alpha1 = 1)
+title(main = "Observation Times")
+
+axis(2, las = 2, font = font, cex.axis = cexP)
+text(labels  = "(d)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+#text(labels = c("20*50", "50*100", "100*200"), x = sapply(coords, mean, simplify = TRUE),y = 0, 
+#     pos = 1, xpd = NA,cex = 0.9, font = font)
+text(cex = cexP, labels = paste0("GLM: ", round(tssObs$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
+
+dataTop = (aucObs - aucObs$glm)[,-7]
+data = aucObs[,-7]
+coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "AUC", alpha1 = 1)
+axis(2, las = 2, font = font, cex.axis = cexP)
+text(labels  = "(e)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+text(cex = cexP, labels = paste0("GLM: ", round(aucObs$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
+
+dataTop = (spearObs - spearObs$glm)[,-5]
+data = spearObs[,-5]
+coords = comparePlot(data, dataTop, cols = colsReg, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "Spear", alpha1 = 1)
+axis(2, las = 2, font = font, cex.axis = cexP)
+axis(1, at = NULL, labels = F, tck = 0)
+text(labels  = "(f)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+text(labels = c("0.007", "0.032", "0.12"), x = sapply(coords, mean, simplify = TRUE),y = 0, 
+     pos = 1, xpd = NA,cex = 0.9, font = font)
+text(cex = cexP, labels = paste0("GLM: ", round(spearObs$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.04, pos = 4)
+legend(x=0.0, y = -0.4,col = cols, legend = c("DNN","CNN","kNN","naive", "RF","BRT","SVM", "GLMstep"), pch = 16,
+       xpd = NA, bty = "n", cex = cexP, text.font = 1, y.intersp = 1.7, x.intersp = 0.7,horiz = T, pt.cex = 0.9)
 
 dev.off()
+
 ```
+
+## Table S1 and S2 
+```{r}
+results = rbind(baseC, baseCTSS)
+results = cbind(data.frame(Measure = c("AUC", "TSS")), results)
+
+# Reorder for rbind:
+reg = data.frame((c("Spearman",baseR[,1], NA, baseR[,3], NA, baseR[,2], baseR[,4:7])))
+colnames(reg) = colnames(results)
+results = rbind(results, reg)
+print(results)
+write.csv(results, file = "./Results/BaselineResults.csv")
+
+resultsE = round(aucGenSize,3)*100
+resultsE = cbind(data.frame(NetworkSize = c("20*50", "50*100", "100*200")),DeacreaseInPercent = rep("AUC",3), resultsE)
+spearGenSizeP = round(spearGenSize,3)*100
+regE = cbind(NetworkSize = c("20*50", "50*100", "100*200"),data.frame("Spearman",spearGenSizeP[,1], NA, spearGenSizeP[,3], NA, spearGenSizeP[,2], spearGenSizeP[,4:7]))
+colnames(regE) = colnames(resultsE)
+resultsE = rbind(resultsE, regE)
+print(resultsE)
+write.csv(resultsE, file = "./Results/GeneralizationError.csv")
+
+```
+
+
+<!-- ## Figure 2 -->
+<!-- ```{r,results=FALSE} -->
+<!-- load(file = "./Results/SimulationAggreationFig2.RData") -->
+<!-- cols =c( "#C0B9B2" ,"#CC0744" ,"#001E09" ,"#C2FF99" ,"#A079BF" ,"#00489C" ,"#6F0062" ) -->
+<!-- names(cols) = c("dnn","cnn","knn","SVM","naive","RF","boost") -->
+<!-- tck = -0.04 -->
+<!-- plotSim = function(df, labels = c("20*50","50*100", "100*200"), cex.axis = 0.8, -->
+<!--                    cex.lab=0.8, ylab = "AUC", cols, ylim = c(0,1),  -->
+<!--                    cexP = 0.8, axisY = NULL,xlab = "A x B Individuals", xpd = NA){ -->
+<!--   par(mgp = c(1.7,0.2,0)) -->
+<!--   plot(NULL, NULL, xlim = c(0,1), ylim = ylim, axes = F,xlab ="",  -->
+<!--        ylab = ylab, font.lab = 2, cex.lab = cex.lab, xpd = NA) -->
+<!--     par(mgp = c(1.3,0.2,0)) -->
+<!--   text(x = 0.5, y = -0.25*max(ylim), pos = 1, labels = xlab, font = 2, cex = cex.lab, xpd = NA) -->
+<!--   axis(1,at = seq(0,1, length.out = 3),labels = labels,cex.axis = cex.axis, xpd = NA, tck = tck) -->
+<!--   par(mgp = c(3,0.4,0)) -->
+<!--   if(is.null(axisY)) axis(2,cex.axis = cex.axis, las = 2, tck = tck) -->
+<!--   else axis(at = seq(0, max(ylim),0.1),2,cex.axis = cex.axis, labels = axisY, las = 2, tck = tck) -->
+<!--   par(mgp = c(1.7,0.2,0)) -->
+<!--   for(i in 1:ncol(df)){ -->
+<!--     lines(x = seq(0,1, length.out = 3), y = df[,i], type = "o", col = cols[i], pch = 21, cex = cexP, bg = "white") -->
+<!--   } -->
+<!-- } -->
+<!-- cexP = 0.9 -->
+<!-- cexA = 0.7 -->
+<!-- nPixel = 10 -->
+<!-- pdf(file = "./Figures/Fig2.pdf", width = 5.50, height = 2.40) -->
+<!-- par(mfrow = c(2,4), mar = c(2.3,2.4,1,2.0)-0.2, oma = c(0.33,0.4,0.5,1.4), mgp = c(1.7,0.5,0)) -->
+<!-- names(cols) = colnames(auc) -->
+<!-- xText = -.59 -->
+<!-- plotSim(auc, labels = NA, cols = cols, ylab = "AUC", ylim = c(0.5,1),xlab = "", cex.axis = cexA, cex.lab = cexP) -->
+<!-- text(labels  = "(a)",x = xText, y = 1.09,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+<!-- plotSim(aucAB, labels = NA, cols = cols, ylab = "AUC", ylim = c(0.5,1), xlab = "", cex.axis = cexA, cex.lab = cexP) -->
+<!-- text(labels  = "(b)",x = xText, y = 1.09,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+<!-- plotSim(aucGenSize, labels = NA, cols = cols, ylab = "Error", ylim = c(0.,0.5),  -->
+<!--         axisY = paste0(seq(0,50,10), "%"), xlab = "", cex.axis = cexA, cex.lab = cexP) -->
+<!-- text(labels  = "(c)",x = xText, y = .59,pos = 4, xpd = NA,font = 2,cex = 0.7) -->
+<!-- plotSim(aucObs, labels = NA, xlab = "",cols = cols, ylab = "AUC", ylim = c(0.5,1), cex.axis = cexA, cex.lab = cexP) -->
+<!-- text(labels  = "(d)",x = xText, y = 1.09,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+
+<!-- legend(x=1.05, y = 0.8,col = cols, legend = c("DNN","CNN","kNN","SVM","naive","RF","BRT"), pch = 16,  -->
+<!--        xpd = NA, bty = "n", cex = cexP, text.font = 2, y.intersp = 1.7, x.intersp = 0.7,horiz = F, pt.cex = 0.9) -->
+<!-- namesSpear = colnames(spear) -->
+<!-- namesSpear[1] = "dnn" -->
+<!-- which(names(cols) %in% namesSpear, arr.ind = T) -->
+<!-- colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T))] -->
+
+
+<!-- plotSim(spear, labels = c("20*50","50*100", "100*200"), cols = colsReg,  -->
+<!--         ylab = "Spearman", ylim = c(0.,1), cex.axis = cexA, cex.lab = cexP) -->
+<!-- text(labels  = "(e)",x = xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+<!-- plotSim(spearAB, labels = c("20*50","50*100", "100*200"), cols = colsReg,  -->
+<!--         ylab = "Spearman", ylim = c(0.,1), cex.axis = cexA, cex.lab = cexP) -->
+<!-- text(labels  = "(f)",x = xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+<!-- plotSim(spearGenSize, labels = c("20*50","50*100", "100*200"), cols = colsReg,  -->
+<!--         ylab = "Error", ylim = c(0.,0.8), axisY = paste0(seq(0,80,10), "%"), cex.axis = cexA, cex.lab = cexP) -->
+<!-- text(labels  = "(g)",x = xText, y =  0.944,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+<!-- plotSim(spearObs, labels = c("50","500", "2000"), xlab = "Observation time", cols = colsReg,  -->
+<!--         ylab = "Spearman", ylim = c(0.,1), cex.axis = cexA, cex.lab = cexP) -->
+<!-- text(labels  = "(h)",x = xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+
+<!-- dev.off() -->
+<!-- ``` -->
 
 
 ## Figure 3
@@ -211,59 +509,59 @@ dev.off()
 ```
 
 
-## Figure S1
-```{r, results = FALSE}
-reset()
-cols =c( "#C0B9B2" ,"#CC0744" ,"#001E09" ,"#C2FF99" ,"#A079BF" ,"#00489C" ,"#6F0062" )
-names(cols) = c("dnn","cnn","knn","SVM","naive","RF","boost")
-cexP = 0.9
-xText = .59
-tck = -0.04
-plotSim = function(df, labels = c("20 x 50","50 x 100", "100 x 200"), cex.axis = 0.8,
-                   cex.lab=0.8, ylab = "AUC", cols, ylim = c(0,1), 
-                   cexP = 0.8, axisY = NULL,xlab = "A x B Individuals", xpd = NA){
-  par(mgp = c(1.4,0.2,0))
-  plot(NULL, NULL, xlim = c(0,1), ylim = ylim, axes = F,xlab ="", 
-       ylab = ylab, font.lab = 2, cex.lab = cex.lab, xpd = NA)
-    par(mgp = c(1.3,0.2,0))
-  text(x = 0.5, y = -0.25*max(ylim), pos = 1, labels = xlab, font = 2, cex = cex.lab, xpd = NA)
-  axis(1,at = seq(0,1, length.out = 3),labels = labels,cex.axis = cex.axis, xpd = NA, tck = tck)
-  par(mgp = c(3,0.4,0))
-  if(is.null(axisY)) axis(2,cex.axis = cex.axis, las = 2, tck = tck)
-  else axis(at = seq(0, max(ylim),0.1),2,cex.axis = cex.axis, labels = axisY, las = 2, tck = tck)
-  par(mgp = c(1.7,0.2,0))
-  for(i in 1:ncol(df)){
-    lines(x = seq(0,1, length.out = 3), y = df[,i], type = "o", col = cols[i], pch = 21, cex = cexP, bg = "white")
-  }
-}
-pdf(file = "./Figures/FigS1.pdf", width = 5.50, height = 2.2)
-par(mfrow = c(2,4), mar = c(2.3,2.3,1,2.2)-0.2, oma = c(0.33,0.4,0.5,1.2), mgp = c(1.7,0.5,0))
-names(cols) = colnames(auc)
-plotSim(tss, labels = NA, cols = cols, ylab = "TSS", ylim = c(0,1),xlab = "", cex.axis = 0.7, cex.lab = cexP)
-text(labels  = "(a)",x = -xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP)
-plotSim(tssAB, labels = NA, cols = cols, ylab = "TSS", ylim = c(0,1), xlab = "", cex.axis = 0.7, cex.lab = cexP)
-text(labels  = "(b)",x = -xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP)
-plotSim(tssObs, labels = NA, xlab = "",cols = cols, ylab = "TSS", ylim = c(0.0,1), cex.axis = 0.7, cex.lab = cexP)
-text(labels  = "(c)",x = -xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP)
-plot(NULL,NULL, ylim = c(0.,0.5), xlab = "", ylab = "", axes = F, xlim = c(0,1))
-legend(x=0, y = 0.2,col = cols, legend = c("DNN","CNN","kNN","SVM","naive","RF","BRT"), pch = 16, xpd = NA, 
-       bty = "n", cex = cexP, text.font = 2, y.intersp = 1.3, x.intersp = 0.7,horiz = F, pt.cex = 0.9)
-namesSpear = colnames(rmse)
-namesSpear[1] = "dnn"
-which(names(cols) %in% namesSpear, arr.ind = T)
-colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T))]
-plotSim(rmse, labels = c("20*50","50*100", "100*200"), cols = colsReg, 
-        ylab = "RMSE", ylim = c(0.,40), cex.axis = 0.7, cex.lab = cexP)
-text(labels  = "(e)",x = -xText, y = 47.2,pos = 4, xpd = NA,font = 2,cex = cexP)
-plotSim(rmseAB, labels = c("20*50","50*100", "100*200"), cols = colsReg, 
-        ylab = "RMSE", ylim = c(0.,27), cex.axis = 0.7, cex.lab = cexP)
-text(labels  = "(f)",x = -xText, y = 31.86,pos = 4, xpd = NA,font = 2,cex = cexP)
-plotSim(rmseObs, labels = c("50","500", "2000"), xlab = "Observation time", 
-        cols = colsReg, ylab = "RMSE", ylim = c(0.,27), cex.axis = 0.7, cex.lab = cexP)
-text(labels  = "(g)",x = -xText, y = 31.86,pos = 4, xpd = NA,font = 2,cex = cexP)
-dev.off()
+<!-- ## Figure S1 -->
+<!-- ```{r, results = FALSE} -->
+<!-- reset() -->
+<!-- cols =c( "#C0B9B2" ,"#CC0744" ,"#001E09" ,"#C2FF99" ,"#A079BF" ,"#00489C" ,"#6F0062" ) -->
+<!-- names(cols) = c("dnn","cnn","knn","SVM","naive","RF","boost") -->
+<!-- cexP = 0.9 -->
+<!-- xText = .59 -->
+<!-- tck = -0.04 -->
+<!-- plotSim = function(df, labels = c("20 x 50","50 x 100", "100 x 200"), cex.axis = 0.8, -->
+<!--                    cex.lab=0.8, ylab = "AUC", cols, ylim = c(0,1),  -->
+<!--                    cexP = 0.8, axisY = NULL,xlab = "A x B Individuals", xpd = NA){ -->
+<!--   par(mgp = c(1.4,0.2,0)) -->
+<!--   plot(NULL, NULL, xlim = c(0,1), ylim = ylim, axes = F,xlab ="",  -->
+<!--        ylab = ylab, font.lab = 2, cex.lab = cex.lab, xpd = NA) -->
+<!--     par(mgp = c(1.3,0.2,0)) -->
+<!--   text(x = 0.5, y = -0.25*max(ylim), pos = 1, labels = xlab, font = 2, cex = cex.lab, xpd = NA) -->
+<!--   axis(1,at = seq(0,1, length.out = 3),labels = labels,cex.axis = cex.axis, xpd = NA, tck = tck) -->
+<!--   par(mgp = c(3,0.4,0)) -->
+<!--   if(is.null(axisY)) axis(2,cex.axis = cex.axis, las = 2, tck = tck) -->
+<!--   else axis(at = seq(0, max(ylim),0.1),2,cex.axis = cex.axis, labels = axisY, las = 2, tck = tck) -->
+<!--   par(mgp = c(1.7,0.2,0)) -->
+<!--   for(i in 1:ncol(df)){ -->
+<!--     lines(x = seq(0,1, length.out = 3), y = df[,i], type = "o", col = cols[i], pch = 21, cex = cexP, bg = "white") -->
+<!--   } -->
+<!-- } -->
+<!-- pdf(file = "./Figures/FigS1.pdf", width = 5.50, height = 2.2) -->
+<!-- par(mfrow = c(2,4), mar = c(2.3,2.3,1,2.2)-0.2, oma = c(0.33,0.4,0.5,1.2), mgp = c(1.7,0.5,0)) -->
+<!-- names(cols) = colnames(auc) -->
+<!-- plotSim(tss, labels = NA, cols = cols, ylab = "TSS", ylim = c(0,1),xlab = "", cex.axis = 0.7, cex.lab = cexP) -->
+<!-- text(labels  = "(a)",x = -xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+<!-- plotSim(tssAB, labels = NA, cols = cols, ylab = "TSS", ylim = c(0,1), xlab = "", cex.axis = 0.7, cex.lab = cexP) -->
+<!-- text(labels  = "(b)",x = -xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+<!-- plotSim(tssObs, labels = NA, xlab = "",cols = cols, ylab = "TSS", ylim = c(0.0,1), cex.axis = 0.7, cex.lab = cexP) -->
+<!-- text(labels  = "(c)",x = -xText, y = 1.18,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+<!-- plot(NULL,NULL, ylim = c(0.,0.5), xlab = "", ylab = "", axes = F, xlim = c(0,1)) -->
+<!-- legend(x=0, y = 0.2,col = cols, legend = c("DNN","CNN","kNN","SVM","naive","RF","BRT"), pch = 16, xpd = NA,  -->
+<!--        bty = "n", cex = cexP, text.font = 2, y.intersp = 1.3, x.intersp = 0.7,horiz = F, pt.cex = 0.9) -->
+<!-- namesSpear = colnames(rmse) -->
+<!-- namesSpear[1] = "dnn" -->
+<!-- which(names(cols) %in% namesSpear, arr.ind = T) -->
+<!-- colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T))] -->
+<!-- plotSim(rmse, labels = c("20*50","50*100", "100*200"), cols = colsReg,  -->
+<!--         ylab = "RMSE", ylim = c(0.,40), cex.axis = 0.7, cex.lab = cexP) -->
+<!-- text(labels  = "(e)",x = -xText, y = 47.2,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+<!-- plotSim(rmseAB, labels = c("20*50","50*100", "100*200"), cols = colsReg,  -->
+<!--         ylab = "RMSE", ylim = c(0.,27), cex.axis = 0.7, cex.lab = cexP) -->
+<!-- text(labels  = "(f)",x = -xText, y = 31.86,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+<!-- plotSim(rmseObs, labels = c("50","500", "2000"), xlab = "Observation time",  -->
+<!--         cols = colsReg, ylab = "RMSE", ylim = c(0.,27), cex.axis = 0.7, cex.lab = cexP) -->
+<!-- text(labels  = "(g)",x = -xText, y = 31.86,pos = 4, xpd = NA,font = 2,cex = cexP) -->
+<!-- dev.off() -->
 
-```
+<!-- ``` -->
 
 
 ## Figure S2
@@ -528,7 +826,7 @@ write_csv(tablePaper, path = "./Figures/resultsPollinator.csv")
 
 ```
 
-## Table S1
+## Table S3
 ```{r,include=FALSE}
 bestTestTable = bestTest[order(bestTest$sensitivity, decreasing = T),]
 test = test[order(test$method),]

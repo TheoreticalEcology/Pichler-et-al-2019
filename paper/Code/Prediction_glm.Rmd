@@ -89,7 +89,8 @@ resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOne
           settings = list(negBin = list(seed = 42, batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"),
-                          glm = list(family = "poisson")),
+                          glm = list(family = "poisson"),
+                          glm_step = list(family = "poisson")),
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, tuningMetric = "spearmanrho",
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
@@ -124,7 +125,8 @@ resultAbR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(
           settings = list(negBin = list(seed = 42,  batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"),
-                          glm = list(family = "poisson")),
+                          glm = list(family = "poisson"),
+                          glm_step = list(family = "poisson")),
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, tuningMetric = "spearmanrho",
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
@@ -196,7 +198,8 @@ if(run){
           settings = list(negBin = list(seed = 42,  batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"),
-                          glm = list(family = "poisson")),
+                          glm = list(family = "poisson"),
+                          glm_step = list(family = "poisson")),
                        tune = "random", iters = iter,  fitSpecies = F,tuningMetric = "spearmanrho",
           crossValidation = crossValidation,
                         block = T, parallel = parallel, seed = 42, keepModels = T)
@@ -255,7 +258,8 @@ resultC = list()
           settings = list(negBin = list(seed = 42,  batch = 50, 
                                         distribution = "poisson",  archFunction = "continous", epochs = epochs),
                           boost = list( objective = "count:poisson"), 
-                          glm = list(family = "poisson")),
+                          glm = list(family = "poisson"),
+                          glm_step = list(family = "poisson")),
                        tune = "random", iters = iter,  fitSpecies = F,tuningMetric = "spearmanrho",
           crossValidation = crossValidation,
                         block = T, parallel = parallel, seed = 42, keepModels = T)

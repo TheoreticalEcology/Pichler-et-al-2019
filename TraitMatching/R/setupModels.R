@@ -226,7 +226,7 @@ getPars <- function(method, settings = NULL, extra = NULL){
        parameter = ParamHelpers::makeParamSet(ParamHelpers::makeDiscreteParam("link", values = c("logit", "probit")),
                                                                                          ParamHelpers::makeLogicalParam("secondOrderInteractions", default = TRUE))
     } else {
-      parameter = ParamHelpers::makeParamSet(ParamHelpers::makeDiscreteParam("poisson.link", values = c("log","sqrt")),
+      parameter = ParamHelpers::makeParamSet(
                                                                                          ParamHelpers::makeLogicalParam("secondOrderInteractions", default = TRUE))
     }
   }

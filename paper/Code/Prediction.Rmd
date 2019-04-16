@@ -51,7 +51,7 @@ knitr::kable(df,caption = "Simulated trait combinations")
 ```{r}
 epochs = 50L
 iter = 30
-parallel = 30
+parallel = 30L
 run = TRUE
 crossValidation = list(outer = list(method = "SpCV", iters = 5, predict = "both"), 
                                  inner = list(method = "SpCV", iters = 3))
@@ -148,7 +148,7 @@ simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
 table(as.matrix(minOneInter(simulatedData$binar(1.2e-1))))
 ```
 
-I tested the influence of three sizes on the performance. I set the observation time $=4e3$ to get for alomost all species at least one interaction. I sampled 25 \%, 50 \% and 100 \% of the species to get three network sizes of:
+We tested the influence of three sizes on the performance. I set the observation time $=4e3$ to get for alomost all species at least one interaction. We sampled 25 \%, 50 \% and 100 \% of the species to get three network sizes of:
 
 ```{r,results=FALSE}
 interBaseP = minOneInter(simulatedData$poisson(1.2e-1))
@@ -295,7 +295,6 @@ if(run){
   
   ResultBaselineC_SVM = readRDS(file = "./Results/simBaselineC_SVM.RDS")
   ResultBaselineR_SVM = readRDS(file = "./Results/simBaselineR_SVM.RDS")
-  
     
   ResultSizeC_GLM = readRDS(file = "./Results/simSizeC_GLM.RDS")
   ResultSizeR_GLM = readRDS(file = "./Results/simSizeR_GLM.RDS")
@@ -330,20 +329,20 @@ if(run){
     ResultObsR[[i]]$Result[["glm_step"]] = ResultObsR_GLM[[i]]$Result$glm_step
   }
   
-  ResultBaselineC$Result[["SVM"]] = ResultSizeBaselineC_SVM$Result$SVM
-  ResultBaselineR$Result[["SVM"]] = ResultSizeBaselineR_SVM$Result$SVM
+  ResultBaselineC$Result[["SVM"]] = ResultBaselineC_SVM$Result$SVM
+  ResultBaselineR$Result[["SVM"]] = ResultBaselineR_SVM$Result$SVM
   
   ResultAbR$Result[["SVM"]] = ResultAbR_SVM$Result$SVM
   ResultAbC$Result[["SVM"]] = ResultAbC_SVM$Result$SVM
   
-  ResultBaselineC$Result[["glm"]] = ResultSizeBaselineC_GLM$Result$glm
-  ResultBaselineR$Result[["glm"]] = ResultSizeBaselineR_GLM$Result$glm
+  ResultBaselineC$Result[["glm"]] = ResultBaselineC_GLM$Result$glm
+  ResultBaselineR$Result[["glm"]] = ResultBaselineR_GLM$Result$glm
   
   ResultAbR$Result[["glm"]] = ResultAbR_GLM$Result$glm
   ResultAbC$Result[["glm"]] = ResultAbC_GLM$Result$glm
   
-  ResultBaselineC$Result[["glm_step"]] = ResultSizeBaselineC_GLM$Result$glm_step
-  ResultBaselineR$Result[["glm_step"]] = ResultSizeBaselineR_GLM$Result$glm_step
+  ResultBaselineC$Result[["glm_step"]] = ResultBaselineC_GLM$Result$glm_step
+  ResultBaselineR$Result[["glm_step"]] = ResultBaselineR_GLM$Result$glm_step
   
   ResultAbR$Result[["glm_step"]] = ResultAbR_GLM$Result$glm_step
   ResultAbC$Result[["glm_step"]] = ResultAbC_GLM$Result$glm_step
@@ -382,60 +381,100 @@ if(run){
 
 We computed tss, auc (rmse, spearman) for testing and training splits: 
 ```{r,results=FALSE}
-load(file = "../Results/ResultsSimulationAgg.RData")
-tss = auc =  tssObs = aucObs = aucGenSize = data.frame(matrix(0,3,7))
-tssGenSize = aucAB = tssAB = data.frame(matrix(0,3,7))
-rmse = spear = rmseObs = spearObs = spearGenSize = data.frame(matrix(0, 3, 5))
-spearGenObs = spearAB = rmseAB = data.frame(matrix(0, 3, 5))
+load(file = "./Results/ResultsSimulationAgg.RData")
+tss = auc =  tssObs = tssGenSize= aucObs = aucGenSize = data.frame(matrix(0,3,9))
+baseC = aucAB = tssAB = baseCTSS = data.frame(matrix(0,1,9))
+rmse = spear = rmseObs = spearGenObs = spearObs = spearGenSize = data.frame(matrix(0, 3, 7))
+baseR=  baseRrmse = spearAB = rmseAB = data.frame(matrix(0, 1, 7))
 
-methods = ResultSizeRagg[[1]][[6]][ResultSizeRagg[[1]][[6]]$set == "test",]$method
+methods = ResultSizeRagg[[1]][[8]][ResultSizeRagg[[1]][[8]]$set == "test",]$method
 colnames(rmse) = colnames(spear) = methods
 colnames(rmseObs) = colnames(spearObs) = methods
 colnames(spearGenObs) = colnames(spearGenSize) = methods
-colnames(spearAB) = colnames(rmseAB) = methods
+colnames(spearAB) = colnames(rmseAB) = colnames(baseR) = colnames(rmseAB) = colnames(baseRrmse) =  methods
 
-methods2 = ResultSizeCagg[[1]][[8]][ResultSizeCagg[[1]][[8]]$set == "test",c(1,11,13)]$method
+methods2 = ResultSizeCagg[[1]][[10]][ResultSizeCagg[[1]][[10]]$set == "test",c(1,11,13)]$method
 colnames(tss) = colnames(auc) = methods2
 colnames(aucObs) = colnames(tssObs) = methods2
-colnames(aucGenSize) = colnames(tssGenSize) = methods2
-colnames(aucAB) = colnames(tssAB)= methods2
+colnames(aucGenSize) = colnames(tssGenSize) = colnames(baseCTSS)= methods2
+colnames(aucAB) = colnames(tssAB) = colnames(baseC) = methods2
 
 agg = function(d, m,  n) d[d$set == "test" & d$method == m, n]
 aggT = function(d, m, n) d[d$set == "train" & d$method == m, n]
 aucCheck = function(a) ifelse(a < 0.5, 1- a, a)
 for(i in 1:3){
-  for(k in 1:8){
+  for(k in 1:9){
+    
     # Classification
-    tss[i,k] = agg(ResultSizeCagg[[i]][[8]], colnames(tss)[k], 11)
-    tssAB[i,k] = agg(ResultAbCagg[[i]][[8]], colnames(tss)[k], 11)
-    tssObs[i,k] = agg(ResultObsCagg[[i]][[8]], colnames(tss)[k], 11)
+    tss[i,k] = agg(ResultSizeCagg[[i]][[9+1]], colnames(tss)[k], 11)
+   # tssAB[i,k] = agg(ResultAbCagg[[i]][[9+1]], colnames(tss)[k], 11)
+    tssObs[i,k] = agg(ResultObsCagg[[i]][[9+1]], colnames(tss)[k], 11)
     
-    auc[i,k] = agg(ResultSizeCagg[[i]][[8]], colnames(auc)[k], 1)
-    aucAB[i,k] = agg(ResultAbCagg[[i]][[8]], colnames(auc)[k], 1)
-    aucObs[i,k] = agg(ResultObsCagg[[i]][[8]], colnames(auc)[k], 1)
+    auc[i,k] = agg(ResultSizeCagg[[i]][[9+1]], colnames(auc)[k], 1)
+   # aucAB[i,k] = agg(ResultAbCagg[[i]][[9+1]], colnames(auc)[k], 1)
+    aucObs[i,k] = agg(ResultObsCagg[[i]][[9+1]], colnames(auc)[k], 1)
     
-    aucGenSize[i,k] = (aucCheck(aggT(ResultSizeCagg[[i]][[8]], colnames(auc)[k], 1))- aucCheck(auc[i,k]))/aucCheck(aggT(ResultSizeCagg[[i]][[8]], colnames(auc)[k], 1))
+    aucGenSize[i,k] = (aucCheck(aggT(ResultSizeCagg[[i]][[10]], colnames(auc)[k], 1))- aucCheck(auc[i,k]))/aucCheck(aggT(ResultSizeCagg[[i]][[10]], colnames(auc)[k], 1))
     
-    tssGenSize[i,k] = (aggT(ResultSizeCagg[[i]][[8]], colnames(tss)[k], 11)-tss[i,k])/aggT(ResultSizeCagg[[i]][[8]], colnames(tss)[k], 11)
-    
+    tssGenSize[i,k] = (aggT(ResultSizeCagg[[i]][[10]], colnames(tss)[k], 11)-tss[i,k])/aggT(ResultSizeCagg[[i]][[10]], colnames(tss)[k], 11)
+    # 
     # Regression
-    if(k < 6){
-      rmse[i,k] = agg(ResultSizeRagg[[i]][[6]], colnames(rmse)[k], 1)
-      rmseAB[i,k] = agg(ResultAbRagg[[i]][[6]], colnames(rmse)[k], 1)
-      rmseObs[i,k] = agg(ResultObsRagg[[i]][[6]], colnames(rmse)[k], 1)
-      spear[i,k] = abs(agg(ResultSizeRagg[[i]][[6]], colnames(spear)[k], 2))
-      spearAB[i,k] = abs(agg(ResultAbRagg[[i]][[6]], colnames(spear)[k], 2))
-      spearObs[i,k] = abs(agg(ResultObsRagg[[i]][[6]], colnames(spear)[k], 2))
-      spearGenSize[i,k] =(aggT(ResultSizeRagg[[i]][[6]], colnames(spear)[k], 2)-spear[i,k])/aggT(ResultSizeRagg[[i]][[6]], colnames(spear)[k], 2)
-      spearGenObs[i,k] = (aggT(ResultObsRagg[[i]][[6]], colnames(spear)[k], 2)-spear[i,k])/aggT(ResultObsRagg[[i]][[6]], colnames(spear)[k], 2)
+    if(k < 8){
+      rmse[i,k] = agg(ResultSizeRagg[[i]][[8]], colnames(rmse)[k], 1)
+      #rmseAB[i,k] = agg(ResultAbRagg[[i]][[6]], colnames(rmse)[k], 1)
+      rmseObs[i,k] = agg(ResultObsRagg[[i]][[8]], colnames(rmse)[k], 1)
+      spear[i,k] = abs(agg(ResultSizeRagg[[i]][[8]], colnames(spear)[k], 2))
+      #spearAB[i,k] = abs(agg(ResultAbRagg[[i]][[6]], colnames(spear)[k], 2))
+      spearObs[i,k] = abs(agg(ResultObsRagg[[i]][[8]], colnames(spear)[k], 2))
+      spearGenSize[i,k] =(aggT(ResultSizeRagg[[i]][[8]], colnames(spear)[k], 2)-spear[i,k])/aggT(ResultSizeRagg[[i]][[8]], colnames(spear)[k], 2)
+      spearGenObs[i,k] = (aggT(ResultObsRagg[[i]][[8]], colnames(spear)[k], 2)-spear[i,k])/aggT(ResultObsRagg[[i]][[8]], colnames(spear)[k], 2)
+    }
+    
+    if(i == 1){
+      aucAB[1,k] = agg(ResultAbCagg[[9+1]], colnames(auc)[k], 1)
+      tssAB[1,k] = agg(ResultAbCagg[[9+1]], colnames(auc)[k], 11)
+      baseC[1,k]  = agg(ResultBaselineCagg[[9+1]], colnames(auc)[k], 1)
+      baseCTSS[1,k]  = agg(ResultBaselineCagg[[9+1]], colnames(auc)[k], 11)
+      if(k < 8){
+         rmseAB[1,k] = agg(ResultAbRagg[[8]], colnames(rmse)[k], 1)
+         spearAB[1,k] = abs(agg(ResultAbRagg[[8]], colnames(spear)[k], 2))
+         baseR[1,k] = agg(ResultBaselineRagg[[8]], colnames(rmse)[k], 2)
+         baseRrmse[1,k] = agg(ResultBaselineRagg[[8]], colnames(rmse)[k], 1)
+
+      }
+      
     }
   }
 }
+# NA in boost:
+baseR$boost = mean(ResultBaselineRagg$boost$test$Spearmanrho,na.rm = TRUE)
+
 auc = as.data.frame(lapply(auc, function(x) ifelse(x < 0.5, 1-x, x)))
+baseC = as.data.frame(lapply(baseC, function(x) ifelse(x < 0.5, 1-x, x)))
 aucAB = as.data.frame(lapply(aucAB, function(x) ifelse(x < 0.5, 1-x, x)))
 aucObs = as.data.frame(lapply(aucObs, function(x) ifelse(x < 0.5, 1-x, x)))
 
-save(rmse, rmseAB, rmseObs, spear,spearAB,spearGenObs, spearGenSize,tss,tssAB,tssGenSize,tssObs,auc,aucAB,aucObs,aucGenSize, file = "../Results/SimulationAggreationFig2.RData")
+save(rmse, 
+     rmseAB,
+     rmseObs,
+     baseRrmse,
+     spear,
+     spearAB,
+     spearObs,
+     spearGenObs, 
+     spearGenSize,
+     baseR,
+     tss,
+     tssAB,
+     tssGenSize,
+     tssObs,
+     baseCTSS,
+     auc,
+     baseC,
+     aucAB,
+     aucObs,
+     aucGenSize, 
+     file = "./Results/SimulationAggreationFig2.RData")
 
 ```
 
