@@ -555,7 +555,7 @@ Connect results and tune thresholds+computing of additional measurements
 tune = FALSE
 if(tune){
   
-  raw = readRDS(file = "../Results/CaseStudy1.RDS")
+  raw = readRDS(file = "./Results/CaseStudy1.RDS")
   
   
  

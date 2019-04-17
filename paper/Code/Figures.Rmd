@@ -293,10 +293,12 @@ dev.off()
 ## Table S1 and S2 
 ```{r}
 results = rbind(baseC, baseCTSS)
+results = round(results,2)
 results = cbind(data.frame(Measure = c("AUC", "TSS")), results)
 
 # Reorder for rbind:
 reg = data.frame((c("Spearman",baseR[,1], NA, baseR[,3], NA, baseR[,2], baseR[,4:7])))
+reg =  data.frame(lapply(reg, function(i) if(is.numeric(i)) return(round(i,2)) else return(i)))
 colnames(reg) = colnames(results)
 results = rbind(results, reg)
 print(results)
@@ -392,8 +394,19 @@ bestTest = bestTest[order(bestTest$sensitivity,decreasing = TRUE),]
 bestTrain = train[paste0(rep("tr",7),substr(rownames(bestTest),3,4)),]
 
 library(Aranea)
-cols =c( "#C0B9B2" ,"#CC0744" ,"#001E09" ,"#C2FF99" ,"#A079BF" ,"#00489C" ,"#6F0062" )
-names(cols) = c("dnn","cnn","knn","SVM","naive","RF","boost")
+# cols =c( "#C0B9B2" ,"#CC0744" ,"#001E09" ,"#C2FF99" ,"#A079BF" ,"#00489C" ,"#6F0062" )
+# names(cols) = c("dnn","cnn","knn","SVM","naive","RF","boost")
+
+cols =c("#bfa23d",
+"#5d3686",
+"#6ca24d",
+"#c26abb",
+"#46c19a",
+"#ba496b",
+"#6c7ed7",
+"#b55c36")
+names(cols) = c("dnn","cnn","knn","SVM","naive","RF","boost", "glm")
+
 addA = function(col, alpha = 0.25) apply(sapply(col, col2rgb)/255, 2, function(x) rgb(x[1], x[2], x[3], alpha=alpha)) 
 multiCoords = matrix(0,8,4)
 multiCoords[1,] = c(0.25, 0.75, 1/3, 1)
@@ -430,24 +443,70 @@ write.table(cbind(round(bestTest2[,-c(6,7,12:14)], digits = 3), method = bestTes
 
 ```{r,results=FALSE}
 #### Figure
+plotResAgg = function(resAgg, labels = c("DNN", "RF", "BRT", "kNN"), col = "darkgreen", font = 1){
+  lenM = length(unique(resAgg$model))
+  plot(NULL, NULL, xlim = c(0,1), ylim = c(0,1), xlab = "", ylab = "", axes = FALSE)
+  seq_y = matrix(c(seq(0,1-1/4, length.out = 4),
+                   seq((1/4),1, length.out = 4) ), ncol = 2)
+    if(length(labels) != 4){
+      if(lenM < 4){
+        seq_x = seq_y[1:lenM,]
+      } else {
+        seq_x = matrix(c(seq(0,1-1/lenM, length.out = lenM),
+                   seq((1/lenM),1, length.out = lenM) ), ncol = 2)
+      }
+  } else {
+    seq_x = seq_y
+  }
+  colfunc = colorRampPalette(c("white", col))
+  
+  axis(3,labels = labels, cex.axis = 0.9, at = apply(seq_x,1,mean),font = font, line = -0.7, col = NA, col.ticks = 1)
+  axis(2,labels = as.character(4:1), at = apply(seq_y,1,mean),font = font,las = 2,line = -0.7, col = NA, col.ticks = 1, cex.axis = 0.9)
+  models = unique(resAgg$model)
+  for(i in models){
+    for(j in 1:4){
+      value = resAgg  %>% filter(model == i) %>% slice(j) %>% pull(trp)
+      if(!is.na(value)) colS = colfunc(1e4+1)[value*1e4 + 1]
+      else colS = "lightgrey"
+      rect(xleft = seq_x[which(i == models),1], xright = seq_x[which(i == models),2], 
+           ybottom = seq_y[4-j+1,1], ytop = seq_y[4-j+1,2], 
+           col = colS, border = "black")
+      text(round(value, digits = 2), x = seq_x[which(i == models),1]*0.97,y = mean(seq_y[(4-j+1),]) ,pos = 4, cex = 0.9, font = font)
+    }
+    
+  }
+}
 resAggSmallReg = readRDS(file = "./Results/resAggSmallReg.RDS")
 resAggSmallClass = readRDS(file = "./Results/resAggSmallClass.RDS")
 
 resAggMiddleReg = readRDS(file = "./Results/resAggMiddleReg.RDS")
 resAggMiddleClass = readRDS(file = "./Results/resAggMiddleClass.RDS")
+load(file = "./Results/glmInferenceTPR.RData")
 
+smallRegGLM = data.frame(model = rep("glm",4), len_true = 1:4, trp = TPRpR)
+smallClassGLM = data.frame(model = rep("glm",4), len_true = 1:4, trp = TPRpC)
+
+
+reset()
 pdf(file = "./Figures/Fig4.pdf",width = 5.5,height = 3.5)
-par(mfrow = c(1,2), mar = c(1,2,0.6,0.1)+0.1,oma = c(0.0,0.2,1.2,0.1))
-plotResAgg(resAggSmallReg)
-text(xpd = NA, x = -0.1, y = 1.1, labels = "a)", font = 2)
-plotResAgg(resAggSmallClass)
-text(xpd = NA, x = -0.1, y = 1.1, labels = "b)", font = 2)
+par(mfrow = c(1,2), mar = c(1,0.7,0.6,0.1)+0.1,oma = c(0.0,0.2,1.2,0.1))
+plotResAgg(bind_rows(resAggSmallReg[,c(1,2,3)], smallRegGLM), col = "darkred" , labels = c("DNN", "RF", "BRT", "kNN", "glm"))
+text(xpd = NA, x = -0.1, y = 1.1, labels = "a)", font = 1, cex = 0.9)
+plotResAgg(bind_rows(resAggSmallReg[,c(1,2,3)], smallRegGLM), col = "darkred", labels = c("DNN", "RF", "BRT", "kNN", "glm"))
+text(xpd = NA, x = -0.1, y = 1.1, labels = "b)", font = 1, cex = 0.9)
 dev.off()
 
-plotResAgg(resAggMiddleReg,labels = c("DNN", "BRT"))
-text(xpd = NA, x = -0.1, y = 1.1, labels = "c)", font = 2)
-plotResAgg(resAggMiddleClass,labels = c("DNN", "BRT"))
-text(xpd = NA, x = -0.1, y = 1.1, labels = "d)", font = 2)
+```
+
+## Figure S3
+```{r}
+reset()
+pdf(file = "./Figures/FigS3.pdf",width = 5.5,height = 3.5)
+par(mfrow = c(1,2), mar = c(1,2,0.6,0.1)+0.1,oma = c(0.0,0.2,1.2,0.1))
+plotResAgg(resAggMiddleReg,labels = c("DNN", "BRT"), col = "darkred")
+text(xpd = NA, x = -0.1, y = 1.1, labels = "a)", font = 1)
+plotResAgg(resAggMiddleClass,labels = c("DNN", "BRT"), col = "darkred")
+text(xpd = NA, x = -0.1, y = 1.1, labels = "b)", font = 1)
 dev.off()
 
 ```
@@ -685,12 +744,13 @@ dev.off()
 <!-- ``` -->
 
 
-## Figure S3
+## Figure S4
 goodness of fit on train for appendix
 
 ```{r, results=FALSE}
 load(file = "./Results/HummingInferenceResult.RData")
 load(file = "./Results/HummingBirdResult.RData")
+addA = TraitMatching:::addA
 models = list(modelRF = modelRF, modelBoost = modelBoost, modelNegBin = modelNegBin, modelPoisson = modelPoisson)
 plotNames = names(community)
 predList = list()
@@ -711,7 +771,7 @@ pos[,2] = c(sapply(1:4, function(x) return(rep(0+x*0.25, 7))))
 pos[,3] = rep(seq(1,0,length.out = 8)[2:8], 4)
 pos[,4] = rep(seq(1,0,length.out = 8)[1:7], 4)
 lwd = 1.0
-pdf(file = "./Figures/FigS3.pdf")
+pdf(file = "./Figures/FigS4.pdf")
 par(mar = c(0.5,.2,.5,.2)-0.1, oma = c(2, 2, 2, 2), xaxt = "s", yaxt = "s", mgp = c(1,1,0))
 plotNames = c("Low", "Mid", "High", "Mid+High", "Low+Mid", "Low+High" , "All")
 labelCounter = 1
@@ -741,7 +801,7 @@ reset()
 ```
 
 
-## Figure S4
+## Figure S5
 
 
 ```{r,results=FALSE}

@@ -94,9 +94,55 @@ for(i in 1:length(simulation$data)){
 save(simulation, file = "./Results/simulationInterMetaDataSMALL.RData")
 
 
+
+
 ```
 
+#### GLM
+```{r}
+library(TraitMatching)
+set.seed(42)
+load(file = "./Results/simulationInterMetaDataSMALL.RData")
 
+resultR = vector("list",4)
+
+for(i in 1:length(simulation$data)){
+  for(n in 1:length(simulation$data[[i]])) {
+      resultR[[i]][[n]] = runTM(createCommunity(simulation$data[[i]][[n]]$A, 
+                                               simulation$data[[i]][[n]]$B, 
+                                               minOneInter(simulation$data[[i]][[n]]$poisson(simulation$res[[i]][[n]])), log = FALSE), 
+                           method = c("glm", "glm_step"), 
+            settings = list(glm = list(family = "poisson"), glm_step = list(family = "poisson")),
+                         tune = "random", iters = 30,  fitSpecies = F,
+                         crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
+                                                inner = list(method = "Holdout", split = 4/5, predict = "both")), 
+                         balanceClasses = "None", block = T, parallel = 30, seed = 42, keepModels = T,tuningMetric = "spearmanrho")
+      saveRDS(resultR, file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALLglm.RDS")
+  }
+}
+
+resultC = vector("list", 4)
+for(i in 1:length(simulation$data)){
+  for(n in 1:length(simulation$data[[i]])) {
+      resultC[[i]][[n]] = runTM(createCommunity(simulation$data[[i]][[n]]$A,
+                                             simulation$data[[i]][[n]]$B, 
+                                             minOneInter(simulation$data[[i]][[n]]$binar(simulation$res[[i]][[n]]))), 
+                         method = c("glm", "glm_step"), 
+                       tune = "random", iters = 30,  fitSpecies = F,
+                       crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
+                                              inner = list(method = "Holdout", split = 4/5, predict = "both")), 
+                       balanceClasses = "None", block = T, parallel = 30, seed = 42, keepModels = T)
+    saveRDS(resultC, file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALLglm.RDS")
+  }
+}
+
+
+save(simulation, file = "./Results/simulationInterMetaDataSMALL.RData")
+
+
+
+
+```
 
 #### Small Interaction
 ```{r}
@@ -298,6 +344,9 @@ saveRDS(result_classif_middle, file = "./Results/res_classif_middle.RDS")
 ### Results
 #### Small
 ```{r}
+library(TraitMatching)
+library(tidyverse)
+source("./Code/helpFunctions.R")
 regrRes = readRDS(file = "./Results/res_reg_small.RDS")
 classRes = readRDS(file = "./Results/res_classif_small.RDS")
 
@@ -306,7 +355,7 @@ studyClassReg = readRDS(file = './Results/simulationTraitsAndStrengthsClassifWOa
 
 load(file = './Results/simulationInterMetaDataSMALL.RData')
 
-library(TraitMatching)
+
 
 TraitInter = simulation$TraitInter
 
@@ -347,10 +396,59 @@ aggResClass$repetition = rep(unlist(apply(ind_matrix, 1, function(x) rep(x[2], x
 
 resAggSmallReg = aggTrpRep(aggTrp(aggResRegr), aggResRegr)
 resAggSmallClass = aggTrpRep(aggTrp(aggResClass), aggResClass)
-save(resAggSmallReg, file = "./Results/resAggMiddleReg.RDS")
-save(resAggSmallClass, file = "./Results/resAggMiddleReg.RDS")
+saveRDS(resAggSmallReg, file = "./Results/resAggSmallReg.RDS")
+saveRDS(resAggSmallClass, file = "./Results/resAggSmallClass.RDS")
 
 ```
+
+#### Small GLM
+```{r}
+load(file = './Results/simulationInterMetaDataSMALL.RData')
+regrResGlm = readRDS(file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALLglm.RDS")
+regrClassGlm = readRDS(file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALLglm.RDS")
+
+
+TPRestR = NULL
+TPRpR = NULL
+TPRestC = NULL
+TPRpC = NULL
+for(i in 1:4){
+  TPRtmpR = NULL
+  TPRtmpPR = NULL
+  TPRtmpPC = NULL
+  TPRtmpC = NULL
+  for(k in 1:10){
+    actual = apply(matrix(simulation$TraitInter[[i]][k,], ncol = 2,byrow = TRUE), 1, function(l) paste0(l[1], ":", l[2]))
+    
+    
+    coefs = coef(summary(mlr::getLearnerModel(regrResGlm[[i]][[k]]$Result$glm$result$models[[1]], more.unwrap = TRUE)))[-1,]
+    found = rownames(coefs[order(coefs[,1],decreasing = TRUE),])[nchar(rownames(coefs[order(coefs[,1],decreasing = TRUE),])) > 2][1:i]
+    TPRtmpR[k] = sum(actual %in% found)/i
+    
+    coefs = coef(summary(mlr::getLearnerModel(regrResGlm[[i]][[k]]$Result$glm$result$models[[1]], more.unwrap = TRUE)))[-1,]
+    found = rownames(coefs[order(coefs[,4],decreasing = FALSE),])[nchar(rownames(coefs[order(coefs[,1],decreasing = TRUE),])) > 2][1:i]
+    TPRtmpPR[k] = sum(actual %in% found)/i
+    
+     
+    coefs = coef(summary(mlr::getLearnerModel(regrClassGlm[[i]][[k]]$Result$glm$result$models[[1]], more.unwrap = TRUE)))[-1,]
+    found = rownames(coefs[order(coefs[,1],decreasing = FALSE),])[nchar(rownames(coefs[order(coefs[,1],decreasing = TRUE),])) > 2][1:i]
+    TPRtmpC[k] = sum(actual %in% found)/i
+    
+    coefs = coef(summary(mlr::getLearnerModel(regrClassGlm[[i]][[k]]$Result$glm$result$models[[1]], more.unwrap = TRUE)))[-1,]
+    found = rownames(coefs[order(coefs[,4],decreasing = FALSE),])[nchar(rownames(coefs[order(coefs[,1],decreasing = TRUE),])) > 2][1:i]
+    TPRtmpPC[k] = sum(actual %in% found)/i
+
+  }
+  TPRestR[i] = mean(TPRtmpR, na.rm = T)
+  TPRpR[i] = mean(TPRtmpPR, na.rm = T)
+  TPRestC[i] = mean(TPRtmpC, na.rm = T)
+  TPRpC[i] = mean(TPRtmpPC, na.rm = T)
+  
+  save(TPRestR, TPRpR, TPRestC, TPRpC, file = "./Results/glmInferenceTPR.RData")
+}
+```
+
+
 
 #### Middle
 ```{r}
@@ -401,8 +499,8 @@ aggResClass$repetition = rep(unlist(apply(ind_matrix, 1, function(x) rep(x[2], x
 
 resAggMiddleReg = aggTrpRep(aggTrp(aggResRegr), aggResRegr)
 resAggMiddleClass = aggTrpRep(aggTrp(aggResClass), aggResClass)
-save(resAggMiddleReg, file = "./Results/resAggMiddleReg.RDS")
-save(resAggMiddleClass, file = "./Results/resAggMiddleClass.RDS")
+saveRDS(resAggMiddleReg, file = "./Results/resAggMiddleReg.RDS")
+saveRDS(resAggMiddleClass, file = "./Results/resAggMiddleClass.RDS")
 
 ```
 
@@ -457,8 +555,10 @@ if(run){
   tbL_c$plot = as.factor(rep("Low", nrow(tbL)))
   
   communityCombined =  createCommunity(community = list(list(tpH, tbH_c, inH), list(tpM, tbM_c, inM), list(tpL, tbL_c, inL)),log = F)
-  communityCombined$data = communityCombined$data %>% mutate(target = target/NumIndividuals) %>% 
-    select(-NumIndividuals) %>% createDummyFeatures(cols = "plot") 
+  communityCombined$data = communityCombined$data %>%
+    dplyr::mutate(target = target/NumIndividuals) %>% 
+    dplyr::select(-NumIndividuals) %>% 
+    mlr::createDummyFeatures(cols = "plot") 
   
   
   Low = LowMid = LowHigh = MidHigh = High = Mid = all =  communityCombined
@@ -494,8 +594,8 @@ if(run){
   
   # two DNN: Poisson and negative binomial distributions
   
-  learnerNegBinDnn = makeLearner("regr.negBinDnn",seed = 42, batch = 25,archFunction = "continous", distribution = "negBin", epochs = 60)
-  learnerPoissonDnn = makeLearner("regr.negBinDnn",seed = 42, batch = 25,archFunction = "continous", distribution = "poisson", epochs = 60)
+  learnerNegBinDnn = makeLearner("regr.negBinDnn",seed = 42, batch = 25,archFunction = "continous", distribution = "negBin", epochs = 30)
+  learnerPoissonDnn = makeLearner("regr.negBinDnn",seed = 42, batch = 25,archFunction = "continous", distribution = "poisson", epochs = 30)
   learnerRF = makeLearner("regr.randomForest", predict.type = "se")
   learnerBoost = makeLearner("regr.xgboost", objective = "count:poisson")
   parDnn = makeParamSet(makeNumericParam("lr", lower = 0.0001, upper = 0.01),
@@ -530,28 +630,28 @@ if(run){
   trainLearner.regr.negBinDnn = TraitMatching:::trainLearner.regr.negBinDnn
   parallelMap::parallelExport("trainLearner.regr.negBinDnn", "predictLearner.regr.negBinDnn", level = "mlr.tuneParams")
   
-  
+  set.seed(42)
   
   for(i in 1:7){
-   set.seed(42)
+   
     task = makeRegrTask(data = community[[i]]$data[,-c(1,2)], target = "target", coordinates = community[[i]]$block)
     
     modelNegBin[[i]] = mlr::train(setHyperPars(learnerNegBinDnn,par.vals =  tuneParams(learnerNegBinDnn, par.set = parDnn,
-                                                               control = makeTuneControlRandom(maxit = 60),measures = spearmanrho,show.info = T,
+                                                               control = makeTuneControlRandom(maxit = 30),measures = spearmanrho,show.info = T,
                                                               task = task, resampling = makeResampleDesc("SpCV", iters = 3))$x)
                               ,task = task)
   
     modelPoisson[[i]] = mlr::train(setHyperPars(learnerPoissonDnn,par.vals =  tuneParams(learnerNegBinDnn, par.set = parDnn,
-                                                               control = makeTuneControlRandom(maxit = 60),measures = spearmanrho,show.info = T,
+                                                               control = makeTuneControlRandom(maxit = 30),measures = spearmanrho,show.info = T,
                                                               task = task, resampling = makeResampleDesc("SpCV", iters = 3))$x)
                               ,task = task)
     
     modelRF[[i]] = mlr::train(setHyperPars(learnerRF,par.vals =  tuneParams(learnerRF, par.set = parRF,
-                                                              control = makeTuneControlRandom(maxit = 60),measures = spearmanrho,show.info = T,
+                                                              control = makeTuneControlRandom(maxit = 30),measures = spearmanrho,show.info = T,
                                                               task = task, resampling = makeResampleDesc("SpCV", iters = 3))$x)
                               ,task = task)
     modelBoost[[i]] = mlr::train(setHyperPars(learnerBoost,par.vals =  tuneParams(learnerBoost, par.set = parBoost,
-                                                              control = makeTuneControlRandom(maxit = 60),measures = spearmanrho,show.info = T,
+                                                              control = makeTuneControlRandom(maxit = 30),measures = spearmanrho,show.info = T,
                                                               task = task, resampling = makeResampleDesc("SpCV", iters = 3))$x)
                               ,task = task)
   

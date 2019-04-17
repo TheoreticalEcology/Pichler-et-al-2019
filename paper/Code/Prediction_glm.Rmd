@@ -464,7 +464,7 @@ if(run){
   
   
   result = runTM(cC, tune = "random", iters = iter, tuningMetric = "auc", crossValidation = cv, block = T, parallel = parallel, fitSpecies = F, balanceClasses = c("Over", "SMOTE", "Under"),
-                 method =  c( "glm", "glm_step"),  
+                 method =  c( "glm"),  
                 settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
                           cnn = list(seed = 42, activation = "relu", drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs))
                 )
