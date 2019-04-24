@@ -148,7 +148,7 @@ simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
 table(as.matrix(minOneInter(simulatedData$binar(1.2e-1))))
 ```
 
-We tested the influence of three sizes on the performance. I set the observation time $=4e3$ to get for alomost all species at least one interaction. We sampled 25 \%, 50 \% and 100 \% of the species to get three network sizes of:
+We tested the influence of three sizes on the performance. We set the observation time $=4e3$ to get for alomost all species at least one interaction. We sampled 25 \%, 50 \% and 100 \% of the species to get three network sizes of:
 
 ```{r,results=FALSE}
 interBaseP = minOneInter(simulatedData$poisson(1.2e-1))
@@ -528,19 +528,19 @@ Training was splitted due to high computional cost
 ```{r,results=FALSE}
 set.seed(42)
 if(run){
-  cv = list(outer = list(method = "SpCV", iters = 10, predict = "both"), inner = list(method = "SpCV", iters = 5))
+  cv = list(outer = list(method = "SpCV", iters = 5, predict = "both"), inner = list(method = "SpCV", iters = 3))
   
   
   
   cC = readRDS(file = "./Data/plantPoll.RDS")
   
   
-  result = runTM(cC, tune = "random", iters = iter, tuningMetric = "auc", crossValidation = cv, block = T, parallel = parallel, fitSpecies = F, balanceClasses = c("Over", "SMOTE", "Under"),
+  result = runTM(cC, tune = "random", iters = iter, tuningMetric = "auc", crossValidation = cv, block = T, parallel = parallel, fitSpecies = F, balanceClasses = c("Over"),
                  method = c("dnn", "cnn", "RFranger", "boost", "knn","naive", "glm"),
                 settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
                           cnn = list(seed = 42, activation = "relu", drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs))
                 )
-  saveRDS(result, file = "./Results/CaseStudy1.RDS")
+  saveRDS(result, file = "./Results/CaseStudy1_Over.RDS")
   
 }
 ```
@@ -555,13 +555,15 @@ Connect results and tune thresholds+computing of additional measurements
 tune = FALSE
 if(tune){
   
-  raw = readRDS(file = "./Results/CaseStudy1.RDS")
+  raw = readRDS(file = "./Results/CaseStudy1_Over.RDS")
+  svm = readRDS(file = "./Results/CaseStudy1_SVM.RDS")
+  raw$Result[["SVM"]] = svm$Result$SVM
   
   
  
-  Results = tuneAndAggregate(raw, tuneT = tss,onlyTest = F, bc = "all")
+  Results = tuneAndAggregate(raw, tuneT = tss,onlyTest = F)
   
-  saveRDS(Results, file = "../Results/aggregatedResults.RDS")
+  saveRDS(Results, file = "./Results/aggregatedResults.RDS")
 }
 
 
@@ -569,11 +571,11 @@ if(tune){
 
 Prepare data for figure
 ```{r,results=FALSE}
-Results = readRDS(file = "../Results/aggregatedResults.RDS")
+Results = readRDS(file = "./Results/aggregatedResults.RDS")
 test = Results$combinedTable[Results$combinedTable$set == "test",]
 train = Results$combinedTable[Results$combinedTable$set == "train",]
-colnames(test) = c("auc", "f1", "bac", "acc", "fdr", "fpr", "npv", "precision","specificity", "sensitivity", "tss", "set", "method", "balance")
-colnames(train) = c("auc", "f1", "bac", "acc", "fdr", "fpr", "npv", "precision","specificity", "sensitivity", "tss", "set", "method", "balance")
+colnames(test) = c("auc", "f1", "bac", "acc", "fdr", "fpr", "npv", "precision","specificity", "sensitivity", "tss", "set", "method")
+colnames(train) = c("auc", "f1", "bac", "acc", "fdr", "fpr", "npv", "precision","specificity", "sensitivity", "tss", "set", "method")
 test = test[order(test$tss, decreasing = T),]
 bestTest = test[!duplicated(test$method),]
 bestTest = bestTest[order(bestTest$auc),]
