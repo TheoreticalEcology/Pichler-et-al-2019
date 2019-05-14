@@ -241,6 +241,168 @@ dev.off()
 ```
 
 
+## NEW new FIGURE 2
+```{r}
+load(file = "./Results/SimulationAggreationFig2.RData")
+load(file = "./Results/SimulationAggreationCIFig2.RData")
+
+plotCI = function(x,y, ci, col, xLine = 0.07, lwd = 0.4) {
+  segments(x0 = x, x1 = x, y0 =y-ci, y1 = y+ci, col = col, lwd = lwd)
+  segments(x0 = x-xLine, x1 = x+xLine, y0 =y-ci, y1 = y-ci, col = col, lwd = lwd)
+  segments(x0 = x-xLine, x1 = x+xLine, y0 =y+ci, y1 = y+ci, col = col, lwd = lwd)
+}
+
+pdf("test_fiure2.pdf",width = 5.5, height = 2.3)
+par(mfrow = c(1,3), mar = c(2,3,1,0.3), mgp = c(1.8,0.7,0), oma = c(2,0,0,0))
+cex = 0.65
+cexP = 0.7
+offset = c(0,0.07,0.14)
+lwd = 0.7
+dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
+names(dictonary) = c("dnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
+data = 
+  rbind(
+    tss[2,,drop = FALSE],
+    tssAB,
+    baseCTSS
+  )
+ord = order(data[1,], decreasing = TRUE)
+
+CIdata = 
+  rbind(
+    tssCI[2,,drop = FALSE],
+    tssABCI,
+    baseCTSSCI
+  )
+
+data = data[,ord]
+not = -which(names(data) == c("glm_step"), arr.ind = TRUE)
+data = data[,not]
+CIdata = CIdata[names(data)]
+
+
+pch = c(16, 17,15)
+#gr <- seq(0.8, 0, length.out = 4)
+#col = c(rgb(0, 0, 0, 0.25),  rgb(0, 160, 176, alpha = 0.25*255, max = 255), rgb(235, 104, 65, alpha = 0.25*255, max = 255))
+#col_full = c(rgb(0, 0, 0, 0.8),  rgb(0, 160, 176, max = 255), rgb(235, 104, 65, max = 255))
+
+col_full = gray.colors(3, start = 0.0, end = 0.8, gamma = 2.2, alpha = NULL)
+col = TraitMatching:::addA(col_full, 0.25)
+
+x = 1:ncol(data)
+matplot(y = t(data),
+        x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(-1, 1), type = "p", pch = pch, col = col_full, cex = cexP,
+        axes = TRUE,
+        xlab = "",
+        ylab = "TSS", las =2,  xaxt="n", cex.axis = cex, cex.lab = cex)
+lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
+lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
+lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
+for(i in 1:3){
+  for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
+}
+axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2)
+text(x-0.2, par("usr")[3] - 0.1, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
+text(x = 0, pos = 2, y = 1+0.16, xpd = NA, labels = "a)", cex = cex)
+
+#text(x = max(x)-1.2,y = 1+0.16, pos = 4, cex = cex, labels = "Presence-absence data", font = 2, xpd = NA)
+
+
+data = 
+  rbind(
+    auc[2,,drop = FALSE],
+    aucAB,
+    baseC
+  )
+CIdata = 
+  rbind(
+    aucCI[2,,drop = FALSE],
+    aucABCI,
+    baseCCI
+  )
+ord = order(data[1,], decreasing = TRUE)
+
+data = data[,ord]
+not = -which(names(data) == c("glm_step"), arr.ind = TRUE)
+data = data[,not]
+CIdata = CIdata[names(data)]
+
+x = 1:ncol(data)
+matplot(y = t(data),
+        x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(0, 1), type = "p", pch = pch, col = col_full, cex = cexP,
+        axes = TRUE,
+        xlab = "",
+        ylab = "AUC", las =2,  xaxt="n",  cex.axis = cex, cex.lab = cex)
+lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
+lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
+lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
+for(i in 1:3){
+  for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
+}
+
+axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2)
+text(x-0.2, par("usr")[3] - 0.05, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
+text(x = 0, pos = 2, y = 1+0.08, xpd = NA, labels = "b)", cex = cex)
+
+
+ points(x = seq(-11,10, length.out = 3), y = rep(-0.3,3), pch = pch, col = col_full, xpd = NA)
+ text(x = seq(-11,10, length.out = 3), y = rep(-0.3,3), pos = 4, 
+      labels = c("TraitMatching, even species abundances ", 
+                 "Random interactions, uneven species abundances", 
+                 "Random interactions, even species abundances"), xpd = NA, cex = cex)
+
+
+dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
+names(dictonary) = c("negBinDnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
+data = 
+  rbind(
+    spear[2,,drop = FALSE],
+    spearAB,
+    baseR
+  )
+CIdata = 
+  rbind(
+    spearCI[2,,drop = FALSE],
+    spearABCI,
+    baseRCI
+  )
+ord = order(data[1,], decreasing = TRUE)
+
+data = data[,ord]
+not = -which(names(data) == c("glm_step"), arr.ind = TRUE)
+data = data[,not]
+CIdata = CIdata[names(data)]
+
+x = 1:ncol(data)
+matplot(y = t(data),
+        x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(-1, 1), type = "p", pch = pch, col = col_full, cex = cexP,
+        axes = TRUE,
+        xlab = "",
+        ylab = "Spearman", las =2,  xaxt="n",  cex.axis = cex, cex.lab = cex)
+lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
+lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
+lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
+
+for(i in 1:3){
+  for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
+}
+axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2)
+text(x-0.17, par("usr")[3] - 0.1, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
+text(x = 0, pos = 2, y = 1+0.16, xpd = NA, labels = "c)", cex = cex)
+#text(x = 3, y = 1+0.16, pos = 4, cex = cex, labels = "Count data", font = 2, xpd = NA)
+
+# 
+# plot(NULL, NULL, xlim = c(1,max(x)), ylim = c(-1,1), axes = FALSE, xlab = "", ylab = "")
+# points(x = rep(1,3), y = seq(0.3, -0.3, length.out = 3), pch = pch, col = col_full, xpd = NA)
+# text(x = rep(1,3), y = seq(0.3, -0.3, length.out = 3), pos = 4, 
+#      labels = c("TraitMatching , even species abundances ", 
+#                 "Random interactions, uneven species abundances", 
+#                 "Random interactions, even species abundances"), xpd = NA, cex = cex)
+
+dev.off()
+```
+
+
 ## Figure S1
 ```{r}
 
@@ -532,7 +694,11 @@ write.table(cbind(round(bestTest[,-c(6,7,12:14)], digits = 3), method = bestTest
 ## Figure 4
 
 ```{r,results=FALSE}
-
+plotCI = function(x,y, ci, col, xLine = 0.01, lwd = 0.4) {
+  segments(x0 = x, x1 = x, y0 =y-ci, y1 = min(1,y+ci), col = col, lwd = lwd)
+  segments(x0 = x-xLine, x1 = x+xLine, y0 =y-ci, y1 = y-ci, col = col, lwd = lwd)
+  segments(x0 = x-xLine, x1 = x+xLine, y0 =min(1,y+ci), y1 = min(1,y+ci), col = col, lwd = lwd)
+}
 cols =c("#bfa23d",
 "#5d3686",
 "#6ca24d",
@@ -550,11 +716,76 @@ resAggMiddleReg = readRDS(file = "./Results/resAggMiddleReg.RDS")
 resAggMiddleClass = readRDS(file = "./Results/resAggMiddleClass.RDS")
 load(file = "./Results/glmInferenceTPR.RData")
 
-smallRegGLM = data.frame(model = rep("glm",4), len_true = 1:4, trp = TPRpR)
-smallClassGLM = data.frame(model = rep("glm",4), len_true = 1:4, trp = TPRpC)
+smallRegGLM = data.frame(model = rep("glm",4), len_true = 1:4, trp = TPRpR, tprCI = TPRpCCI)
+smallClassGLM = data.frame(model = rep("glm",4), len_true = 1:4, trp = TPRpC, tprCI = TPRpRCI)
 
 dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
 names(dictonary) = c("classif.keras_seq.tuned", "classif.kknn.tuned", "classif.randomForest.tuned", "classif.xgboost.tuned","glm")
+
+
+
+
+dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
+names(dictonary) = c("classif.keras_seq.tuned", "classif.kknn.tuned", "classif.randomForest.tuned", "classif.xgboost.tuned","glm")
+ResClass = bind_rows(resAggSmallClass[,c(1,2,3,9)], smallClassGLM)
+ResClassT = tapply(ResClass$trp, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
+ResClassTCI = tapply(ResClass$tprCI, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
+means = apply(ResClassT, 2, mean)
+ord = order(means, decreasing = TRUE)
+
+
+
+
+plotInf = function(res,ci, xlab = "", ylab = "", col = rep("black", 7)){
+  nC = ncol(res)
+  xX = 1/(nC+1)
+  xS = xX/(nC-1)
+  nR = nrow(res)
+  xC = seq(0, 1-xX, length.out = nC+1)
+  for(i in 1:4) xC[i+1] = xC[i+1]+i*xS
+  xC = xC[1:nC]
+  xSS = xX/nR
+  coords = NULL
+  counter = 1
+  plot(NULL, NULL, xlim = c(0,1), ylim = c(0,1), axes = FALSE, xlab = xlab , ylab = ylab)
+  for(i in 1:nC){
+    tmp = res[,i]
+    for(j in 1:nR){
+      points(x = xC[i]+(j-1)*xSS, y = tmp[j], col = col[i], pch = 16)
+      coords[counter] = mean(c(xC[i]+(j-1)*xSS, xC[i]+j*xSS))
+      counter = counter + 1
+      plotCI(x = xC[i]+(j-1)*xSS, y = tmp[j], ci[j,i], col = "black")
+      
+    }
+  }
+  km = apply(res,2,mean)
+  for(i in 1:5){
+    segments(x0 = xC[i] - xX*0.08, x1 = (xC[i])+xX*1.08, y0 = km[i], y1 = km[i], lty = 1, col = "red")
+    
+    x = 1:4
+    ce = coef(lm(res[,i]~scale(x)))
+    cc= c(xC[i] - xX*0.08, (xC[i])+xX*1.08)
+    
+    segments(x0 = min(cc), x1 = max(cc), y0 = ce[1]-mean(cc)*ce[2], y1 = ce[1]+mean(cc)*ce[2], lty =2 , col = "red")
+  }
+  
+  
+  return(coords)
+}
+coords = plotInf(ResClassT[,ord], ResClassTCI[,ord])
+axis(2, las = 2, cex.axis = cexP)
+text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
+.a = apply(matrix(1:20, nrow = 5, byrow = TRUE)[,c(1,4)], 1, 
+           function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
+text(labels = dictonary[colnames(ResClassT)[ord]], 
+     x = apply(matrix(coords, nrow = 5, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
+text(labels = "(a)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font =2)
+
+x = 1:4
+coef(lm(ResClassT[,1]~scale(x)))[2]
+
+
+
 
 
 barInf = function(res, xlab = "", ylab = "", col = rep("white", 7)){

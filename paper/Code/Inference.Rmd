@@ -412,6 +412,11 @@ TPRestR = NULL
 TPRpR = NULL
 TPRestC = NULL
 TPRpC = NULL
+
+TPRestRCI = NULL
+TPRpRCI = NULL
+TPRestCCI = NULL
+TPRpCCI = NULL
 for(i in 1:4){
   TPRtmpR = NULL
   TPRtmpPR = NULL
@@ -440,11 +445,18 @@ for(i in 1:4){
 
   }
   TPRestR[i] = mean(TPRtmpR, na.rm = T)
-  TPRpR[i] = mean(TPRtmpPR, na.rm = T)
-  TPRestC[i] = mean(TPRtmpC, na.rm = T)
-  TPRpC[i] = mean(TPRtmpPC, na.rm = T)
+  TPRestRCI[i] = CI(TPRtmpR)
   
-  save(TPRestR, TPRpR, TPRestC, TPRpC, file = "./Results/glmInferenceTPR.RData")
+  TPRpR[i] = mean(TPRtmpPR, na.rm = T)
+  TPRpRCI[i] = CI(TPRtmpPR)
+  
+  TPRestC[i] = mean(TPRtmpC, na.rm = T)
+  TPRestCCI[i] = CI(TPRtmpC)
+  
+  TPRpC[i] = mean(TPRtmpPC, na.rm = T)
+  TPRpCCI[i] = CI(TPRtmpPC)
+  
+  save(TPRestR, TPRpR, TPRestC, TPRpC,TPRestRCI,TPRpRCI,TPRestCCI,TPRpCCI, file = "./Results/glmInferenceTPR.RData")
 }
 ```
 

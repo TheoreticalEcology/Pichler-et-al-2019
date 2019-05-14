@@ -909,24 +909,33 @@ plotResAgg = function(resAgg, labels = c("DNN", "RF", "BRT", "kNN"), col = "dark
     
   }
 }
-
-
+CI = function(x) return(qnorm(0.975) * sd(x) / sqrt(length(x)))
 
 aggTrpRep = function(trpRes, aggRes){
-  out = 
+  CI = function(x) return(qnorm(0.975) * sd(x) / sqrt(length(x)))
+  sub = 
     trpRes %>% 
-    reshape2::melt(id.vars = c("len_fac", "rep_fac")) %>% 
-    mutate(len_true = as.character(len_fac) %>% as.numeric(), 
-           repetition = rep_fac %>% as.character %>% as.numeric,
-           model = variable,
-           trp = value) %>% 
-    select(model, repetition, len_true, trp) %>% 
-    right_join(aggRes, by = c("len_true", "repetition", "model")) %>% 
-    filter(!duplicated(perf_diff)) %>% 
-    filter(!is.na(trp)) %>% 
-    group_by(model, len_true) %>% 
-    select(model, len_true, trp, pos_true, found_strength, perf_test, perf_train, perf_diff) %>% 
-    summarise_all(funs(mean))
+      reshape2::melt(id.vars = c("len_fac", "rep_fac")) %>% 
+      mutate(len_true = as.character(len_fac) %>% as.numeric(), 
+             repetition = rep_fac %>% as.character %>% as.numeric,
+             model = variable,
+             trp = value) %>% 
+      select(model, repetition, len_true, trp) %>% 
+      right_join(aggRes, by = c("len_true", "repetition", "model")) %>% 
+      filter(!duplicated(perf_diff)) %>% 
+      filter(!is.na(trp)) %>% 
+      group_by(model, len_true) %>% 
+      select(model, len_true, trp, pos_true, found_strength, perf_test, perf_train, perf_diff)
+  
+ out =
+   sub %>% 
+      summarise_all(funs(mean)) %>% 
+      right_join( sub %>% 
+                    summarise_at(vars(trp), CI) %>% 
+                    mutate(tprCI = trp) %>% 
+                    select(-trp))
+ 
+    
   return(out)
 }
 
