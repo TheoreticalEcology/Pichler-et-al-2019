@@ -252,12 +252,13 @@ plotCI = function(x,y, ci, col, xLine = 0.07, lwd = 0.4) {
   segments(x0 = x-xLine, x1 = x+xLine, y0 =y+ci, y1 = y+ci, col = col, lwd = lwd)
 }
 
-pdf("test_fiure2.pdf",width = 5.5, height = 2.3)
-par(mfrow = c(1,3), mar = c(2,3,1,0.3), mgp = c(1.8,0.7,0), oma = c(2,0,0,0))
+pdf("./Figures/Fig2.pdf",width = 5.5, height = 2.3, compress = FALSE)
+par(mfrow = c(1,3), mar = c(2,1.6,1,0.3), mgp = c(1.8,0.5,0), oma = c(0.6,0,1,0))
 cex = 0.65
 cexP = 0.7
 offset = c(0,0.07,0.14)
 lwd = 0.7
+tck=-0.03
 dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
 names(dictonary) = c("dnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
 data = 
@@ -294,16 +295,17 @@ matplot(y = t(data),
         x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(-1, 1), type = "p", pch = pch, col = col_full, cex = cexP,
         axes = TRUE,
         xlab = "",
-        ylab = "TSS", las =2,  xaxt="n", cex.axis = cex, cex.lab = cex)
+        ylab = "", las =2,  xaxt="n", cex.axis = cex, cex.lab = cex, tck=tck)
 lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
 lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
 lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
 for(i in 1:3){
   for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
 }
-axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2)
-text(x-0.2, par("usr")[3] - 0.1, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
-text(x = 0, pos = 2, y = 1+0.16, xpd = NA, labels = "a)", cex = cex)
+axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2, tck=tck)
+text(x-0.2, par("usr")[3] - 0.07, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
+text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "A", cex = cex*1.1, font = 2)
+text(x = 0.85*max(x), pos = 4, y = 1, xpd = NA, labels = "TSS", cex = cex, font = 1)
 
 #text(x = max(x)-1.2,y = 1+0.16, pos = 4, cex = cex, labels = "Presence-absence data", font = 2, xpd = NA)
 
@@ -332,7 +334,7 @@ matplot(y = t(data),
         x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(0, 1), type = "p", pch = pch, col = col_full, cex = cexP,
         axes = TRUE,
         xlab = "",
-        ylab = "AUC", las =2,  xaxt="n",  cex.axis = cex, cex.lab = cex)
+        ylab = "", las =2,  xaxt="n",  cex.axis = cex, cex.lab = cex, tck=tck)
 lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
 lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
 lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
@@ -340,13 +342,13 @@ for(i in 1:3){
   for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
 }
 
-axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2)
-text(x-0.2, par("usr")[3] - 0.05, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
-text(x = 0, pos = 2, y = 1+0.08, xpd = NA, labels = "b)", cex = cex)
+axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2, tck=tck)
+text(x-0.2, par("usr")[3] - 0.035, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
+text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "B", cex = cex*1.1, font = 2)
+text(x = 0.85*max(x), pos = 4, y = 1, xpd = NA, labels = "AUC", cex = cex, font = 1)
 
-
- points(x = seq(-11,10, length.out = 3), y = rep(-0.3,3), pch = pch, col = col_full, xpd = NA)
- text(x = seq(-11,10, length.out = 3), y = rep(-0.3,3), pos = 4, 
+ points(x = c(-8,0,9), y = rep(-0.22,3), pch = pch, col = col_full, xpd = NA)
+ text(x =  c(-8,0,9), y = rep(-0.22,3), pos = 4, 
       labels = c("TraitMatching, even species abundances ", 
                  "Random interactions, uneven species abundances", 
                  "Random interactions, even species abundances"), xpd = NA, cex = cex)
@@ -378,7 +380,7 @@ matplot(y = t(data),
         x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(-1, 1), type = "p", pch = pch, col = col_full, cex = cexP,
         axes = TRUE,
         xlab = "",
-        ylab = "Spearman", las =2,  xaxt="n",  cex.axis = cex, cex.lab = cex)
+        ylab = "", las =2,  xaxt="n",  cex.axis = cex, cex.lab = cex, tck=tck)
 lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
 lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
 lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
@@ -386,9 +388,11 @@ lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lw
 for(i in 1:3){
   for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
 }
-axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2)
-text(x-0.17, par("usr")[3] - 0.1, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
-text(x = 0, pos = 2, y = 1+0.16, xpd = NA, labels = "c)", cex = cex)
+axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2, tck=tck)
+text(x-0.17, par("usr")[3] - 0.07, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
+text(x = 0.63, pos = 4, y = 1, xpd = NA, labels = "C", cex = cex*1.1, font = 2)
+text(x = 0.76*max(x), pos = 4, y = 1, xpd = NA, labels = "Spearman", cex = cex, font = 1)
+
 #text(x = 3, y = 1+0.16, pos = 4, cex = cex, labels = "Count data", font = 2, xpd = NA)
 
 # 
@@ -736,120 +740,141 @@ ord = order(means, decreasing = TRUE)
 
 
 
-plotInf = function(res,ci, xlab = "", ylab = "", col = rep("black", 7)){
-  nC = ncol(res)
-  xX = 1/(nC+1)
-  xS = xX/(nC-1)
-  nR = nrow(res)
-  xC = seq(0, 1-xX, length.out = nC+1)
-  for(i in 1:4) xC[i+1] = xC[i+1]+i*xS
-  xC = xC[1:nC]
-  xSS = xX/nR
-  coords = NULL
+plotInf = function(res,ci, xlab = "", ylab = "", col = rep("black", 7), between = 0.4){
+  plotSize = 1*(1-between)
+  groupSize = plotSize/ncol(res)
+  pointBaseX = seq(0,groupSize, length.out = nrow(res))
+  emptySize = between/(ncol(res)-1)
+  baseX = (0:(ncol(res) - 1))*(emptySize+groupSize)
+  coords = matrix(NA, nrow = ncol(res), 4)
+  for(i in 1:nrow(coords)) coords[i,] = baseX[i]+pointBaseX
   counter = 1
-  plot(NULL, NULL, xlim = c(0,1), ylim = c(0,1), axes = FALSE, xlab = xlab , ylab = ylab)
-  for(i in 1:nC){
-    tmp = res[,i]
-    for(j in 1:nR){
-      points(x = xC[i]+(j-1)*xSS, y = tmp[j], col = col[i], pch = 16)
-      coords[counter] = mean(c(xC[i]+(j-1)*xSS, xC[i]+j*xSS))
-      counter = counter + 1
-      plotCI(x = xC[i]+(j-1)*xSS, y = tmp[j], ci[j,i], col = "black")
-      
-    }
-  }
+  plot(NULL, NULL, xlim = c(0,1), ylim = c(0,1), axes = TRUE,xaxt = "n", xlab = xlab , ylab = ylab, yaxt = "n")
   km = apply(res,2,mean)
   for(i in 1:5){
-    segments(x0 = xC[i] - xX*0.08, x1 = (xC[i])+xX*1.08, y0 = km[i], y1 = km[i], lty = 1, col = "red")
-    
+    segments(x0 = min(coords[i,])-0.03, x1 = max(coords[i,])+0.03, y0 = km[i], y1 = km[i], lty = 1, col = "red", xpd = NA, lwd = 0.6)
     x = 1:4
     ce = coef(lm(res[,i]~scale(x)))
-    cc= c(xC[i] - xX*0.08, (xC[i])+xX*1.08)
-    
-    segments(x0 = min(cc), x1 = max(cc), y0 = ce[1]-mean(cc)*ce[2], y1 = ce[1]+mean(cc)*ce[2], lty =2 , col = "red")
+    cc= c(coords[i,])
+    segments(x0 = min(cc)-0.03, x1 = max(cc)+0.03, y0 = ce[1]-mean(cc)*ce[2], y1 = ce[1]+mean(cc)*ce[2], lty =2 , col = "red", lwd = 0.6)
   }
-  
-  
-  return(coords)
-}
-coords = plotInf(ResClassT[,ord], ResClassTCI[,ord])
-axis(2, las = 2, cex.axis = cexP)
-text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
-.a = apply(matrix(1:20, nrow = 5, byrow = TRUE)[,c(1,4)], 1, 
-           function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
-text(labels = dictonary[colnames(ResClassT)[ord]], 
-     x = apply(matrix(coords, nrow = 5, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
-text(labels = "(a)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font =2)
-
-x = 1:4
-coef(lm(ResClassT[,1]~scale(x)))[2]
-
-
-
-
-
-barInf = function(res, xlab = "", ylab = "", col = rep("white", 7)){
-  nC = ncol(res)
-  xX = 1/(nC+1)
-  xS = xX/(nC-1)
-  nR = nrow(res)
-  xC = seq(0, 1-xX, length.out = nC+1)
-  for(i in 1:4) xC[i+1] = xC[i+1]+i*xS
-  xC = xC[1:nC]
-  xSS = xX/nR
-  coords = NULL
-  counter = 1
-  plot(NULL, NULL, xlim = c(0,1), ylim = c(0,1), axes = FALSE, xlab = xlab , ylab = ylab)
-  for(i in 1:nC){
-    tmp = res[,i]
-    for(j in 1:nR){
-      rect(xleft = xC[i]+(j-1)*xSS, xright = xC[i]+j*xSS, ybottom = 0, ytop = tmp[j], col = col[i])
-      coords[counter] = mean(c(xC[i]+(j-1)*xSS, xC[i]+j*xSS))
-      counter = counter + 1
-    }
+  for(i in 1:ncol(res)) points(x = coords[i,], y = res[,i], col = col[i], pch = 16,cex = 0.5)
+  for(i in 1:ncol(res)) {
+    for(j in 1:nrow(res)) plotCI(x = coords[i,j], y = res[j,i], ci[j,i], col = "black")
   }
   km = apply(res,2,mean)
-  for(i in 1:5){
-    segments(x0 = xC[i] - xX*0.08, x1 = (xC[i])+xX*1.08, y0 = km[i], y1 = km[i], lty = 1, col = "red")
-  }
+ 
   return(coords)
 }
-addA = TraitMatching:::addA
-cexP = 0.5
+
+wideX = function(co) seq(min(co)-0.01, max(co)+0.01, length.out = 4)  
+
 pdf(file = "./Figures/Fig4.pdf", width = 5.50, height = 1.8)
-par(mfrow = c(1,2),  mar = c(1.2,1.6,0.2, 0.3), oma = c(0,0.0,0.4,0), mgp = c(3,0.6,0))
+par(mfrow = c(1,2),  mar = c(1.2,0.9,0.2, 0.3), oma = c(0,0.0,0.4,0), mgp = c(3,0.27,0))
+
 dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
 names(dictonary) = c("classif.keras_seq.tuned", "classif.kknn.tuned", "classif.randomForest.tuned", "classif.xgboost.tuned","glm")
-ResClass = bind_rows(resAggSmallClass[,c(1,2,3)], smallClassGLM)
-ResClass = tapply(ResClass$trp, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
-means = apply(ResClass, 2, mean)
+ResClass = bind_rows(resAggSmallClass[,c(1,2,3,9)], smallClassGLM)
+ResClassT = tapply(ResClass$trp, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
+ResClassTCI = tapply(ResClass$tprCI, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
+means = apply(ResClassT, 2, mean)
 ord = order(means, decreasing = TRUE)
-coords = barInf(ResClass[,ord], col = addA(cols[dictonary[colnames(ResClass)[ord]]], 0.4) )
-axis(2, las = 2, cex.axis = cexP)
-text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
-.a = apply(matrix(1:20, nrow = 5, byrow = TRUE)[,c(1,4)], 1, 
-           function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
-text(labels = dictonary[colnames(ResClass)[ord]], 
-     x = apply(matrix(coords, nrow = 5, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
-text(labels = "(a)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font =2)
+
+
+coords = plotInf(ResClassT[,ord], ResClassTCI[,ord], between = 0.7)
+axis(2, las = 2, cex.axis = cexP, tck = -0.02)
+text(labels = rep(1:4, 5), x = as.vector((apply(coords, 1, wideX))), y = 0.01, pos = 1, cex = cexP, xpd = NA)
+.a = apply(coords, 1, 
+           function(co) segments(x0 = co[1]-0.025, x1 = co[4]+0.025, y0 = -0.12, y1 = -0.12, xpd = NA))
+text(labels = dictonary[colnames(ResClassT)[ord]], 
+     x = apply(coords,1, function(co) mean(co)), y = -0.07, pos = 1, xpd = NA, cex = cexP)
+text(labels = "TPR", x = 0.9, y = 0.97, xpd = NA, pos = 4, cex = cexP, font =1)
+text(labels = "A", x = 0.02, y = 1.08, xpd = NA, pos = 2, cex = cexP, font =2)
 
 
 dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
 names(dictonary) = c("regr.negBinDnn.tuned", "regr.kknn.tuned", "regr.randomForest.tuned", "regr.xgboost.tuned","glm")
-ResReg = bind_rows(resAggSmallReg[,c(1,2,3)], smallRegGLM)
-ResReg = tapply(ResReg$trp, list(factor(ResReg$len_true),ResReg$model), simplify = TRUE, FUN = function(i)i)
-means = apply(ResReg, 2, mean)
+ResReg = bind_rows(resAggSmallReg[,c(1,2,3,9)], smallRegGLM)
+ResRegT = tapply(ResReg$trp, list(factor(ResReg$len_true),ResReg$model), simplify = TRUE, FUN = function(i) i)
+ResRegTCI = tapply(ResReg$tprCI, list(factor(ResReg$len_true),ResReg$model), simplify = TRUE, FUN = function(i)i)
+means = apply(ResRegT, 2, mean)
 ord = order(means, decreasing = TRUE)
-coords = barInf(ResReg[,ord], col = addA(cols[dictonary[colnames(ResReg)[ord]]], 0.4) )
-axis(2, las = 2, cex.axis = cexP)
-text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
-.a = apply(matrix(1:20, nrow = 5, byrow = TRUE)[,c(1,4)], 1, 
-           function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
-text(labels = dictonary[colnames(ResReg)[ord]], 
-     x = apply(matrix(coords, nrow = 5, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
-text(labels = "(b)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font = 2)
+
+coords = plotInf(ResRegT[,ord], ResRegTCI[,ord], between = 0.7)
+axis(2, las = 2, cex.axis = cexP, tck = -0.02)
+text(labels = rep(1:4, 5), x = as.vector((apply(coords, 1, wideX))), y = 0.01, pos = 1, cex = cexP, xpd = NA)
+.a = apply(coords, 1, 
+           function(co) segments(x0 = co[1]-0.025, x1 = co[4]+0.025, y0 = -0.12, y1 = -0.12, xpd = NA))
+text(labels = dictonary[colnames(ResRegT)[ord]], 
+     x = apply(coords,1, function(co) mean(co)), y = -0.07, pos = 1, xpd = NA, cex = cexP)
+text(labels = "TPR", x = 0.9, y = 0.97, xpd = NA, pos = 4, cex = cexP, font =1)
+text(labels = "B", x = 0.02, y = 1.08, xpd = NA, pos = 2, cex = cexP, font =2)
 
 dev.off()
+
+# 
+# barInf = function(res, xlab = "", ylab = "", col = rep("white", 7)){
+#   nC = ncol(res)
+#   xX = 1/(nC+1)
+#   xS = xX/(nC-1)
+#   nR = nrow(res)
+#   xC = seq(0, 1-xX, length.out = nC+1)
+#   for(i in 1:4) xC[i+1] = xC[i+1]+i*xS
+#   xC = xC[1:nC]
+#   xSS = xX/nR
+#   coords = NULL
+#   counter = 1
+#   plot(NULL, NULL, xlim = c(0,1), ylim = c(0,1), axes = FALSE, xlab = xlab , ylab = ylab)
+#   for(i in 1:nC){
+#     tmp = res[,i]
+#     for(j in 1:nR){
+#       rect(xleft = xC[i]+(j-1)*xSS, xright = xC[i]+j*xSS, ybottom = 0, ytop = tmp[j], col = col[i])
+#       coords[counter] = mean(c(xC[i]+(j-1)*xSS, xC[i]+j*xSS))
+#       counter = counter + 1
+#     }
+#   }
+#   km = apply(res,2,mean)
+#   for(i in 1:5){
+#     segments(x0 = xC[i] - xX*0.08, x1 = (xC[i])+xX*1.08, y0 = km[i], y1 = km[i], lty = 1, col = "red")
+#   }
+#   return(coords)
+# }
+# addA = TraitMatching:::addA
+# cexP = 0.5
+# #pdf(file = "./Figures/Fig4.pdf", width = 5.50, height = 1.8)
+# par(mfrow = c(1,1),  mar = c(1.2,1.6,0.2, 0.3), oma = c(0,0.0,0.4,0), mgp = c(3,0.6,0))
+# dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
+# names(dictonary) = c("classif.keras_seq.tuned", "classif.kknn.tuned", "classif.randomForest.tuned", "classif.xgboost.tuned","glm")
+# ResClass = bind_rows(resAggSmallClass[,c(1,2,3)], smallClassGLM)
+# ResClass = tapply(ResClass$trp, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
+# means = apply(ResClass, 2, mean)
+# ord = order(means, decreasing = TRUE)
+# coords = barInf(ResClass[,ord], col = addA(cols[dictonary[colnames(ResClass)[ord]]], 0.4) )
+# axis(2, las = 2, cex.axis = cexP)
+# text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
+# .a = apply(matrix(1:20, nrow = 5, byrow = TRUE)[,c(1,4)], 1, 
+#            function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
+# text(labels = dictonary[colnames(ResClass)[ord]], 
+#      x = apply(matrix(coords, nrow = 5, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
+# text(labels = "(a)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font =2)
+# 
+# 
+# dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
+# names(dictonary) = c("regr.negBinDnn.tuned", "regr.kknn.tuned", "regr.randomForest.tuned", "regr.xgboost.tuned","glm")
+# ResReg = bind_rows(resAggSmallReg[,c(1,2,3)], smallRegGLM)
+# ResReg = tapply(ResReg$trp, list(factor(ResReg$len_true),ResReg$model), simplify = TRUE, FUN = function(i)i)
+# means = apply(ResReg, 2, mean)
+# ord = order(means, decreasing = TRUE)
+# coords = barInf(ResReg[,ord], col = addA(cols[dictonary[colnames(ResReg)[ord]]], 0.4) )
+# axis(2, las = 2, cex.axis = cexP)
+# text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
+# .a = apply(matrix(1:20, nrow = 5, byrow = TRUE)[,c(1,4)], 1, 
+#            function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
+# text(labels = dictonary[colnames(ResReg)[ord]], 
+#      x = apply(matrix(coords, nrow = 5, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
+# text(labels = "(b)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font = 2)
+# 
+# dev.off()
 
 
 ```
