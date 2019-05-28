@@ -12,7 +12,7 @@ oldpar = par()
 reset = function() suppressWarnings(do.call(par, oldpar))
 run = TRUE
 set.seed(42)
-source("./Code/helpFunctions.R")
+source("../Code/helpFunctions.R")
 ```
 
 
@@ -243,8 +243,8 @@ dev.off()
 
 ## NEW new FIGURE 2
 ```{r}
-load(file = "./Results/SimulationAggreationFig2.RData")
-load(file = "./Results/SimulationAggreationCIFig2.RData")
+load(file = "../Results/SimulationAggreationFig2.RData")
+load(file = "../Results/SimulationAggreationCIFig2.RData")
 
 plotCI = function(x,y, ci, col, xLine = 0.07, lwd = 0.4) {
   segments(x0 = x, x1 = x, y0 =y-ci, y1 = y+ci, col = col, lwd = lwd)
@@ -252,7 +252,7 @@ plotCI = function(x,y, ci, col, xLine = 0.07, lwd = 0.4) {
   segments(x0 = x-xLine, x1 = x+xLine, y0 =y+ci, y1 = y+ci, col = col, lwd = lwd)
 }
 
-pdf("./Figures/Fig2.pdf",width = 5.5, height = 2.3, compress = FALSE)
+pdf("../Figures/Fig2.pdf",width = 5.5, height = 2.3, compress = FALSE)
 par(mfrow = c(1,3), mar = c(2,1.6,1,0.3), mgp = c(1.8,0.5,0), oma = c(0.6,0,1,0))
 cex = 0.65
 cexP = 0.7
@@ -304,8 +304,8 @@ for(i in 1:3){
 }
 axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2, tck=tck)
 text(x-0.2, par("usr")[3] - 0.07, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
-text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "A", cex = cex*1.1, font = 2)
-text(x = 0.85*max(x), pos = 4, y = 1, xpd = NA, labels = "TSS", cex = cex, font = 1)
+text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "(a)", cex = cex*1.1, font = 2)
+text(x = 0.5*max(x), pos = 4, y = -0.4, xpd = NA, labels = "TSS", cex = cex, font = 1)
 
 #text(x = max(x)-1.2,y = 1+0.16, pos = 4, cex = cex, labels = "Presence-absence data", font = 2, xpd = NA)
 
@@ -344,14 +344,16 @@ for(i in 1:3){
 
 axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2, tck=tck)
 text(x-0.2, par("usr")[3] - 0.035, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
-text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "B", cex = cex*1.1, font = 2)
-text(x = 0.85*max(x), pos = 4, y = 1, xpd = NA, labels = "AUC", cex = cex, font = 1)
+text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "(b)", cex = cex*1.1, font = 2)
+text(x = 0.5*max(x), pos = 4, y = 0.3, xpd = NA, labels = "AUC", cex = cex, font = 1)
+#text(x = 0.5*max(x), pos = 4, y = -0.4, xpd = NA, labels = "TSS", cex = cex, font = 1)
 
- points(x = c(-8,0,9), y = rep(-0.22,3), pch = pch, col = col_full, xpd = NA)
+
+ points(x = c(-8,0,9), y = rep(-0.22,3), pch = rev(pch), col = rev(col_full), xpd = NA)
  text(x =  c(-8,0,9), y = rep(-0.22,3), pos = 4, 
-      labels = c("TraitMatching, even species abundances ", 
+      labels = rev(c("TraitMatching, even species abundances ", 
                  "Random interactions, uneven species abundances", 
-                 "Random interactions, even species abundances"), xpd = NA, cex = cex)
+                 "Random interactions, even species abundances")), xpd = NA, cex = cex)
 
 
 dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
@@ -390,8 +392,9 @@ for(i in 1:3){
 }
 axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2, tck=tck)
 text(x-0.17, par("usr")[3] - 0.07, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
-text(x = 0.63, pos = 4, y = 1, xpd = NA, labels = "C", cex = cex*1.1, font = 2)
-text(x = 0.76*max(x), pos = 4, y = 1, xpd = NA, labels = "Spearman", cex = cex, font = 1)
+text(x = 0.63, pos = 4, y = 1, xpd = NA, labels = "(c)", cex = cex*1.1, font = 2)
+#text(x = 0.76*max(x), pos = 4, y = 1, xpd = NA, labels = "Spearman", cex = cex, font = 1)
+text(x = 0.5*max(x), pos = 4, y = -0.4, xpd = NA, labels = "Spearman", cex = cex, font = 1)
 
 #text(x = 3, y = 1+0.16, pos = 4, cex = cex, labels = "Count data", font = 2, xpd = NA)
 
@@ -712,13 +715,13 @@ cols =c("#bfa23d",
 "#6c7ed7",
 "#b55c36")
 names(cols) = c("DNN","cnn","kNN","SVM","naive","RF","BRT", "GLM")
-load(file = "./Results/glmInferenceTPR.RData")
-resAggSmallReg = readRDS(file = "./Results/resAggSmallReg.RDS")
-resAggSmallClass = readRDS(file = "./Results/resAggSmallClass.RDS")
+load(file = "../Results/glmInferenceTPR.RData")
+resAggSmallReg = readRDS(file = "../Results/resAggSmallReg.RDS")
+resAggSmallClass = readRDS(file = "../Results/resAggSmallClass.RDS")
 
-resAggMiddleReg = readRDS(file = "./Results/resAggMiddleReg.RDS")
-resAggMiddleClass = readRDS(file = "./Results/resAggMiddleClass.RDS")
-load(file = "./Results/glmInferenceTPR.RData")
+resAggMiddleReg = readRDS(file = "../Results/resAggMiddleReg.RDS")
+resAggMiddleClass = readRDS(file = "../Results/resAggMiddleClass.RDS")
+load(file = "../Results/glmInferenceTPR.RData")
 
 smallRegGLM = data.frame(model = rep("glm",4), len_true = 1:4, trp = TPRpR, tprCI = TPRpCCI)
 smallClassGLM = data.frame(model = rep("glm",4), len_true = 1:4, trp = TPRpC, tprCI = TPRpRCI)
@@ -726,7 +729,7 @@ smallClassGLM = data.frame(model = rep("glm",4), len_true = 1:4, trp = TPRpC, tp
 dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
 names(dictonary) = c("classif.keras_seq.tuned", "classif.kknn.tuned", "classif.randomForest.tuned", "classif.xgboost.tuned","glm")
 
-
+cexP = 0.65
 
 
 dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
@@ -736,7 +739,6 @@ ResClassT = tapply(ResClass$trp, list(factor(ResClass$len_true),ResClass$model),
 ResClassTCI = tapply(ResClass$tprCI, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
 means = apply(ResClassT, 2, mean)
 ord = order(means, decreasing = TRUE)
-
 
 
 
@@ -754,9 +756,12 @@ plotInf = function(res,ci, xlab = "", ylab = "", col = rep("black", 7), between 
   for(i in 1:5){
     segments(x0 = min(coords[i,])-0.03, x1 = max(coords[i,])+0.03, y0 = km[i], y1 = km[i], lty = 1, col = "red", xpd = NA, lwd = 0.6)
     x = 1:4
-    ce = coef(lm(res[,i]~scale(x)))
-    cc= c(coords[i,])
-    segments(x0 = min(cc)-0.03, x1 = max(cc)+0.03, y0 = ce[1]-mean(cc)*ce[2], y1 = ce[1]+mean(cc)*ce[2], lty =2 , col = "red", lwd = 0.6)
+    m = lm(res[,i]~scale(x))
+   # if(summary(m)$coefficients[2,4] < 0.05){
+      ce = coef(m)
+      cc= c(coords[i,])
+      segments(x0 = min(cc)-0.03, x1 = max(cc)+0.03, y0 = ce[1]-mean(cc)*ce[2], y1 = ce[1]+mean(cc)*ce[2], lty =2 , col = "red", lwd = 0.6)
+   # }
   }
   for(i in 1:ncol(res)) points(x = coords[i,], y = res[,i], col = col[i], pch = 16,cex = 0.5)
   for(i in 1:ncol(res)) {
@@ -769,8 +774,8 @@ plotInf = function(res,ci, xlab = "", ylab = "", col = rep("black", 7), between 
 
 wideX = function(co) seq(min(co)-0.01, max(co)+0.01, length.out = 4)  
 
-pdf(file = "./Figures/Fig4.pdf", width = 5.50, height = 1.8)
-par(mfrow = c(1,2),  mar = c(1.2,0.9,0.2, 0.3), oma = c(0,0.0,0.4,0), mgp = c(3,0.27,0))
+pdf(file = "../Figures/Fig4.pdf", width = 5.50, height = 1.8)
+par(mfrow = c(1,2),  mar = c(1.0,1.4,0.4, 0.3), oma = c(0,0.0,0.4,0), mgp = c(3,0.27,0))
 
 dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
 names(dictonary) = c("classif.keras_seq.tuned", "classif.kknn.tuned", "classif.randomForest.tuned", "classif.xgboost.tuned","glm")
@@ -781,15 +786,18 @@ means = apply(ResClassT, 2, mean)
 ord = order(means, decreasing = TRUE)
 
 
+right_order = dictonary[names(means)[order(means, decreasing = TRUE)]]
+
+
 coords = plotInf(ResClassT[,ord], ResClassTCI[,ord], between = 0.7)
 axis(2, las = 2, cex.axis = cexP, tck = -0.02)
-text(labels = rep(1:4, 5), x = as.vector((apply(coords, 1, wideX))), y = 0.01, pos = 1, cex = cexP, xpd = NA)
-.a = apply(coords, 1, 
-           function(co) segments(x0 = co[1]-0.025, x1 = co[4]+0.025, y0 = -0.12, y1 = -0.12, xpd = NA))
+#text(labels = rep(1:4, 5), x = as.vector((apply(coords, 1, wideX))), y = 0.01, pos = 1, cex = cexP, xpd = NA)
+#.a = apply(coords, 1, 
+#           function(co) segments(x0 = co[1]-0.025, x1 = co[4]+0.025, y0 = -0.12, y1 = -0.12, xpd = #NA))
 text(labels = dictonary[colnames(ResClassT)[ord]], 
-     x = apply(coords,1, function(co) mean(co)), y = -0.07, pos = 1, xpd = NA, cex = cexP)
-text(labels = "TPR", x = 0.9, y = 0.97, xpd = NA, pos = 4, cex = cexP, font =1)
-text(labels = "A", x = 0.02, y = 1.08, xpd = NA, pos = 2, cex = cexP, font =2)
+     x = apply(coords,1, function(co) mean(co)), y = -0.02, pos = 1, xpd = NA, cex = cexP)
+text(labels = "TPR", x = 0.87, y = 0.97, xpd = NA, pos = 4, cex = cexP, font =1)
+text(labels = "(a)", x = 0.02, y = 1.09, xpd = NA, pos = 2, cex = cexP*1.1, font =2)
 
 
 dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
@@ -800,15 +808,17 @@ ResRegTCI = tapply(ResReg$tprCI, list(factor(ResReg$len_true),ResReg$model), sim
 means = apply(ResRegT, 2, mean)
 ord = order(means, decreasing = TRUE)
 
+ord = sapply(right_order, function(x) which(x == dictonary[colnames(ResRegT)], arr.ind = TRUE))
+
 coords = plotInf(ResRegT[,ord], ResRegTCI[,ord], between = 0.7)
 axis(2, las = 2, cex.axis = cexP, tck = -0.02)
-text(labels = rep(1:4, 5), x = as.vector((apply(coords, 1, wideX))), y = 0.01, pos = 1, cex = cexP, xpd = NA)
-.a = apply(coords, 1, 
-           function(co) segments(x0 = co[1]-0.025, x1 = co[4]+0.025, y0 = -0.12, y1 = -0.12, xpd = NA))
+#text(labels = rep(1:4, 5), x = as.vector((apply(coords, 1, wideX))), y = 0.01, pos = 1, cex = cexP, xpd = NA)
+#.a = apply(coords, 1, 
+#           function(co) segments(x0 = co[1]-0.025, x1 = co[4]+0.025, y0 = -0.12, y1 = -0.12, xpd = NA))
 text(labels = dictonary[colnames(ResRegT)[ord]], 
-     x = apply(coords,1, function(co) mean(co)), y = -0.07, pos = 1, xpd = NA, cex = cexP)
-text(labels = "TPR", x = 0.9, y = 0.97, xpd = NA, pos = 4, cex = cexP, font =1)
-text(labels = "B", x = 0.02, y = 1.08, xpd = NA, pos = 2, cex = cexP, font =2)
+     x = apply(coords,1, function(co) mean(co)), y = -0.02, pos = 1, xpd = NA, cex = cexP)
+text(labels = "TPR", x = 0.87, y = 0.97, xpd = NA, pos = 4, cex = cexP, font =1)
+text(labels = "(b)", x = 0.02, y = 1.09, xpd = NA, pos = 2, cex = cexP*1.1, font =2)
 
 dev.off()
 
@@ -881,53 +891,178 @@ dev.off()
 
 ## Figure S3
 ```{r}
-reset()
-pdf(file = "./Figures/FigS3.pdf",width = 5.5,height = 3.5)
-par(mfrow = c(1,2), mar = c(1,2,0.6,0.1)+0.1,oma = c(0.0,0.2,1.2,0.1))
-plotResAgg(resAggMiddleClass,labels = c("DNN", "BRT"), col = "darkred")
-text(xpd = NA, x = -0.1, y = 1.1, labels = "a)", font = 1)
-plotResAgg(resAggMiddleReg ,labels = c("DNN", "BRT"), col = "darkred")
-text(xpd = NA, x = -0.1, y = 1.1, labels = "b)", font = 1)
-dev.off()
+plotCI = function(x,y, ci, col, xLine = 0.01, lwd = 0.4) {
+  segments(x0 = x, x1 = x, y0 =y-ci, y1 = min(1,y+ci), col = col, lwd = lwd)
+  segments(x0 = x-xLine, x1 = x+xLine, y0 =y-ci, y1 = y-ci, col = col, lwd = lwd)
+  segments(x0 = x-xLine, x1 = x+xLine, y0 =min(1,y+ci), y1 = min(1,y+ci), col = col, lwd = lwd)
+}
+cols =c("#bfa23d",
+"#5d3686",
+"#6ca24d",
+"#c26abb",
+"#46c19a",
+"#ba496b",
+"#6c7ed7",
+"#b55c36")
+names(cols) = c("DNN","cnn","kNN","SVM","naive","RF","BRT", "GLM")
+load(file = "../Results/glmInferenceTPR.RData")
+resAggSmallReg = readRDS(file = "../Results/resAggSmallReg.RDS")
+resAggSmallClass = readRDS(file = "../Results/resAggSmallClass.RDS")
 
+resAggMiddleReg = readRDS(file = "../Results/resAggMiddleReg.RDS")
+resAggMiddleClass = readRDS(file = "../Results/resAggMiddleClass.RDS")
+load(file = "../Results/glmInferenceTPR.RData")
 
+smallRegGLM = data.frame(model = rep("glm",4), len_true = 1:4, trp = TPRpR, tprCI = TPRpCCI)
+smallClassGLM = data.frame(model = rep("glm",4), len_true = 1:4, trp = TPRpC, tprCI = TPRpRCI)
 
-addA = TraitMatching:::addA
-cexP = 0.5
-pdf(file = "./Figures/FigS3.pdf", width = 5.50, height = 1.8)
-par(mfrow = c(1,2),  mar = c(1.2,1.6,0.2, 0.3), oma = c(0,0.0,0.4,0), mgp = c(3,0.6,0))
 dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
 names(dictonary) = c("classif.keras_seq.tuned", "classif.kknn.tuned", "classif.randomForest.tuned", "classif.xgboost.tuned","glm")
-ResClass = resAggMiddleClass[,c(1,2,3)]
-ResClass = tapply(ResClass$trp, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
-means = apply(ResClass, 2, mean)
+
+
+
+
+dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
+names(dictonary) = c("classif.keras_seq.tuned", "classif.kknn.tuned", "classif.randomForest.tuned", "classif.xgboost.tuned","glm")
+ResClass = bind_rows(resAggMiddleClass[,c(1,2,3,9)], smallClassGLM)
+ResClassT = tapply(ResClass$trp, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
+ResClassTCI = tapply(ResClass$tprCI, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
+means = apply(ResClassT, 2, mean)
 ord = order(means, decreasing = TRUE)
-coords = barInf(ResClass[,ord], col = addA(cols[dictonary[colnames(ResClass)[ord]]], 0.4) )
-axis(2, las = 2, cex.axis = cexP)
-text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
-.a = apply(matrix(1:8, nrow = 2, byrow = TRUE)[,c(1,4)], 1, 
-           function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
-text(labels = dictonary[colnames(ResClass)[ord]], 
-     x = apply(matrix(coords, nrow = 2, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
-text(labels = "(a)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font =2)
+
+
+
+plotInf = function(res,ci, xlab = "", ylab = "", col = rep("black", 7), between = 0.4){
+  plotSize = 1*(1-between)
+  groupSize = plotSize/ncol(res)
+  pointBaseX = seq(0,groupSize, length.out = nrow(res))
+  emptySize = between/(ncol(res)-1)
+  baseX = (0:(ncol(res) - 1))*(emptySize+groupSize)
+  coords = matrix(NA, nrow = ncol(res), 4)
+  for(i in 1:nrow(coords)) coords[i,] = baseX[i]+pointBaseX
+  counter = 1
+  plot(NULL, NULL, xlim = c(0,1), ylim = c(0,1), axes = TRUE,xaxt = "n", xlab = xlab , ylab = ylab, yaxt = "n")
+  km = apply(res,2,mean)
+  for(i in 1:ncol(res)){
+    segments(x0 = min(coords[i,])-0.03, x1 = max(coords[i,])+0.03, y0 = km[i], y1 = km[i], lty = 1, col = "red", xpd = NA, lwd = 0.6)
+    x = 1:4
+    ce = coef(lm(res[,i]~scale(x)))
+    cc= c(coords[i,])
+    segments(x0 = min(cc)-0.03, x1 = max(cc)+0.03, y0 = ce[1]-mean(cc)*ce[2], y1 = ce[1]+mean(cc)*ce[2], lty =2 , col = "red", lwd = 0.6)
+  }
+  for(i in 1:ncol(res)) points(x = coords[i,], y = res[,i], col = col[i], pch = 16,cex = 0.5)
+  for(i in 1:ncol(res)) {
+    for(j in 1:nrow(res)) plotCI(x = coords[i,j], y = res[j,i], ci[j,i], col = "black")
+  }
+  km = apply(res,2,mean)
+ 
+  return(coords)
+}
+
+wideX = function(co) seq(min(co)-0.01, max(co)+0.01, length.out = 4)  
+
+pdf(file = "../Figures/FigS3.pdf", width = 2.25, height = 1.8)
+par(mfrow = c(1,2),  mar = c(1.0,1.4,0.4, 0.3), oma = c(0,0.0,0.4,0), mgp = c(3,0.27,0))
+
+dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
+names(dictonary) = c("classif.keras_seq.tuned", "classif.kknn.tuned", "classif.randomForest.tuned", "classif.xgboost.tuned","glm")
+ResClass = bind_rows(resAggMiddleClass[,c(1,2,3,9)])
+ResClassT = tapply(ResClass$trp, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
+ResClassTCI = tapply(ResClass$tprCI, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
+means = apply(ResClassT, 2, mean)
+ord = order(means, decreasing = TRUE)
+
+
+right_order = dictonary[names(means)[order(means, decreasing = TRUE)]]
+
+
+coords = plotInf(ResClassT[,ord], ResClassTCI[,ord], between = 0.4)
+axis(2, las = 2, cex.axis = cexP, tck = -0.02)
+#text(labels = rep(1:4, 5), x = as.vector((apply(coords, 1, wideX))), y = 0.01, pos = 1, cex = cexP, xpd = NA)
+#.a = apply(coords, 1, 
+#           function(co) segments(x0 = co[1]-0.025, x1 = co[4]+0.025, y0 = -0.12, y1 = -0.12, xpd = #NA))
+text(labels = dictonary[colnames(ResClassT)[ord]], 
+     x = apply(coords,1, function(co) mean(co)), y = -0.02, pos = 1, xpd = NA, cex = cexP)
+text(labels = "TPR", x = 0.20, y = 0.015, xpd = NA, pos = 4, cex = cexP, font =1)
+text(labels = "(a)", x = 0.02, y = 1.08, xpd = NA, pos = 2, cex = cexP*1.1, font =2)
+
 
 
 dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
 names(dictonary) = c("regr.negBinDnn.tuned", "regr.kknn.tuned", "regr.randomForest.tuned", "regr.xgboost.tuned","glm")
-ResReg = resAggMiddleReg[,c(1,2,3)]
-ResReg = tapply(ResReg$trp, list(factor(ResReg$len_true),ResReg$model), simplify = TRUE, FUN = function(i)i)
-means = apply(ResReg, 2, mean)
+ResReg = bind_rows(resAggMiddleReg[,c(1,2,3,9)])
+ResRegT = tapply(ResReg$trp, list(factor(ResReg$len_true),ResReg$model), simplify = TRUE, FUN = function(i) i)
+ResRegTCI = tapply(ResReg$tprCI, list(factor(ResReg$len_true),ResReg$model), simplify = TRUE, FUN = function(i)i)
+means = apply(ResRegT, 2, mean)
 ord = order(means, decreasing = TRUE)
-coords = barInf(ResReg[,ord], col = addA(cols[dictonary[colnames(ResReg)[ord]]], 0.4) )
-axis(2, las = 2, cex.axis = cexP)
-text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
-.a = apply(matrix(1:8, nrow = 2, byrow = TRUE)[,c(1,4)], 1, 
-           function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
-text(labels = dictonary[colnames(ResReg)[ord]], 
-     x = apply(matrix(coords, nrow = 2, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
-text(labels = "(b)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font = 2)
+
+ord = sapply(right_order, function(x) which(x == dictonary[colnames(ResRegT)], arr.ind = TRUE))
+
+coords = plotInf(ResRegT[,ord], ResRegTCI[,ord], between = 0.4)
+axis(2, las = 2, cex.axis = cexP, tck = -0.02)
+#text(labels = rep(1:4, 5), x = as.vector((apply(coords, 1, wideX))), y = 0.01, pos = 1, cex = cexP, xpd = NA)
+#.a = apply(coords, 1, 
+#           function(co) segments(x0 = co[1]-0.025, x1 = co[4]+0.025, y0 = -0.12, y1 = -0.12, xpd = NA))
+text(labels = dictonary[colnames(ResRegT)[ord]], 
+     x = apply(coords,1, function(co) mean(co)), y = -0.02, pos = 1, xpd = NA, cex = cexP)
+text(labels = "TPR", x = 0.20, y = 0.015, xpd = NA, pos = 4, cex = cexP, font =1)
+text(labels = "(b)", x = 0.02, y = 1.08, xpd = NA, pos = 2, cex = cexP*1.1, font =2)
+
+
 
 dev.off()
+
+
+
+
+
+# reset()
+# pdf(file = "./Figures/FigS3.pdf",width = 5.5,height = 3.5)
+# par(mfrow = c(1,2), mar = c(1,2,0.6,0.1)+0.1,oma = c(0.0,0.2,1.2,0.1))
+# plotResAgg(resAggMiddleClass,labels = c("DNN", "BRT"), col = "darkred")
+# text(xpd = NA, x = -0.1, y = 1.1, labels = "a)", font = 1)
+# plotResAgg(resAggMiddleReg ,labels = c("DNN", "BRT"), col = "darkred")
+# text(xpd = NA, x = -0.1, y = 1.1, labels = "b)", font = 1)
+# dev.off()
+# 
+# 
+# 
+# addA = TraitMatching:::addA
+# cexP = 0.5
+# pdf(file = "./Figures/FigS3.pdf", width = 5.50, height = 1.8)
+# par(mfrow = c(1,2),  mar = c(1.2,1.6,0.2, 0.3), oma = c(0,0.0,0.4,0), mgp = c(3,0.6,0))
+# dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
+# names(dictonary) = c("classif.keras_seq.tuned", "classif.kknn.tuned", "classif.randomForest.tuned", "classif.xgboost.tuned","glm")
+# ResClass = resAggMiddleClass[,c(1,2,3)]
+# ResClass = tapply(ResClass$trp, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
+# means = apply(ResClass, 2, mean)
+# ord = order(means, decreasing = TRUE)
+# coords = barInf(ResClass[,ord], col = addA(cols[dictonary[colnames(ResClass)[ord]]], 0.4) )
+# axis(2, las = 2, cex.axis = cexP)
+# text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
+# .a = apply(matrix(1:8, nrow = 2, byrow = TRUE)[,c(1,4)], 1, 
+#            function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
+# text(labels = dictonary[colnames(ResClass)[ord]], 
+#      x = apply(matrix(coords, nrow = 2, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
+# text(labels = "(a)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font =2)
+# 
+# 
+# dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
+# names(dictonary) = c("regr.negBinDnn.tuned", "regr.kknn.tuned", "regr.randomForest.tuned", "regr.xgboost.tuned","glm")
+# ResReg = resAggMiddleReg[,c(1,2,3)]
+# ResReg = tapply(ResReg$trp, list(factor(ResReg$len_true),ResReg$model), simplify = TRUE, FUN = function(i)i)
+# means = apply(ResReg, 2, mean)
+# ord = order(means, decreasing = TRUE)
+# coords = barInf(ResReg[,ord], col = addA(cols[dictonary[colnames(ResReg)[ord]]], 0.4) )
+# axis(2, las = 2, cex.axis = cexP)
+# text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
+# .a = apply(matrix(1:8, nrow = 2, byrow = TRUE)[,c(1,4)], 1, 
+#            function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
+# text(labels = dictonary[colnames(ResReg)[ord]], 
+#      x = apply(matrix(coords, nrow = 2, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
+# text(labels = "(b)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font = 2)
+# 
+# dev.off()
 
 
 ```
@@ -938,14 +1073,14 @@ dev.off()
 
 ## Figure 5
 ```{r,results=FALSE}
-load(file = "./Results/HummingInferenceResult.RData")
+load(file = "../Results/HummingInferenceResult.RData")
 humT = c( "Bill.Length", "Bill.Curvature", "Body.Mass","Wing" , "Tail" , "plot.Low", "plot.Mid", "plot.High")
 plantT = c( "Corolla.Length","Corolla.Curvature", "Corolla.Volumen","Inner.Diameter", "Ext.Diameter")
 interHum = apply(rbind(expand.grid(humT, plantT), expand.grid( plantT, humT)), 1, function(x) paste0(x[1],":", x[2]))
 reset()
 cexP = 0.9
 
-pdf(file = "./Figures/Fig5.pdf", width = 5.5, height = 3.7)
+pdf(file = "../Figures/Fig5.pdf", width = 5.5, height = 3.7)
 par(mfrow = c(1,2),mar = c(0.3,1,1,3)+0.0,oma = c(1,0.3,2,1))
 # Fig5a
 plot(NULL,NULL, xlim = c(0,1), ylim = c(0,1), axes = F, xlab = "", ylab = "")
@@ -981,7 +1116,7 @@ drawRankingMatrix2(best, groups = groups, cex = 0.7, top_n = 8)
 #text(x = -0.01, y = 1.03, labels = "(b)", cex = 0.9, xpd = NA, font = 2)
 
 for(i in 8:1){
-  rect(ytop = -0.04,ybottom = -0.07,xleft = seq(0.0,1,length.out = 9)[i],xright = seq(0,1,length.out = 9)[i+1], col = RColorBrewer::brewer.pal(8,name = "YlGnBu")[i],border = NA, xpd = NA)
+  rect(ytop = -0.04,ybottom = -0.07,xleft = seq(0.0,1,length.out = 9)[i],xright = seq(0,1,length.out = 9)[i+1], col = rev(RColorBrewer::brewer.pal(8,name = "YlGnBu"))[i],border = NA, xpd = NA)
 }
 text(y= -0.07,x = rev(seq(0, seq(0,1,length.out = 9)[8], length.out = 8))+0.03, labels = 8:1, pos = 1, font = 2, cex = 0.7, xpd = NA)
 mtext(side = 3, text = c("(a)", "(b)"),line = 3,at = c(-1.7,-0.5), font = 2, cex = 0.9)
@@ -1226,7 +1361,7 @@ reset()
 
 
 ```{r,results=FALSE}
-load(file = "./Results/HummingInferenceResult.RData")
+load(file = "../Results/HummingInferenceResult.RData")
 humT = c( "Bill.Length", "Bill.Curvature", "Body.Mass","Wing" , "Tail" )
 plantT = c( "Corolla.Length","Corolla.Curvature", "Corolla.Volumen","Inner.Diameter", "Ext.Diameter")
 interHum = apply(rbind(expand.grid(humT, plantT), expand.grid( plantT, humT)), 1, function(x) paste0(x[1],":", x[2]))
@@ -1236,7 +1371,7 @@ groups = list(a = humT, b = plantT)
 
 best = ResultInterCombined$rf
 best$pairwise_interactions = best$pairwise_interactions[order(best$pairwise_interactions$Interactions,decreasing = TRUE),, drop = FALSE]
-pdf(file = "./Figures/FigS4.pdf")
+pdf(file = "../Figures/FigS5.pdf")
 modelNames = c("BRT", "NgDNN", "pDNN", "RF")
 par(mfrow = c(4,4), mar = c(1.5,1,1.5,1)+0.3,oma = c(0.0,5,3,0))
 for(i in 1:4){
