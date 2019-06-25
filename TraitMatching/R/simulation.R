@@ -9,7 +9,6 @@
 #' @param pollinatorTraitNumber parameter to set the number of pollinator traits on an interval scale
 #' @param factorPollinatorTraitsNumber parameter to set the number of ordinal pollinator traits
 #' @return A list containing two species/trait matrices and two corresponding abundance vectors
-#' @export
 #'
 GetSpeciesProperties <- function(plantSpeciesnumber = 200, pollinatorSpeciesnumber = 200, plantTraitNumber = 11, factorPlantTraitNumber = 5,
                                  pollinatorTraitNumber = 5, factorPollinatorTraitNumber = 5, abundance_dist = 1) {
@@ -82,7 +81,6 @@ GetSpeciesProperties <- function(plantSpeciesnumber = 200, pollinatorSpeciesnumb
 #' @param desire, desired value between 0 and 1
 #' @return A list containg the interaction matrix and vectors of the sampled traits
 #' @example /inst/examples/simexample.R
-#' @export
 #'
 
 #plantSpeciesnumber = 50, pollinatorSpeciesnumber = 50, randomTraits = 0, binary = F, factorPlantTraitNumber = 0, factorPollinatorTraitNumber = 0

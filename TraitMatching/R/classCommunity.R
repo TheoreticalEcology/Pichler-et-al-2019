@@ -1,5 +1,7 @@
 #' createCommunity
 #'
+#' create Community object for \link{\code{runTM}}
+#'
 #' @param a, group a
 #' @param b, group b
 #' @param z, interaction matrix for a and b, rows == a and cols == b
@@ -83,8 +85,9 @@ createCommunity = function(a = NULL, b = NULL, z = NULL, community = NULL, respo
 
 }
 
+#' createBlock
 #' create coords
-#' @param data
+#' @param data data which to block
 createBlock = function(data){
   levels(data$Y) = 1:length(levels(data$Y))
   data$X = data$Y
@@ -99,9 +102,9 @@ createBlock = function(data){
 }
 
 
-
+#' mergeCommunities
 #' merge communities
-#' @param data
+#' @param data data to merge
 mergeCommunities = function(data){
   if(length(data) == 1) return(data[[1]])
 

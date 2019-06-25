@@ -3,9 +3,7 @@ Title: Analysis of bipartite networks
 Version: 0.0.0.9000
 Authors@R: person("Maximilian", "Pichler", email = "Maximilian-Pichler@web.de", role = c("aut", "cre"))
 Description: 
-Depends:
-    R (>= 3.3.2),
-    mlr,
+Depends: R (>= 3.3.2)
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
@@ -22,11 +20,10 @@ Imports:
     ParamHelpers,
     missForest,
     kknn,
-    sensitivity,
     snow,
     keras,
     kknn
-RoxygenNote: 6.0.1.9000
+RoxygenNote: 6.1.1
 Suggests:
     testthat,
     kknn,

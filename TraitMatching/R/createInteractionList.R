@@ -5,7 +5,6 @@
 #' @param Z matrix with X*Y species. Interactions can be binaries or probabilities
 #'
 #'
-#' @export
 
 
 

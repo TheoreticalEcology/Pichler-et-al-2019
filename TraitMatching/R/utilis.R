@@ -1,32 +1,3 @@
-#' Print Function for TMsobol
-#' @param x, TMsobol object
-#' @export
-print.TMsobol <- function(x){
-  cat("Estimation of Total Interaction Indices\n")
-  cat("Scaled TIIs with 0.95 confidence intervals and their interaction group:\n\n")
-  print(x$tii.scaled)
-
-
-}
-
-
-#' Print Function for PermutationRF
-#' @param x, PermutationRF object from permutationRF()
-#' @export
-
-print.PermutationRF <- function(x){
-  cat("Result from permutationRF: \n\n")
-  print(x$result)
-
-
-
-}
-
-
-
-seed = function() set.seed(42)
-
-
 
 #' @export
 poisson.fun = function(task, model, pred, feats, extra.args) {
@@ -106,6 +77,7 @@ negBinLL = makeMeasure(
 
 
 
+#' combineResults
 #' combine Results
 #' @param res list of results
 
@@ -165,7 +137,7 @@ tss = makeMeasure(
 
 
 
-
+#' tuneAndAggregate
 #' tune treshold and get measuremens
 #' @param combined Results
 #' @param tuneT msr to tune treshold
@@ -347,6 +319,11 @@ tuneAndAggregate = function(combinedResults = NULL, tuneT = tss, measures = list
 
 
 
+#' tuneAndAggregateRegression
+#' tune treshold and get measuremens
+#' @param combinedResults Results
+#' @param measures msr to tune treshold
+#' @param onlyTest measures to calculate
 
 tuneAndAggregateRegression = function(combinedResults = NULL, measures = list(rmse, spearmanrho), onlyTest = T){
   require(mlr)
@@ -459,6 +436,7 @@ print.TMmodel <- function(x){
 
 
 
+#' addA
 #' color help function
 #' @param col color as hex
 #' @param alpha alpha
@@ -466,7 +444,7 @@ addA = function(col, alpha = 0.25) apply(sapply(col, col2rgb)/255, 2, function(x
 
 
 
-
+#' minOneInter
 #' select only rows and columns with at least one interaction
 #' @param inter interaction matrix
 #' @export
@@ -479,7 +457,7 @@ minOneInter = function(inter){
   return(data.frame(inter[whichRow,whichCol]))
 }
 
-
+#' createInterFeatures
 #' Feature Eng funcion. Create interaction features, all combinations
 #' @param df data.frame with the last variable as target
 
@@ -501,6 +479,7 @@ createInterFeatures = function(df){
 
 
 #' plotOverfitting
+#' plot Overfitting...
 #' @param Results results from runTM
 #' @param names of methods
 #' @param titles titles for the plots
@@ -603,7 +582,7 @@ plotOverfitting = function(Results, methods = c("RF", "dnn", "cnn", "cforest", "
 }
 
 
-
+#' DNNuncertanity
 #' get sd for predictions
 #' @param result previous result
 #' @param data data for the model

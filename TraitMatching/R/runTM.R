@@ -1,16 +1,42 @@
-#' runTM function
+#' Fit TM model
 #'
-#' @param classCommunity from createCommunity()
-#' @param settings settings with lists for models
-#' @param method Method to be used. RF, RF_random, knn, knn_FS, SVM, (deep)neural net or best for selecting best of these models. RF_random is default
-#' @param tune Default method = random
-#' @param parallel boolean. Parallel computing. Default = T
-#' @param iters for tuning control. Random search, default = 5
-#' @param tuningMetric Tuning evaluation metric, default = GAT
-#' @param balanceClasses method to balance Classes, default = "Over" for Oversampling
-#' @param crossValidation cv...
-#' @param fitSpecies default = FALSE, per default species (first and second column) will not be fitted along, if TRUE both will be fitted but also vector with species columns name can be given
+#' @description Fit, tune and cross-validate a TM model
 #'
+#' @param classCommunity object of class classCommunity created by \link{\code{createCommunity}}
+#' @param settings list of settings for the machine learning model. See details
+#' @param method Which ML algorithm to be used. RF, knn, SVM, DNN, CNN, boost, ngBinDNN, naive, or CNN. See details. "RF" is default
+#' @param tune How to tune ML parameters. We support only "random" at the moment.
+#' @param tuningMetric Which predictive measurement should be used for tuning. "AUC" is default. See details.
+#' @param parallel boolean or numeric. See details.
+#' @param iters Number of tuning steps
+#' @param crossValidation List for CV plan. See details.
+#' @param fitSpecies boolean for fit species as categorical predictor.
+#' @param balanceClasses How to balance classes. Default is oversampling "Over".
+#' @param returnOnlySetup return setup without fitting.
+#' @param block ...
+#' @param seed set seed
+#' @param keepModels Whether to return all fitted Models or not.
+#' @param normalize Whether to normalize data or not.
+#'
+#' @details
+#' \itemize{
+#' \item \link{\code{classCommunity}}: Provide a, b, z as data.frames. a and b are group matrices (e.g. plants and pollinators). First column in each data.frame must be species names. The z data.frame is the interaction matrix with rownames == speciesnames of a, and colnames == speciesnames of b.
+#' \item \code{settings}: The parameters you set here will be not tuned. We support at the moment the following ML algorithms with parameters:
+#' RF (Classification and Regression): mtry, nodesize, replace.
+#' knn (Classification and Regression): k, kernel \code{= c("rectangular", "triangular", "epanechnikov", "optimal")}
+#' SVM (Classification and Regression): kernel = \code{c("gauss_rbf", "poisson")}, lambdas, gammas.
+#' DNN (Classification and Regression): lr, arch, drop, nLayer, bias, activation, archFunction, batch, decay, alpha, opti, logTarget (only for Regression).
+#' boost (Classification and Regression): booster = \code{c("gbtree", "tree")}, sample_type = \code{c("uniform", "weighted")}, normalize_type = \code{c("tree", "forest")}, eta, gamma, max_depth, lambda, alpha, min_child_weight, nrounds, rate_drop, skip_drop.
+#' CNN (Classification): lr, arch, drop, filter, bias, pool, nLayer, nConv, activation, archFunction, batch, decay, opti
+#' naive (Classification): laplace
+#' negBinDnn (Regression): lr, arch, nLayer, activation, bias, archFunction, batch, opti, distribution =\code{ c("poisson", "negBin")}, Link
+#' \item \code{method}: scalar or subset of \code{c("RF", "SVM", "DNN", "CNN", "boost", "ngBinDnn", "naive", "knn")}
+#' \item \code{tuningMetric}: At the moment we support: \code{c("tss", "spearmanrho", "rmsle", "poisson", "poissonQuasi", "negBinLL", "rmse", "expvar", "arsq", "sae", "mcc", "auc", "bac", "ber", "brier.scaled", "f1", "gpr", "kappa", "logloss", "mcc", "ppv", "ssr", "tpr", "wkappa")}
+#' \item \code{parallel}: Boolean or numeric vector. If TRUE, all available cores will be used. If numeric vector, "double" parallelization will be used. Each model will get its own cluster and the tuning will be parallelized.
+#' \item \code{crossValidation}: list of two named list that define the outer and inner resampling strategy. \code{list = list(outer = list(method = "CV", iters), inner = list(method = "CV", iters))}. Methods can be change to SpCV. With SpCV, Species from the b Matrix will be left out with all its interactions (structured CV).
+#' }
+#'
+#' @author Maximilian Pichler
 #' @export
 
 
@@ -18,6 +44,8 @@ runTM <- function(classCommunity, settings = NULL,method = "RF", tune = "random"
   outer = list(method = "CV", iters = 10),
   inner = list(method = "CV", iters = 3)
 ), balanceClasses = "Over", fitSpecies = F, returnOnlySetup = F, block = NULL, seed = NULL, keepModels = FALSE, normalize = T){
+
+  if(any(!method %in% c("RF", "SVM", "DNN", "CNN", "boost", "ngBinDnn", "naive", "knn"))) stop("Method is not supported")
 
   if(is.null(settings)) {
     settings = list()

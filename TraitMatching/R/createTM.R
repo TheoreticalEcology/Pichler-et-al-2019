@@ -17,7 +17,6 @@
 #' @param iters for tuning control. Random search, default = 5
 #' @param tuning_metric Tuning evaluation metric, default = GAT
 #'
-#' @export
 #'
 
 

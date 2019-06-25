@@ -5,7 +5,6 @@
 #' @param models default TRUE, show info about all available models
 #' @param onlyModels default FALSE, return only available models
 #' @param onlyMeasures default FALSE, return only available Measures
-#' @export
 
 showInfo <- function(learner = NULL, models = T, onlyModels = F, onlyMeasures = F, onlyBC = F){
   info <- list()
@@ -48,6 +47,7 @@ print.TMinfo <- function(info){
 }
 
 
+#' modelSetup
 #' Setup function for model setup. It's possible to manually set parameters to overwrite default values and specify parameters to be tuned.
 #' @param RF rf from random Forest
 #' @param SVM svm from
@@ -57,7 +57,6 @@ print.TMinfo <- function(info){
 #' @param knnFS knn with feature selection
 #' @param naive naive bayes algo
 #' @param boost boost algo
-#' @export
 
 # RF = list(set = list(ntree = 100), tune = c("mtry", "importance"))
 

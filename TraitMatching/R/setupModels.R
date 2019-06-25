@@ -1,9 +1,11 @@
 
 
-#' RF from randomForest package
-#' @param method
-#' @param balanceClasses
-#' @param predict.type
+#' get Learner
+#'
+#' configure Learner
+#' @param method which method
+#' @param balanceClasses balance class type
+#' @param predict.type predict type
 #' @param extra settings for learner
 
 
@@ -19,7 +21,7 @@ getLearner <- function(method, balanceClasses, predict.type = "prob", predict.tr
     else if(method == "boost") learner = do.call(mlr::makeLearner, c(list(cl = "regr.xgboost"), extra))
     else if(method == "knnFS") learner <- mlr::makeFilterWrapper(do.call(mlr::makeLearner, c(list(cl = "regr.kknn"), extra)))
     else if(method == "cforest") learner = do.call(mlr::makeLearner, c(list(cl = "regr.cforest"), extra))
-    else if(method == "cnn") learner = do.call(mlr::makeLearner, c(list(cl = "regr.keras_conv"), extra))
+   # else if(method == "cnn") learner = do.call(mlr::makeLearner, c(list(cl = "regr.keras_conv"), extra))
     else if(method == "wideDeep") learner = do.call(mlr::makeLearner, c(list(cl = "regr.wideDeep"), extra))
     else if(method == "preDnn") learner = do.call(mlr::makeLearner, c(list(cl = "regr.preKeras"), extra))
     else if(method == "negBinDnn") learner = do.call(mlr::makeLearner, c(list(cl = "regr.negBinDnn"), extra))
@@ -66,7 +68,9 @@ getLearner <- function(method, balanceClasses, predict.type = "prob", predict.tr
 
 
 
-#' set Parameter
+#' getPars
+#'
+#' get Parameter config for each learner
 #' @param method learner
 #' @param settings modelSettings to bet set
 #' @param extra settings

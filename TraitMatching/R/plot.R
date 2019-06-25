@@ -5,7 +5,6 @@
 #'
 #' @param x Provide TM object from createTM
 #'
-#' @export
 
 plotDP <- function(x) {
   if(class(x)[1] != "TMmodel") stop("Error, pls provide TMmodel object from TM()")

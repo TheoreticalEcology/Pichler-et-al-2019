@@ -4,7 +4,6 @@
 #' @param parallel CPUs to use, default use all available CPU's
 #' @param data If no Object from createTMmodel, provide X, Y and interactionlist in a List
 #'
-#' @export
 
 
 

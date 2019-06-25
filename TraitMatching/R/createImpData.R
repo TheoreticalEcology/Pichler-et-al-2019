@@ -3,7 +3,6 @@
 #' @param X Matrix with n rows species and n columns traits. First column = species
 #' @param Y Matrix with n rows species and n columns traits. First column = species
 #'
-#' @export
 
 
 

@@ -1,5 +1,7 @@
 
-#' Create species for simulateInter
+#' createSpecies
+#'
+#' simulate Species
 #'
 #'@param NumberA number of A
 #'@param NumberB number of B
@@ -132,7 +134,10 @@ createDiscrete = function(range){
 
 
 
-#' Simulate Interaction
+#' simulateInteraction
+#'
+#' simulate trait matching
+#'
 #' @param speciesClass speciesClass
 #' @param main main traits
 #' @param inter ...
