@@ -2,7 +2,8 @@
 % Please edit documentation in R/utilis.R
 \name{addA}
 \alias{addA}
-\title{color help function}
+\title{addA
+color help function}
 \usage{
 addA(col, alpha = 0.25)
 }
@@ -12,5 +13,6 @@ addA(col, alpha = 0.25)
 \item{alpha}{alpha}
 }
 \description{
+addA
 color help function
 }

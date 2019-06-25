@@ -4,7 +4,7 @@
 \alias{makeRLearner.regr.keras_seq}
 \title{Keras_seq learner}
 \usage{
-\method{makeRLearner}{regr.keras_seq}()
+makeRLearner.regr.keras_seq()
 }
 \description{
 Keras_seq learner

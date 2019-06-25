@@ -4,7 +4,7 @@
 \alias{predictLearner.regr.poisson}
 \title{PredictLearner for keras_seq implemantation into mlr}
 \usage{
-\method{predictLearner}{regr.poisson}(.learner, .model, .newdata, ...)
+predictLearner.regr.poisson(.learner, .model, .newdata, ...)
 }
 \description{
 PredictLearner for keras_seq implemantation into mlr

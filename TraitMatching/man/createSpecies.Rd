@@ -2,11 +2,11 @@
 % Please edit documentation in R/simulationNew.R
 \name{createSpecies}
 \alias{createSpecies}
-\title{Create species for simulateInter}
+\title{createSpecies}
 \usage{
 createSpecies(NumberA = 20, NumberB = 40, traitsA = c(5, 5),
-  traitsB = c(8, 8), rangeDiscrete = 2:8, seed = 1337, abundance = 2,
-  speciesClass = NULL, specialist = T, coLin = NULL,
+  traitsB = c(8, 8), rangeDiscrete = 2:8, seed = 1337,
+  abundance = 2, speciesClass = NULL, specialist = T, coLin = NULL,
   sampling = function(n) runif(n, 0, 1), specRange = c(1, 2))
 }
 \arguments{
@@ -19,5 +19,5 @@ createSpecies(NumberA = 20, NumberB = 40, traitsA = c(5, 5),
 \item{traitsB}{vector for traitsB}
 }
 \description{
-Create species for simulateInter
+simulate Species
 }

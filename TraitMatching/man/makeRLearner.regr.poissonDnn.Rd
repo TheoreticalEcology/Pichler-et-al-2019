@@ -4,7 +4,7 @@
 \alias{makeRLearner.regr.poissonDnn}
 \title{Keras_seq learner}
 \usage{
-\method{makeRLearner}{regr.poissonDnn}()
+makeRLearner.regr.poissonDnn()
 }
 \description{
 Keras_seq learner

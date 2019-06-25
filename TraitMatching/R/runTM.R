@@ -2,7 +2,7 @@
 #'
 #' @description Fit, tune and cross-validate a TM model
 #'
-#' @param classCommunity object of class classCommunity created by \link{\code{createCommunity}}
+#' @param classCommunity object of class classCommunity created by \code{\link{createCommunity}}
 #' @param settings list of settings for the machine learning model. See details
 #' @param method Which ML algorithm to be used. RF, knn, SVM, DNN, CNN, boost, ngBinDNN, naive, or CNN. See details. "RF" is default
 #' @param tune How to tune ML parameters. We support only "random" at the moment.
@@ -20,7 +20,7 @@
 #'
 #' @details
 #' \itemize{
-#' \item \link{\code{classCommunity}}: Provide a, b, z as data.frames. a and b are group matrices (e.g. plants and pollinators). First column in each data.frame must be species names. The z data.frame is the interaction matrix with rownames == speciesnames of a, and colnames == speciesnames of b.
+#' \item \code{\link{classCommunity}}: Provide a, b, z as data.frames. a and b are group matrices (e.g. plants and pollinators). First column in each data.frame must be species names. The z data.frame is the interaction matrix with rownames == speciesnames of a, and colnames == speciesnames of b.
 #' \item \code{settings}: The parameters you set here will be not tuned. We support at the moment the following ML algorithms with parameters:
 #' RF (Classification and Regression): mtry, nodesize, replace.
 #' knn (Classification and Regression): k, kernel \code{= c("rectangular", "triangular", "epanechnikov", "optimal")}

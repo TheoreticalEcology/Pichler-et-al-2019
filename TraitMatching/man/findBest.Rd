@@ -4,8 +4,8 @@
 \alias{findBest}
 \title{Find best Model of all available Models}
 \usage{
-findBest(interactionList, parallel = T, tune = "random", target = NULL,
-  iters = 100)
+findBest(interactionList, parallel = T, tune = "random",
+  target = NULL, iters = 100)
 }
 \arguments{
 \item{interactionList}{permuted data with binary classification for interaction}

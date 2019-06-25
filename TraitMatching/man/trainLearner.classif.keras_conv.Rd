@@ -2,22 +2,23 @@
 % Please edit documentation in R/Keras_conv.R, R/cnn.R
 \name{trainLearner.classif.keras_conv}
 \alias{trainLearner.classif.keras_conv}
-\alias{trainLearner.classif.keras_conv}
 \title{Keras_conv train function}
 \usage{
-\method{trainLearner}{classif.keras_conv}(.learner, .task, .subset,
+trainLearner.classif.keras_conv(.learner, .task, .subset,
   .weights = NULL, batch = 25, archFunction = "negExp",
   activation = "relu", decay = 0.97, nConv = 1, pool = "average",
-  kernel_size = 2L, bias = T, nLayer = 10, arch = 200, opti = "sgd",
-  loss = "categorical_crossentropy", drop = 0.6, lr = 0.01, filter = 10,
-  epochs = 200, classwt = NULL, seed = NULL, ...)
+  kernel_size = 2L, bias = T, nLayer = 10, arch = 200,
+  opti = "sgd", loss = "categorical_crossentropy", drop = 0.6,
+  lr = 0.01, filter = 10, epochs = 200, classwt = NULL,
+  seed = NULL, ...)
 
-\method{trainLearner}{classif.keras_conv}(.learner, .task, .subset,
+trainLearner.classif.keras_conv(.learner, .task, .subset,
   .weights = NULL, batch = 25, archFunction = "negExp",
   activation = "relu", decay = 0.97, nConv = 1, pool = "average",
-  kernel_size = 2L, bias = T, nLayer = 10, arch = 200, opti = "sgd",
-  loss = "categorical_crossentropy", drop = 0.6, lr = 0.01, filter = 10,
-  epochs = 200, classwt = NULL, seed = NULL, ...)
+  kernel_size = 2L, bias = T, nLayer = 10, arch = 200,
+  opti = "sgd", loss = "categorical_crossentropy", drop = 0.6,
+  lr = 0.01, filter = 10, epochs = 200, classwt = NULL,
+  seed = NULL, ...)
 }
 \description{
 Keras_conv train function

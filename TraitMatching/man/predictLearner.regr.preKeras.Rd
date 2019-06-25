@@ -4,8 +4,8 @@
 \alias{predictLearner.regr.preKeras}
 \title{PredictLearner for keras_seq implemantation into mlr}
 \usage{
-\method{predictLearner}{regr.preKeras}(.learner, .model, .newdata,
-  split = c(20, 20), ...)
+predictLearner.regr.preKeras(.learner, .model, .newdata, split = c(20,
+  20), ...)
 }
 \description{
 PredictLearner for keras_seq implemantation into mlr

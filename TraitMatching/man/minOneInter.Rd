@@ -2,7 +2,8 @@
 % Please edit documentation in R/utilis.R
 \name{minOneInter}
 \alias{minOneInter}
-\title{select only rows and columns with at least one interaction}
+\title{minOneInter
+select only rows and columns with at least one interaction}
 \usage{
 minOneInter(inter)
 }
@@ -10,5 +11,6 @@ minOneInter(inter)
 \item{inter}{interaction matrix}
 }
 \description{
+minOneInter
 select only rows and columns with at least one interaction
 }

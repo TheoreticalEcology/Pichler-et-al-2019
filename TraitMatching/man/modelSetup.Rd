@@ -2,7 +2,8 @@
 % Please edit documentation in R/configureModel.R
 \name{modelSetup}
 \alias{modelSetup}
-\title{Setup function for model setup. It's possible to manually set parameters to overwrite default values and specify parameters to be tuned.}
+\title{modelSetup
+Setup function for model setup. It's possible to manually set parameters to overwrite default values and specify parameters to be tuned.}
 \usage{
 modelSetup(RF = NULL, SVM = NULL, dnn = NULL, RFranger = NULL,
   knn = NULL, knnFS = NULL, naive = NULL, boost = NULL,
@@ -26,5 +27,6 @@ modelSetup(RF = NULL, SVM = NULL, dnn = NULL, RFranger = NULL,
 \item{keras}{keras tensorflow}
 }
 \description{
+modelSetup
 Setup function for model setup. It's possible to manually set parameters to overwrite default values and specify parameters to be tuned.
 }

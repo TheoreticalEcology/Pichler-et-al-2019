@@ -2,7 +2,8 @@
 % Please edit documentation in R/utilis.R
 \name{DNNuncertanity}
 \alias{DNNuncertanity}
-\title{get sd for predictions}
+\title{DNNuncertanity
+get sd for predictions}
 \usage{
 DNNuncertanity(result, data, inst, n = 100, logTarget = TRUE,
   correct = TRUE, negBin = FALSE)
@@ -15,5 +16,6 @@ DNNuncertanity(result, data, inst, n = 100, logTarget = TRUE,
 \item{inst}{resampling instance}
 }
 \description{
+DNNuncertanity
 get sd for predictions
 }

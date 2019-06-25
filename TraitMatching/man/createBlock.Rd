@@ -2,10 +2,15 @@
 % Please edit documentation in R/classCommunity.R
 \name{createBlock}
 \alias{createBlock}
-\title{create coords}
+\title{createBlock
+create coords}
 \usage{
 createBlock(data)
 }
+\arguments{
+\item{data}{data which to block}
+}
 \description{
+createBlock
 create coords
 }

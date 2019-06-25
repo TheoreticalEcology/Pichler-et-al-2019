@@ -4,11 +4,12 @@
 \alias{trainLearner.regr.keras_conv}
 \title{Keras_conv train function}
 \usage{
-\method{trainLearner}{regr.keras_conv}(.learner, .task, .subset,
-  .weights = NULL, batch = 25, decay = 0.97, archFunction = "negExp",
+trainLearner.regr.keras_conv(.learner, .task, .subset, .weights = NULL,
+  batch = 25, decay = 0.97, archFunction = "negExp",
   activation = "relu", pool = "average", nConv = 1, nLayer = 2L,
   bias = T, kernel_size = 2, epochs = 200, loss = "poisson",
-  opti = "sgd", arch = 30L, drop = 0.25, filter = 18, lr = 0.01, ...)
+  opti = "sgd", arch = 30L, drop = 0.25, filter = 18, lr = 0.01,
+  ...)
 }
 \description{
 Keras_conv train function

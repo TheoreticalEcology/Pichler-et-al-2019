@@ -4,7 +4,7 @@
 \alias{makeRLearner.regr.keras_conv}
 \title{Keras_convlearner}
 \usage{
-\method{makeRLearner}{regr.keras_conv}()
+makeRLearner.regr.keras_conv()
 }
 \description{
 Keras_convlearner

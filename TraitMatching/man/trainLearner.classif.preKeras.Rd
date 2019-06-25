@@ -4,12 +4,11 @@
 \alias{trainLearner.classif.preKeras}
 \title{Keras_seq train function}
 \usage{
-\method{trainLearner}{classif.preKeras}(.learner, .task, .subset,
-  .weights = NULL, decay = 0.97, batch = 40, alpha = 0.2, bias = T,
-  lr = 0.01, archFunction = "continous", activation = "relu",
-  classwt = NULL, epochs = 200, nLayer = 10,
-  loss = "categorical_crossentropy", opti = "adamax", split = c(20, 20),
-  arch = 30, drop = 0.2, ...)
+trainLearner.classif.preKeras(.learner, .task, .subset, .weights = NULL,
+  decay = 0.97, batch = 40, alpha = 0.2, bias = T, lr = 0.01,
+  archFunction = "continous", activation = "relu", classwt = NULL,
+  epochs = 200, nLayer = 10, loss = "categorical_crossentropy",
+  opti = "adamax", split = c(20, 20), arch = 30, drop = 0.2, ...)
 }
 \description{
 Keras_seq train function

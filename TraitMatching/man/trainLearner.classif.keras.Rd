@@ -4,10 +4,10 @@
 \alias{trainLearner.classif.keras}
 \title{Keras trainer}
 \usage{
-\method{trainLearner}{classif.keras}(.learner, .task, .subset,
-  .weights = NULL, classwt = NULL, epochs = 50,
-  loss = "categorical_crossentropy", opti = "adamax", split = c(20, 20),
-  A_arch = c(20, 20), B_arch = 20, C_arch = c(20, 20), ...)
+trainLearner.classif.keras(.learner, .task, .subset, .weights = NULL,
+  classwt = NULL, epochs = 50, loss = "categorical_crossentropy",
+  opti = "adamax", split = c(20, 20), A_arch = c(20, 20),
+  B_arch = 20, C_arch = c(20, 20), ...)
 }
 \description{
 Keras trainer

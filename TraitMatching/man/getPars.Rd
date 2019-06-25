@@ -2,7 +2,7 @@
 % Please edit documentation in R/setupModels.R
 \name{getPars}
 \alias{getPars}
-\title{set Parameter}
+\title{getPars}
 \usage{
 getPars(method, settings = NULL, extra = NULL)
 }
@@ -14,5 +14,5 @@ getPars(method, settings = NULL, extra = NULL)
 \item{extra}{settings}
 }
 \description{
-set Parameter
+get Parameter config for each learner
 }

@@ -4,7 +4,7 @@
 \alias{makeRLearner.regr.multiNomDnn}
 \title{Keras_seq learner}
 \usage{
-\method{makeRLearner}{regr.multiNomDnn}()
+makeRLearner.regr.multiNomDnn()
 }
 \description{
 Keras_seq learner

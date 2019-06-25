@@ -4,7 +4,8 @@
 \alias{plotROC}
 \title{Roc Plot}
 \usage{
-plotROC(TM, cutoff = F, spar = 0.7, cost_function = T, show_in_two = F)
+plotROC(TM, cutoff = F, spar = 0.7, cost_function = T,
+  show_in_two = F)
 }
 \arguments{
 \item{TM}{Provide TM object from createTM}

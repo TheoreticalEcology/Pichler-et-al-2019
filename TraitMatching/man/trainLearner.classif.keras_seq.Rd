@@ -2,22 +2,19 @@
 % Please edit documentation in R/Keras_seq.R, R/dnn.R
 \name{trainLearner.classif.keras_seq}
 \alias{trainLearner.classif.keras_seq}
-\alias{trainLearner.classif.keras_seq}
 \title{Keras_seq train function}
 \usage{
-\method{trainLearner}{classif.keras_seq}(.learner, .task, .subset,
-  .weights = NULL, decay = 0.97, alpha = 0.2, archFunction = "negExp",
-  batch = 32, activation = "relu", lr = 0.01, classwt = NULL,
-  bias = T, epochs = 200, nLayer = 10,
-  loss = "categorical_crossentropy", opti = "sgd", arch = 30,
-  drop = 0.2, seed = NULL, ...)
+trainLearner.classif.keras_seq(.learner, .task, .subset, .weights = NULL,
+  decay = 0.97, alpha = 0.2, archFunction = "negExp", batch = 32,
+  activation = "relu", lr = 0.01, classwt = NULL, bias = T,
+  epochs = 200, nLayer = 10, loss = "categorical_crossentropy",
+  opti = "sgd", arch = 30, drop = 0.2, seed = NULL, ...)
 
-\method{trainLearner}{classif.keras_seq}(.learner, .task, .subset,
-  .weights = NULL, decay = 0.97, alpha = 0.2, archFunction = "negExp",
-  batch = 32, activation = "relu", lr = 0.01, classwt = NULL,
-  bias = T, epochs = 200, nLayer = 10,
-  loss = "categorical_crossentropy", opti = "sgd", arch = 30,
-  drop = 0.2, seed = NULL, ...)
+trainLearner.classif.keras_seq(.learner, .task, .subset, .weights = NULL,
+  decay = 0.97, alpha = 0.2, archFunction = "negExp", batch = 32,
+  activation = "relu", lr = 0.01, classwt = NULL, bias = T,
+  epochs = 200, nLayer = 10, loss = "categorical_crossentropy",
+  opti = "sgd", arch = 30, drop = 0.2, seed = NULL, ...)
 }
 \description{
 Keras_seq train function

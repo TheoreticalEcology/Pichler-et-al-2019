@@ -2,11 +2,11 @@
 % Please edit documentation in R/simulationNew.R
 \name{simulateInteraction}
 \alias{simulateInteraction}
-\title{Simulate Interaction}
+\title{simulateInteraction}
 \usage{
 simulateInteraction(species = NULL, main = c("A1", "B9", "B10"),
-  inter = matrix(c("A2", "B2", "A6", "B7", "A3", "B9"), ncol = 2, nrow = 3,
-  byrow = T), weights = list(main = c(1, 2, 0.5), inter = c(1, 4, 2)),
+  inter = matrix(c("A2", "B2", "A6", "B7", "A3", "B9"), ncol = 2, nrow =
+  3, byrow = T), weights = list(main = c(1, 2, 0.5), inter = c(1, 4, 2)),
   cov = NULL, reSim = NULL, setSeed = 42, ...)
 }
 \arguments{
@@ -25,5 +25,5 @@ simulateInteraction(species = NULL, main = c("A1", "B9", "B10"),
 \item{speciesClass}{speciesClass}
 }
 \description{
-Simulate Interaction
+simulate trait matching
 }

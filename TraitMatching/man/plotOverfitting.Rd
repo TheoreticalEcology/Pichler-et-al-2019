@@ -2,11 +2,12 @@
 % Please edit documentation in R/utilis.R
 \name{plotOverfitting}
 \alias{plotOverfitting}
-\title{plotOverfitting}
+\title{plotOverfitting
+plot Overfitting...}
 \usage{
-plotOverfitting(Results, methods = c("RF", "dnn", "cnn", "cforest", "boost",
-  "knn", "SVM"), titles = c("RF", "dnn", "cnn", "cforest", "boost", "knn",
-  "SVM"), measure = "auc", box = T)
+plotOverfitting(Results, methods = c("RF", "dnn", "cnn", "cforest",
+  "boost", "knn", "SVM"), titles = c("RF", "dnn", "cnn", "cforest",
+  "boost", "knn", "SVM"), measure = "auc", box = T)
 }
 \arguments{
 \item{Results}{results from runTM}
@@ -21,4 +22,5 @@ plotOverfitting(Results, methods = c("RF", "dnn", "cnn", "cforest", "boost",
 }
 \description{
 plotOverfitting
+plot Overfitting...
 }

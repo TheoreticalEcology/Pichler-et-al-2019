@@ -2,7 +2,8 @@
 % Please edit documentation in R/utilis.R
 \name{combineResults}
 \alias{combineResults}
-\title{combine Results}
+\title{combineResults
+combine Results}
 \usage{
 combineResults(res = NULL)
 }
@@ -10,5 +11,6 @@ combineResults(res = NULL)
 \item{res}{list of results}
 }
 \description{
+combineResults
 combine Results
 }

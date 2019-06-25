@@ -2,10 +2,15 @@
 % Please edit documentation in R/classCommunity.R
 \name{mergeCommunities}
 \alias{mergeCommunities}
-\title{merge communities}
+\title{mergeCommunities
+merge communities}
 \usage{
 mergeCommunities(data)
 }
+\arguments{
+\item{data}{data to merge}
+}
 \description{
+mergeCommunities
 merge communities
 }

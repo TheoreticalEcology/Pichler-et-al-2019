@@ -4,8 +4,8 @@
 \alias{predictLearner.classif.keras}
 \title{PredictLearner for keras implemantation into mlr}
 \usage{
-\method{predictLearner}{classif.keras}(.learner, .model, .newdata,
-  split = c(20, 20), ...)
+predictLearner.classif.keras(.learner, .model, .newdata, split = c(20,
+  20), ...)
 }
 \description{
 PredictLearner for keras implemantation into mlr

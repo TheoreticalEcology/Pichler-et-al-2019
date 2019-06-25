@@ -2,7 +2,8 @@
 % Please edit documentation in R/utilis.R
 \name{createInterFeatures}
 \alias{createInterFeatures}
-\title{Feature Eng funcion. Create interaction features, all combinations}
+\title{createInterFeatures
+Feature Eng funcion. Create interaction features, all combinations}
 \usage{
 createInterFeatures(df)
 }
@@ -10,5 +11,6 @@ createInterFeatures(df)
 \item{df}{data.frame with the last variable as target}
 }
 \description{
+createInterFeatures
 Feature Eng funcion. Create interaction features, all combinations
 }

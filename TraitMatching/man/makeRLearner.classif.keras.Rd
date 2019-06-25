@@ -4,7 +4,7 @@
 \alias{makeRLearner.classif.keras}
 \title{Keras learner}
 \usage{
-\method{makeRLearner}{classif.keras}()
+makeRLearner.classif.keras()
 }
 \description{
 Keras learner

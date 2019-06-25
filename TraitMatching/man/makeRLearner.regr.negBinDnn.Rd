@@ -4,7 +4,7 @@
 \alias{makeRLearner.regr.negBinDnn}
 \title{Keras_seq learner}
 \usage{
-\method{makeRLearner}{regr.negBinDnn}()
+makeRLearner.regr.negBinDnn()
 }
 \description{
 Keras_seq learner

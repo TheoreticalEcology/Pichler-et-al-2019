@@ -4,7 +4,7 @@
 \alias{predictLearner.regr.negBinDnn}
 \title{PredictLearner for keras_seq implemantation into mlr}
 \usage{
-\method{predictLearner}{regr.negBinDnn}(.learner, .model, .newdata, ...)
+predictLearner.regr.negBinDnn(.learner, .model, .newdata, ...)
 }
 \description{
 PredictLearner for keras_seq implemantation into mlr

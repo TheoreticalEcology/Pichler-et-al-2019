@@ -2,14 +2,20 @@
 % Please edit documentation in R/setupModels.R
 \name{getLearner}
 \alias{getLearner}
-\title{RF from randomForest package}
+\title{get Learner}
 \usage{
 getLearner(method, balanceClasses, predict.type = "prob",
   predict.treshold = NULL, extra = NULL)
 }
 \arguments{
+\item{method}{which method}
+
+\item{balanceClasses}{balance class type}
+
+\item{predict.type}{predict type}
+
 \item{extra}{settings for learner}
 }
 \description{
-RF from randomForest package
+configure Learner
 }

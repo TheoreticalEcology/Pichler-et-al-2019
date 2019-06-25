@@ -4,7 +4,7 @@
 \alias{makeRLearner.classif.preKeras}
 \title{Keras_seq learner}
 \usage{
-\method{makeRLearner}{classif.preKeras}()
+makeRLearner.classif.preKeras()
 }
 \description{
 Keras_seq learner

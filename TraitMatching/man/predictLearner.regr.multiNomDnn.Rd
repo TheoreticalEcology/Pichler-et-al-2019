@@ -4,7 +4,7 @@
 \alias{predictLearner.regr.multiNomDnn}
 \title{PredictLearner for keras_seq implemantation into mlr}
 \usage{
-\method{predictLearner}{regr.multiNomDnn}(.learner, .model, .newdata, ...)
+predictLearner.regr.multiNomDnn(.learner, .model, .newdata, ...)
 }
 \description{
 PredictLearner for keras_seq implemantation into mlr

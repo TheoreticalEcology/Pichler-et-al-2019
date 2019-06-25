@@ -2,10 +2,12 @@
 % Please edit documentation in R/utilis.R
 \name{tuneAndAggregate}
 \alias{tuneAndAggregate}
-\title{tune treshold and get measuremens}
+\title{tuneAndAggregate
+tune treshold and get measuremens}
 \usage{
-tuneAndAggregate(combinedResults = NULL, tuneT = tss, measures = list(auc,
-  f1, bac, acc, fdr, fpr, npv, ppv, tnr, tpr), onlyTest = T, bc = "None")
+tuneAndAggregate(combinedResults = NULL, tuneT = tss,
+  measures = list(auc, f1, bac, acc, fdr, fpr, npv, ppv, tnr, tpr),
+  onlyTest = T, bc = "None")
 }
 \arguments{
 \item{tuneT}{msr to tune treshold}
@@ -15,5 +17,6 @@ tuneAndAggregate(combinedResults = NULL, tuneT = tss, measures = list(auc,
 \item{combined}{Results}
 }
 \description{
+tuneAndAggregate
 tune treshold and get measuremens
 }

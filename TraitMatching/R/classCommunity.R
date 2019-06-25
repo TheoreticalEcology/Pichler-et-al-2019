@@ -1,6 +1,6 @@
 #' createCommunity
 #'
-#' create Community object for \link{\code{runTM}}
+#' create Community object for \code{\link{runTM}}
 #'
 #' @param a, group a
 #' @param b, group b

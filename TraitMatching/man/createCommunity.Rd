@@ -25,5 +25,5 @@ createCommunity(a = NULL, b = NULL, z = NULL, community = NULL,
 \item{target, }{in case of community, provide name of response column}
 }
 \description{
-createCommunity
+create Community object for \code{\link{runTM}}
 }

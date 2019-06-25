@@ -2,12 +2,11 @@
 % Please edit documentation in R/Keras_seq.R, R/dnn.R
 \name{predictLearner.classif.keras_seq}
 \alias{predictLearner.classif.keras_seq}
-\alias{predictLearner.classif.keras_seq}
 \title{PredictLearner for keras_seq implemantation into mlr}
 \usage{
-\method{predictLearner}{classif.keras_seq}(.learner, .model, .newdata, ...)
+predictLearner.classif.keras_seq(.learner, .model, .newdata, ...)
 
-\method{predictLearner}{classif.keras_seq}(.learner, .model, .newdata, ...)
+predictLearner.classif.keras_seq(.learner, .model, .newdata, ...)
 }
 \description{
 PredictLearner for keras_seq implemantation into mlr

@@ -2,12 +2,11 @@
 % Please edit documentation in R/Keras_conv.R, R/cnn.R
 \name{makeRLearner.classif.keras_conv}
 \alias{makeRLearner.classif.keras_conv}
-\alias{makeRLearner.classif.keras_conv}
 \title{Keras_convlearner}
 \usage{
-\method{makeRLearner}{classif.keras_conv}()
+makeRLearner.classif.keras_conv()
 
-\method{makeRLearner}{classif.keras_conv}()
+makeRLearner.classif.keras_conv()
 }
 \description{
 Keras_convlearner

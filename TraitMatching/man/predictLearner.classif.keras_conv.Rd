@@ -2,12 +2,11 @@
 % Please edit documentation in R/Keras_conv.R, R/cnn.R
 \name{predictLearner.classif.keras_conv}
 \alias{predictLearner.classif.keras_conv}
-\alias{predictLearner.classif.keras_conv}
 \title{PredictLearner for keras_conv implemantation into mlr}
 \usage{
-\method{predictLearner}{classif.keras_conv}(.learner, .model, .newdata, ...)
+predictLearner.classif.keras_conv(.learner, .model, .newdata, ...)
 
-\method{predictLearner}{classif.keras_conv}(.learner, .model, .newdata, ...)
+predictLearner.classif.keras_conv(.learner, .model, .newdata, ...)
 }
 \description{
 PredictLearner for keras_conv implemantation into mlr

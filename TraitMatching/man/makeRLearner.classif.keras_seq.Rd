@@ -2,12 +2,11 @@
 % Please edit documentation in R/Keras_seq.R, R/dnn.R
 \name{makeRLearner.classif.keras_seq}
 \alias{makeRLearner.classif.keras_seq}
-\alias{makeRLearner.classif.keras_seq}
 \title{Keras_seq learner}
 \usage{
-\method{makeRLearner}{classif.keras_seq}()
+makeRLearner.classif.keras_seq()
 
-\method{makeRLearner}{classif.keras_seq}()
+makeRLearner.classif.keras_seq()
 }
 \description{
 Keras_seq learner

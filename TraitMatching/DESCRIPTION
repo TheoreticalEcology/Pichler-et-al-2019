@@ -26,6 +26,5 @@ Imports:
 RoxygenNote: 6.1.1
 Suggests:
     testthat,
-    kknn,
-    mvtnorm
+        mvtnorm
 VignetteBuilder: knitr

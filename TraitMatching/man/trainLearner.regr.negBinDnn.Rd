@@ -4,9 +4,9 @@
 \alias{trainLearner.regr.negBinDnn}
 \title{Keras_seq train function}
 \usage{
-\method{trainLearner}{regr.negBinDnn}(.learner, .task, .subset,
-  .weights = NULL, batch = 25L, archFunction = "negExp", bias = T,
-  lr = 0.01, epochs = 200, nLayer = 10, opti = "rmsprop", arch = 30L,
+trainLearner.regr.negBinDnn(.learner, .task, .subset, .weights = NULL,
+  batch = 25L, archFunction = "negExp", bias = T, lr = 0.01,
+  epochs = 200, nLayer = 10, opti = "rmsprop", arch = 30L,
   seed = NULL, expValue = F, distribution = "poisson",
   activation = "relu", early_stopping = TRUE, Link = TRUE, ...)
 }

@@ -4,8 +4,8 @@
 \alias{showInfo}
 \title{Show Info and parameters of available learners}
 \usage{
-showInfo(learner = NULL, models = T, onlyModels = F, onlyMeasures = F,
-  onlyBC = F)
+showInfo(learner = NULL, models = T, onlyModels = F,
+  onlyMeasures = F, onlyBC = F)
 }
 \arguments{
 \item{learner}{default, all}

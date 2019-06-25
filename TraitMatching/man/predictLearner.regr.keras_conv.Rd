@@ -4,7 +4,7 @@
 \alias{predictLearner.regr.keras_conv}
 \title{PredictLearner for keras_conv implemantation into mlr}
 \usage{
-\method{predictLearner}{regr.keras_conv}(.learner, .model, .newdata, ...)
+predictLearner.regr.keras_conv(.learner, .model, .newdata, ...)
 }
 \description{
 PredictLearner for keras_conv implemantation into mlr

@@ -15,7 +15,7 @@ poisson.fun = function(task, model, pred, feats, extra.args) {
 
 
 #' @export
-poisson = makeMeasure(
+poisson = mlr::makeMeasure(
   id = "poisson", name = "poisson",
   properties = c("regr",  "req.model", "req.task", "req.pred"),
   minimize = TRUE, best = 0, worst = +Inf,
@@ -40,7 +40,7 @@ poissonQuasi.fun = function(task, model, pred, feats, extra.args) {
 
 
 #' @export
-poissonQuasi = makeMeasure(
+poissonQuasi = mlr::makeMeasure(
   id = "poissonQuasi", name = "poissonQuasi",
   properties = c("regr", "req.pred", "req.truth"),
   minimize = TRUE, best = 0, worst = +Inf,
@@ -63,7 +63,7 @@ negBinLL.fun = function(task, model, pred, feats, extra.args) {
 
 
 #' @export
-negBinLL = makeMeasure(
+negBinLL = mlr::makeMeasure(
   id = "negBinLL", name = "negBinLL",
   properties = c("regr", "req.pred", "req.truth"),
   minimize = TRUE, best = 0, worst = +Inf,
@@ -115,7 +115,7 @@ measureTTS = function(true, predictions, pos, neg) {
 
 
 #' @export
-tss = makeMeasure(
+tss = mlr::makeMeasure(
   id = "tss", name = "tss",
   properties = c("classif", "req.pred", "req.truth"),
   minimize = FALSE, best = 1, worst = -1,
@@ -706,7 +706,7 @@ aic.fun = function(task, model, pred, feats, extra.args) {
 
 
 #' @export
-aic = makeMeasure(
+aic = mlr::makeMeasure(
   id = "aic", name = "aic",
   properties = c("regr", "req.pred", "req.truth", "classif", "req.model"),
   minimize = TRUE, best = 0, worst = +Inf,

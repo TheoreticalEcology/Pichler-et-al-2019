@@ -4,9 +4,9 @@
 \alias{trainLearner.regr.poissonDnn}
 \title{Keras_seq train function}
 \usage{
-\method{trainLearner}{regr.poissonDnn}(.learner, .task, .subset,
-  .weights = NULL, batch = 25L, archFunction = "negExp", bias = T,
-  lr = 0.01, epochs = 200, nLayer = 10, opti = "rmsprop", arch = 30L,
+trainLearner.regr.poissonDnn(.learner, .task, .subset, .weights = NULL,
+  batch = 25L, archFunction = "negExp", bias = T, lr = 0.01,
+  epochs = 200, nLayer = 10, opti = "rmsprop", arch = 30L,
   drop = 0.2, seed = NULL, expValue = F, ...)
 }
 \description{
