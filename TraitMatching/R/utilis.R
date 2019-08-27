@@ -390,44 +390,48 @@ tuneAndAggregateRegression = function(combinedResults = NULL, measures = list(rm
 
 print.TMmodel <- function(x){
 
-  rbindAll <- function(a, b) {
-
-    aDiff <- setdiff(colnames(a), colnames(b))
-    bDiff <- setdiff(colnames(b), colnames(a))
-
-    a[, c(as.character(bDiff))] <- NA
-
-    b[, c(as.character(aDiff))] <- NA
-
-    return(rbind(a, b))
-  }
-
-  Result <- data.frame()
-  if("multiBalance" %in% class(x)){
-    for(j in 1:length(x$Result)){
-      res <- data.frame()
-      if(length(x$Result[[j]]) != 0){
-        for(i in 1:length(x$Result[[j]])) {
-          if(!"error" %in% class(x$Result[[j]][[i]]$result)) {
-            res <- rbind(res, as.data.frame(t(x$Result[[j]][[i]]$result$aggr), row.names = names(x$Result[[j]])[i]))
-          }
-        }
-      }
-      #rownames(res) <- names(x$Result[[j]])
-      res <- res[, unique(colnames(res))]
-      res$Method <- rownames(res)
-      res$BalanceMethod <- matrix(names(x$Result)[j], ncol = 1, nrow = nrow(res))
-
-      if(!nrow(res) == 0) {
-        if(sum(dim(Result)) > 0)Result <- rbindAll(Result, res)
-        else Result <- rbind(Result, res)
-      }
-    }
-    Result <- Result[order(Result[paste(x$settings$tuningMetric$id, ".test.mean", sep = "")],  decreasing = T),]
-    rownames(Result) <- 1:nrow(Result)
-    print(Result)
-  }
+  # rbindAll <- function(a, b) {
+  #
+  #   aDiff <- setdiff(colnames(a), colnames(b))
+  #   bDiff <- setdiff(colnames(b), colnames(a))
+  #
+  #   a[, c(as.character(bDiff))] <- NA
+  #
+  #   b[, c(as.character(aDiff))] <- NA
+  #
+  #   return(rbind(a, b))
+  # }
+  #
+  # Result <- data.frame()
+  # if("multiBalance" %in% class(x)){
+  #   for(j in 1:length(x$Result)){
+  #     res <- data.frame()
+  #     if(length(x$Result[[j]]) != 0){
+  #       for(i in 1:length(x$Result[[j]])) {
+  #         if(!"error" %in% class(x$Result[[j]][[i]]$result)) {
+  #           res <- rbind(res, as.data.frame(t(x$Result[[j]][[i]]$result$aggr), row.names = names(x$Result[[j]])[i]))
+  #         }
+  #       }
+  #     }
+  #     #rownames(res) <- names(x$Result[[j]])
+  #     res <- res[, unique(colnames(res))]
+  #     res$Method <- rownames(res)
+  #     res$BalanceMethod <- matrix(names(x$Result)[j], ncol = 1, nrow = nrow(res))
+  #
+  #     if(!nrow(res) == 0) {
+  #       if(sum(dim(Result)) > 0)Result <- rbindAll(Result, res)
+  #       else Result <- rbind(Result, res)
+  #     }
+  #   }
+  #   Result <- Result[order(Result[paste(x$settings$tuningMetric$id, ".test.mean", sep = "")],  decreasing = T),]
+  #   rownames(Result) <- 1:nrow(Result)
+  #   print(Result)
+  # }
   #for(i in 1:length(x$Result[[i]]$extract)){print(x$Result[[i]]$extract[[i]])}
+  for(i in 1:length(x$Result)) {
+    print(x$Result[[i]]$result)
+  }
+
 }
 
 
