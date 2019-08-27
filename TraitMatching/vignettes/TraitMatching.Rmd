@@ -41,7 +41,8 @@ summary(community$data)
 Default is hyperparameter tuning with nested CV. Tuning is parallelized. You can train more than one model at the same time. Over and Undersampling are also supported (see help). TraitMatching package relies on the mlr framework. So in the following we will use mlr functions for handling the models:
 
 ```{r, fig.show='hold'}
-results = runTM(community, iters = 5L)
+results = runTM(community, iters = 5L, parallel = 5L, 
+                crossValidation = list(outer = list(method = "CV", iters = 3), inner = list(method = "CV", iters = 3)))
 print(results)
 
 ```
@@ -52,7 +53,7 @@ print(results$Result$RF$result$extract[[1]])
 print(results$Result$RF$result$extract[[2]])
 ```
 
-## Get random forest model:
+## Get ranger model:
 ```{r}
 rf = getLearnerModel(results$Result$RF$result$models[[1]], more.unwrap = TRUE)
 
@@ -60,6 +61,10 @@ rf = getLearnerModel(results$Result$RF$result$models[[1]], more.unwrap = TRUE)
 
 ## Calculate trait-matching effects from fitted models
 ```{r}
-tm_effect = get_Interaction_Strengths(community$data[,-c(1,2)], model = results$Result$RF$result$models[[1]], any = FALSE, target = "target", grid_size = 5L, any_n_times = 1L, parallel = TRUE)
+tm_effect = get_Interaction_Strengths(community$data[,-c(1,2)], model = results$Result$RF$result$models[[1]], 
+                                      any = FALSE, target = "target", grid_size = 15L, any_n_times = 1L,
+                                      depth = 5L,  groups = c("A", "B"), parallel = 5L)
+
+print(tm_effect$pairwise_interactions)
 ```
 

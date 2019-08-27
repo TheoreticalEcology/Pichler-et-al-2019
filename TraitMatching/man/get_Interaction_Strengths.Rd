@@ -15,7 +15,7 @@ get_Interaction_Strengths(data, model, any = TRUE, groups = NULL,
 
 \item{any}{calculate overall x vs any interaction strengths}
 
-\item{groups}{vector with group lettersn, for example c("A", "B") for A1, A2,...B1,...}
+\item{groups}{vector with group letters, for example c("A", "B") for A1, A2,...B1,...}
 
 \item{grid_size}{size of subsampled marginal variable distribution}
 

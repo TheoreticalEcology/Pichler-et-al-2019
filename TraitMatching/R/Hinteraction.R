@@ -266,6 +266,7 @@ get_Interaction_Strengths = function(data,
     cat("\n Using parallel backend...be cautious about memory!...")
     cl = parallel::makePSOCKcluster(parallel)
     doParallel::registerDoParallel(cl)
+    .null = parallel::clusterCall(cl, function(x) library(mlr))
     .null = parallel::clusterCall(cl, function(x) library(TraitMatching))
 
     pairwise_result = snow::parSapply(cl = cl,X = work_list,
