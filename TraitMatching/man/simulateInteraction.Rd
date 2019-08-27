@@ -2,28 +2,35 @@
 % Please edit documentation in R/simulationNew.R
 \name{simulateInteraction}
 \alias{simulateInteraction}
-\title{simulateInteraction}
+\title{Simulate plant-pollinator networks}
 \usage{
-simulateInteraction(species = NULL, main = c("A1", "B9", "B10"),
-  inter = matrix(c("A2", "B2", "A6", "B7", "A3", "B9"), ncol = 2, nrow =
-  3, byrow = T), weights = list(main = c(1, 2, 0.5), inter = c(1, 4, 2)),
-  cov = NULL, reSim = NULL, setSeed = 42, ...)
+simulateInteraction(species = NULL, main = NULL,
+  inter = matrix(c("A1", "B1", "A2", "B2", "A3", "B3"), ncol = 2, nrow =
+  3, byrow = T), weights = list(main = 1, inter = c(1, 4, 2)),
+  reSim = NULL, setSeed = 42, ...)
 }
 \arguments{
-\item{main}{main traits}
+\item{species}{can be of createSpecies class, optional, default NULL}
 
-\item{inter}{...}
+\item{main}{vector of main effects}
 
-\item{weights}{weights for traits}
+\item{inter}{two column matrix of trait-matching effects}
 
-\item{cov}{covariance matrix, if not provided, it will randomly generated}
+\item{weights}{list of two vectors for main and inter (trait-matching) effect weights}
 
-\item{reSim}{reSim}
+\item{reSim}{output of simulateInteraction}
 
-\item{...}{to speciesClass}
-
-\item{speciesClass}{speciesClass}
+\item{...}{arguments passed to createSpecies function, see details}
 }
 \description{
-simulate trait matching
+Create two groups with weighted trait-matching effects and/or main effects.
+}
+\details{
+\itemize{
+\item \code{species}: If you want, you can directly the output of createSpecies, two groups (a and b) with traits. Otherwise, pass arguments to createSpecies with \code{...}
+\item \code{main}: main effects. Currently not fully supported!
+\item \code{inter}: matrix of intended trait-matching effects. N rows for n trait-matching effects. Pass trait-matching by trait names (i.e "A1", "B1")
+\item \code{...} see \code{\link{createSpecies}} for detailed information.
+
+}
 }

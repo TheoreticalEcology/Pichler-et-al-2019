@@ -1,15 +1,23 @@
 
 #' createSpecies
 #'
-#' simulate Species
+#'@description create two groups (plants, pollinators) of species
 #'
-#'@param NumberA number of A
-#'@param NumberB number of B
-#'@param traitsA vector for traitsA = NumberofNUmerical, NumberofCategorical
-#'@param traitsB vector for traitsB
+#'@param NumberA number of A species
+#'@param NumberB number of B species
+#'@param traitsA vector for traitsA = c(NumberofCategorical, NumberofNumerical), default no categorical traits
+#'@param traitsB vector for traitsB = c(NumberofCategorical, NumberofNumerical), default no categorical traits
+#'@param rangeDiscrete how many levels to sample for categorical traits
+#'@param seed seed
+#'@param abundance can be logical, numerical or a function. Numerical will be the rate in the exponential distribution, default = 2
+#'@param speciesClass if you want to resample categorical traits, provide createSpecies object
+#'@param specialist logical if group B should be specialized or not
+#'@param coLin you can set collinear traits (not fully supported yet)
+#'@param sampling sampling function for traits, default runif(n,0,1)
+#'@param specRanger specialization range, default c(1,2)
 #'@export
 
-createSpecies = function(NumberA = 20, NumberB = 40, traitsA = c(5,5), traitsB = c(8,8), rangeDiscrete = 2:8,seed = 1337, abundance = 2,
+createSpecies = function(NumberA = 20, NumberB = 40, traitsA = c(0,8), traitsB = c(0,8), rangeDiscrete = 2:8,seed = 1337, abundance = 2,
                          speciesClass = NULL, specialist = T, coLin = NULL, sampling = function(n) runif(n, 0,1), specRange = c(1,2)){
   spec = specialist
 
@@ -134,24 +142,30 @@ createDiscrete = function(range){
 
 
 
-#' simulateInteraction
+#' Simulate plant-pollinator networks
 #'
-#' simulate trait matching
+#' @description Create two groups with weighted trait-matching effects and/or main effects.
 #'
-#' @param speciesClass speciesClass
-#' @param main main traits
-#' @param inter ...
-#' @param weights weights for traits
-#' @param cov covariance matrix, if not provided, it will randomly generated
-#' @param reSim reSim
-#' @param ... to speciesClass
+#' @param species can be of createSpecies class, optional, default NULL
+#' @param main vector of main effects
+#' @param inter two column matrix of trait-matching effects
+#' @param weights list of two vectors for main and inter (trait-matching) effect weights
+#' @param reSim output of simulateInteraction
+#' @param ... arguments passed to createSpecies function, see details
+#'
+#' @details
+#' \itemize{
+#' \item \code{species}: If you want, you can directly the output of createSpecies, two groups (a and b) with traits. Otherwise, pass arguments to createSpecies with \code{...}
+#' \item \code{main}: main effects. Currently not fully supported!
+#' \item \code{inter}: matrix of intended trait-matching effects. N rows for n trait-matching effects. Pass trait-matching by trait names (i.e "A1", "B1")
+#' \item \code{...} see \code{\link{createSpecies}} for detailed information.
+#'
+#' }
+#'
 #' @export
 
-simulateInteraction = function(species = NULL, main = c("A1", "B9", "B10"), inter = matrix(c("A2", "B2",
-                                                                                             "A6", "B7",
-                                                                                             "A3", "B9"), ncol = 2, nrow = 3, byrow = T),
-                               weights = list(main = c(1,2,0.5), inter = c(1,4,2)),
-                               cov = NULL,
+simulateInteraction = function(species = NULL, main = NULL, inter = matrix(c("A1", "B1","A2", "B2","A3", "B3"), ncol = 2, nrow = 3, byrow = T),
+                               weights = list(main = 1, inter = c(1,4,2)),
                                reSim = NULL,
                                setSeed = 42,
                                ...){

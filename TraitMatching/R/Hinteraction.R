@@ -18,10 +18,10 @@ pairwise_interaction = function(data = NULL,
                                 target = NULL,
                                 pairs = list(a = c("x.1"), b = c("x.2", "x.3", "x.4", "x.5"))){
 
-  
+
   if(is.factor(data[,target]) || length(unique(data[,target])) == 2) classif = TRUE
   else classif = FALSE
-  
+
   if(!is.null(target)) data = data[,-which(colnames(data) == target, arr.ind = TRUE)]
   pair_a_ind = which(colnames(data) == pairs$a, arr.ind = TRUE)
   pair_b_ind = sapply(pairs$b, function(i) which(colnames(data)==i, arr.ind = T))
@@ -171,7 +171,7 @@ any_interaction = function(data = NULL,
 #' @param data data.frame w/e or w/o target
 #' @param model model of class mlr
 #' @param any calculate overall x vs any interaction strengths
-#' @param groups vector with group lettersn, for example c("A", "B") for A1, A2,...B1,...
+#' @param groups vector with group letters, for example c("A", "B") for A1, A2,...B1,...
 #' @param grid_size size of subsampled marginal variable distribution
 #' @param target target variable, character name
 #' @param depth n variables with highest overall interaction strengths are used for pairwise interaction strengths
@@ -253,7 +253,7 @@ get_Interaction_Strengths = function(data,
       b = group_all[!group_all %in% c(trim, top[i])]
       work_list[[top[i]]] = list(a = top[i], b = b)
     }
-    
+
     work_list = lapply(work_list, function(x) if(length(x$b) == 0 || length(x$a) == 0) return(NULL) else x)
     work_list = work_list[!sapply(work_list, is.null)]
   }

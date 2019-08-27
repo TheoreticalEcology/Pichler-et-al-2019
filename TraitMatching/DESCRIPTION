@@ -1,7 +1,7 @@
 Package: TraitMatching
 Title: Analysis of bipartite networks
 Version: 0.0.0.9000
-Authors@R: person("Maximilian", "Pichler", email = "Maximilian-Pichler@web.de", role = c("aut", "cre"))
+Authors@R: person("Maximilian", "Pichler", email = "Maximilian.Pichler@ur.de", role = c("aut", "cre"))
 Description: 
 Depends: R (>= 3.3.2)
 License: GPL-3
@@ -26,5 +26,6 @@ Imports:
 RoxygenNote: 6.1.1
 Suggests:
     testthat,
-        mvtnorm
+    mvtnorm,
+    roxygen2
 VignetteBuilder: knitr

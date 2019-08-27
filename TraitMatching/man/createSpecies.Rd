@@ -4,20 +4,36 @@
 \alias{createSpecies}
 \title{createSpecies}
 \usage{
-createSpecies(NumberA = 20, NumberB = 40, traitsA = c(5, 5),
-  traitsB = c(8, 8), rangeDiscrete = 2:8, seed = 1337,
+createSpecies(NumberA = 20, NumberB = 40, traitsA = c(0, 8),
+  traitsB = c(0, 8), rangeDiscrete = 2:8, seed = 1337,
   abundance = 2, speciesClass = NULL, specialist = T, coLin = NULL,
   sampling = function(n) runif(n, 0, 1), specRange = c(1, 2))
 }
 \arguments{
-\item{NumberA}{number of A}
+\item{NumberA}{number of A species}
 
-\item{NumberB}{number of B}
+\item{NumberB}{number of B species}
 
-\item{traitsA}{vector for traitsA = NumberofNUmerical, NumberofCategorical}
+\item{traitsA}{vector for traitsA = c(NumberofCategorical, NumberofNumerical), default no categorical traits}
 
-\item{traitsB}{vector for traitsB}
+\item{traitsB}{vector for traitsB = c(NumberofCategorical, NumberofNumerical), default no categorical traits}
+
+\item{rangeDiscrete}{how many levels to sample for categorical traits}
+
+\item{seed}{seed}
+
+\item{abundance}{can be logical, numerical or a function. Numerical will be the rate in the exponential distribution, default = 2}
+
+\item{speciesClass}{if you want to resample categorical traits, provide createSpecies object}
+
+\item{specialist}{logical if group B should be specialized or not}
+
+\item{coLin}{you can set collinear traits (not fully supported yet)}
+
+\item{sampling}{sampling function for traits, default runif(n,0,1)}
+
+\item{specRanger}{specialization range, default c(1,2)}
 }
 \description{
-simulate Species
+create two groups (plants, pollinators) of species
 }
