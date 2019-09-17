@@ -480,13 +480,16 @@ save(rmse,
 # Confidence Intervals:
 
 getCI = function(x) return(qnorm(0.975) * sd(x) / sqrt(length(x)))
-tssCI = aucCI = data.frame(matrix(0,3,9))
+tssCI = aucCI = aucObsCI = tssObsCI=data.frame(matrix(0,3,9))
 baseCCI = aucABCI = tssABCI=  baseCTSSCI = data.frame(matrix(0,1,9))
+
 len = length(ResultSizeCagg[[i]]) - 1
 for(i in 1:3){
   for(j in 1:len){
     tssCI[i,j] = getCI(ResultSizeCagg[[i]][[j]]$test$tts)
     aucCI[i,j] = getCI(ResultSizeCagg[[i]][[j]]$test$auc)
+    tssObsCI[i,j] = getCI(ResultObsCagg[[i]][[j]]$test$tts)
+    aucObsCI[i,j] = getCI(ResultObsCagg[[i]][[j]]$test$auc)
     if(i == 1){
       baseCCI[1,j] = getCI(ResultBaselineCagg[[j]]$test$auc)
       aucABCI[1,j] = getCI(ResultAbCagg[[j]]$test$auc)
@@ -495,19 +498,20 @@ for(i in 1:3){
     }
   }
 }
-colnames(tssCI) = colnames(aucCI) = names(ResultSizeCagg[[i]])[1:len]
+colnames(tssCI) = colnames(aucCI) = colnames(aucObsCI) = colnames(tssObsCI) = names(ResultSizeCagg[[i]])[1:len]
 colnames(aucABCI) = colnames(tssABCI) = names(ResultAbCagg)[1:len]
 colnames(baseCTSSCI) = colnames(baseCCI) = names(ResultBaselineCagg)[1:len]
 
 
 
-spearCI = data.frame(matrix(0,3,7))
-baseRCI = spearABCI =  data.frame(matrix(0,1,7))
+spearCI= spearObsCI  = data.frame(matrix(0,3,7))
+baseRCI = spearABCI  =  data.frame(matrix(0,1,7))
 len = length(ResultSizeRagg[[i]]) - 1
 
 for(i in 1:3){
   for(j in 1:len){
     spearCI[i,j] = getCI(ResultSizeRagg[[i]][[j]]$test$Spearmanrho)
+    spearObsCI[i,j] = getCI(ResultObsRagg[[i]][[j]]$test$Spearmanrho)
     if(i == 1){
       baseRCI[1,j] = getCI(ResultBaselineRagg[[j]]$test$Spearmanrho)
       spearABCI[1,j] = getCI(ResultAbRagg[[j]]$test$Spearmanrho)
@@ -517,8 +521,10 @@ for(i in 1:3){
 colnames(spearCI) =  names(ResultSizeRagg[[i]])[1:len]
 colnames(baseRCI) =  names(ResultBaselineRagg)[1:len]
 colnames(spearABCI) =  names(ResultAbRagg)[1:len]
+colnames(spearObsCI) = names(ResultObsRagg)[1:len]
 
-save(tssCI, baseCCI, aucCI, aucABCI, tssABCI, baseCTSSCI, spearCI, baseRCI, spearABCI,file = "./Results/SimulationAggreationCIFig2.RData")
+save(tssCI, baseCCI, aucCI, aucABCI, tssABCI, baseCTSSCI, aucObsCI, tssObsCI, spearObsCI,
+     spearCI, baseRCI, spearABCI,file = "./Results/SimulationAggreationCIFig2.RData")
 
 ```
 

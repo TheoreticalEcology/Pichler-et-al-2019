@@ -12,239 +12,239 @@ oldpar = par()
 reset = function() suppressWarnings(do.call(par, oldpar))
 run = TRUE
 set.seed(42)
-source("../Code/helpFunctions.R")
+source("Code/helpFunctions.R")
 ```
 
 
-## Figure 2 new
+<!-- ## Figure 2 new -->
 ```{r}
 
 
-comparePlot = function(data = NULL, dataTop = NULL, cols = RColorBrewer::brewer.pal(8, "Accent"), 
-                       sk = 0.3, alpha1 = 0.3, xlab = "", ylab = "", neg = TRUE, bValues = FALSE, drawBase = FALSE,
-                       colDraw = "darkgray", lwdDraw = 1){
-  nr = ncol(data)
-  ak = 1-(nrow(data))*sk
-  xCb = c(0, sk+ak/2, 1-sk)
-  ik = sk/nr*0.9
-  jk = sk/nr*0.1
-  plot(NULL, NULL, axes = FALSE, xlim = c(0,1), ylim = c(0,1), ylab = ylab, xlab = xlab, cex.lab = 1.3)
-  out = list()
-  for(k in 1:nrow(data)){
-    stepX = xCb[k]
-    for(i in 1:(nr-1)){
-      stepX[i+1] = stepX[i] + ik+jk
-    }
-    xC = matrix(c(stepX, stepX+ik), ncol = 2)
-    if(!neg){
-      for(i in 1:nr){
-        rect(xleft = xC[i,1], xright = xC[i,2], ybottom = 0, ytop = data[k,i], col = addA(cols[i], alpha1))
-      }
-    } 
-    for(i in 1:nr){
-      if(dataTop[k,i]>0) {
-        rect(xleft = xC[i,1], xright = xC[i,2], ybottom = (data-dataTop)[k,i], 
-                              ytop = (data-dataTop)[k,1]+ dataTop[k,i], col = addA(cols[i], 1))
-                 if(bValues) text(x = mean(xC[i,1:2]), y = (data)[k,i], pos = 3, 
-                      labels = paste0("+", round(dataTop[k,i],digits = 2)), cex = 0.9, xpd = NA)
-
-      }
-      if(neg){
-        if(dataTop[k,i]<0) {
-          rect(xleft = xC[i,1], xright = xC[i,2], ybottom = (data)[k,i], 
-                              ytop = max((data-dataTop)[k,1]), col = addA(cols[i], alpha1))
-         if(bValues) text(x = mean(xC[i,1:2]), y = (data)[k,i], pos = 1, labels = paste0(round(dataTop[k,i],2)), cex = 0.9, xpd = NA)
-        }
-      }
-      
-    }
-    out[[k]] = xC
-    if(drawBase) segments(y1 =max((data-dataTop)[k,1]),  y0 = max((data-dataTop)[k,1]), x0 = min(xC[,1])-ak/5, x1 = max(xC[,2])+ak/5, col = colDraw, xpd = NA, lwd = lwdDraw)
-  }
-  return(out)
-}
-load(file = "./Results/SimulationAggreationFig2.RData")
-cols =c("#bfa23d",
-"#5d3686",
-"#6ca24d",
-"#c26abb",
-"#46c19a",
-"#ba496b",
-"#6c7ed7",
-"#b55c36")
-names(cols) = c("dnn","cnn","knn","SVM","naive","RFranger","boost", "glm")
-cexP = 1.3
-cexA = 0.7
-nPixel = 10
-xText = -.23
-yText = 1.15
-font = 1
-
-
-
-pdf(file = "./Figures/Fig2a.pdf", width = 5.50, height = 4.40)
-par(mfrow = c(1,1), mar = c(1,3.2,0.5,0.4), oma = c(0,0.1,0.0,0.0), mgp = c(2.2,0.9,0))
-dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
-names(dictonary) = c("dnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
-ord = order(tss[1,], decreasing = TRUE)
-not = -which(names(tss[1,ord]) %in% c("glm", "glm_step"), arr.ind = TRUE)
-dataTop = (tss[1,ord] - tss$glm[1])[,not]
-data = tss[1,ord][,not]
-coords = comparePlot(data, dataTop, cols = cols[names(dataTop)], neg = TRUE, bValues = FALSE, sk = 0.95, ylab = "", alpha1 = 1, drawBase = TRUE, lwdDraw = 1, colDraw = "darkgrey") # cols["glm"]
-axis(2, las = 2, font = font, cex.axis = cexP)
-#text(labels  = "(a)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
-text(labels = dictonary[names(data)], x = apply(coords[[1]], 1, mean), 
-     pos = 1, y = 0.00, xpd = NA, cex = cexP)
-# text(labels = "GLM", y = tss$glm[1], x = 0.95, pos = 4, xpd = NA, cex = cexP)
-dev.off()
-
-
-pdf(file = "./Figures/Fig2c.pdf", width = 5.50, height = 4.40)
-par(mfrow = c(1,1), mar = c(1,3.2,0.5,0.4), oma = c(0,0.1,0.0,0.0), mgp = c(2.2,0.9,0))
-dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
-names(dictonary) = c("dnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
-ord = order(tssAB[1,], decreasing = TRUE)
-not = -which(names(tssAB[1,ord]) %in% c("glm", "glm_step"), arr.ind = TRUE)
-dataTop = (tssAB[1,ord] - tssAB$glm[1])[,not]
-data = tssAB[1,ord][,not]
-coords = comparePlot(data, dataTop, cols = cols[names(dataTop)], neg = TRUE, bValues = FALSE, sk = 0.95, ylab = "", alpha1 = 1, drawBase = TRUE, lwdDraw = 1, colDraw = "darkgrey") # cols["glm"]
-axis(2, las = 2, font = font, cex.axis = cexP)
-#text(labels  = "(a)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
-text(labels = dictonary[names(data)], x = apply(coords[[1]], 1, mean), 
-     pos = 1, y = 0.00, xpd = NA, cex = cexP)
-# text(labels = "GLM", y = tssAB$glm[1], x = 0.95, pos = 4, xpd = NA, cex = cexP)
-dev.off()
-
-
-pdf(file = "./Figures/Fig2b.pdf", width = 5.50, height = 4.40)
-par(mfrow = c(1,1), mar = c(1,3.4,0.5,0.4), oma = c(0,0.1,0.0,0.0), mgp = c(2.4,0.9,0))
-dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
-names(dictonary) = c("negBinDnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
-namesSpear = colnames(spear)
-namesSpear = namesSpear[-which((namesSpear) %in% c("glm", "glm_step"),arr.ind = TRUE)]
-namesSpear[1] = "dnn"
-which(names(cols) %in% namesSpear, arr.ind = T)
-colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
-ord = order(spear[1,], decreasing = TRUE)
-not = -which(names(spear[1,ord]) %in% c("glm", "glm_step"), arr.ind = TRUE)
-dataTop = (spear[1,ord] - spear$glm[1])[1,not]
-data = spear[1,ord][,not]
-coords = comparePlot(data, dataTop, cols = colsReg[ord][!is.na(colsReg[ord])], neg = TRUE, sk = 0.95, 
-                     bValues = FALSE, ylab = "", 
-                     alpha1 = 1, drawBase = TRUE, lwdDraw = 1, colDraw = "darkgrey")
-axis(2, las = 2, font = font, cex.axis = cexP)
-text(labels = dictonary[names(data)], x = apply(coords[[1]], 1, mean), 
-     pos = 1, y = 0.00, xpd = NA, cex = cexP)
-#text(labels = "GLM", y = spear$glm[1], x = 0.95, pos = 4, xpd = NA, cex = cexP)
-#text(labels  = "(c)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
-#text(labels = c("Network Size: 20*50"), x = sapply(coords, mean, simplify = TRUE)[1],y = 0, 
-#     pos = 1, xpd = NA,cex = 0.9, font = font)
-#text(cex = cexP, labels = paste0("GLM: ", round(spear$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
-dev.off()
-
-
-
-pdf(file = "./Figures/Fig2d.pdf", width = 5.50, height = 4.40)
-par(mfrow = c(1,1), mar = c(1,3.3,0.5,0.4), oma = c(0,0.1,0.0,0.0), mgp = c(2.4,0.9,0))
-dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
-names(dictonary) = c("negBinDnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
-namesSpear = colnames(spear)
-namesSpear = namesSpear[-which((namesSpear) %in% c("glm", "glm_step"),arr.ind = TRUE)]
-namesSpear[1] = "dnn"
-which(names(cols) %in% namesSpear, arr.ind = T)
-colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
-ord = order(spearAB[1,], decreasing = TRUE)
-not = -which(names(spear[1,ord]) %in% c("glm", "glm_step"), arr.ind = TRUE)
-
-dataTop = (spearAB[1,ord] - spearAB$glm[1])[1,not]
-data = spearAB[1,ord][,not]
-coords = comparePlot(data, dataTop, cols = colsReg[ord][!is.na(colsReg[ord])], neg = TRUE, sk = 0.95, 
-                     bValues = FALSE, ylab = "", 
-                     alpha1 = 1, drawBase = TRUE, lwdDraw = 1, colDraw = "darkgrey")
-axis(2, las = 2, font = font, cex.axis = cexP)
-text(labels = dictonary[names(data)], x = apply(coords[[1]], 1, mean), 
-     pos = 1, y = 0.00, xpd = NA, cex = cexP)
-#text(labels = "GLM", y = spearAB$glm[1], x = 0.95, pos = 4, xpd = NA, cex = cexP)
-#text(labels  = "(c)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
-#text(labels = c("Network Size: 20*50"), x = sapply(coords, mean, simplify = TRUE)[1],y = 0, 
-#     pos = 1, xpd = NA,cex = 0.9, font = font)
-#text(cex = cexP, labels = paste0("GLM: ", round(spear$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
-dev.off()
-
-
-
-# dataTop = (tssAB - tssAB$glm)[,-7]
-# data = tssAB[,-7]
-# coords = comparePlot(data, dataTop, cols = cols, sk = 1, bValues = TRUE, ylab = "TSS", alpha1 = 1)
-# axis(2, las = 2, font = font, cex.axis = cexP)
-# text(labels  = "(b)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
-# text(labels = c("Abundance"), x = mean(coords[[1]]),y = 0, 
-#      pos = 1, xpd = NA,cex = 0.9, font = font)
-# text(cex = cexP, labels = paste0("GLM: ", round(tssAB$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
+# comparePlot = function(data = NULL, dataTop = NULL, cols = RColorBrewer::brewer.pal(8, "Accent"), 
+#                        sk = 0.3, alpha1 = 0.3, xlab = "", ylab = "", neg = TRUE, bValues = FALSE, drawBase = FALSE,
+#                        colDraw = "darkgray", lwdDraw = 1){
+#   nr = ncol(data)
+#   ak = 1-(nrow(data))*sk
+#   xCb = c(0, sk+ak/2, 1-sk)
+#   ik = sk/nr*0.9
+#   jk = sk/nr*0.1
+#   plot(NULL, NULL, axes = FALSE, xlim = c(0,1), ylim = c(0,1), ylab = ylab, xlab = xlab, cex.lab = 1.3)
+#   out = list()
+#   for(k in 1:nrow(data)){
+#     stepX = xCb[k]
+#     for(i in 1:(nr-1)){
+#       stepX[i+1] = stepX[i] + ik+jk
+#     }
+#     xC = matrix(c(stepX, stepX+ik), ncol = 2)
+#     if(!neg){
+#       for(i in 1:nr){
+#         rect(xleft = xC[i,1], xright = xC[i,2], ybottom = 0, ytop = data[k,i], col = addA(cols[i], alpha1))
+#       }
+#     } 
+#     for(i in 1:nr){
+#       if(dataTop[k,i]>0) {
+#         rect(xleft = xC[i,1], xright = xC[i,2], ybottom = (data-dataTop)[k,i], 
+#                               ytop = (data-dataTop)[k,1]+ dataTop[k,i], col = addA(cols[i], 1))
+#                  if(bValues) text(x = mean(xC[i,1:2]), y = (data)[k,i], pos = 3, 
+#                       labels = paste0("+", round(dataTop[k,i],digits = 2)), cex = 0.9, xpd = NA)
 # 
+#       }
+#       if(neg){
+#         if(dataTop[k,i]<0) {
+#           rect(xleft = xC[i,1], xright = xC[i,2], ybottom = (data)[k,i], 
+#                               ytop = max((data-dataTop)[k,1]), col = addA(cols[i], alpha1))
+#          if(bValues) text(x = mean(xC[i,1:2]), y = (data)[k,i], pos = 1, labels = paste0(round(dataTop[k,i],2)), cex = 0.9, xpd = NA)
+#         }
+#       }
+#       
+#     }
+#     out[[k]] = xC
+#     if(drawBase) segments(y1 =max((data-dataTop)[k,1]),  y0 = max((data-dataTop)[k,1]), x0 = min(xC[,1])-ak/5, x1 = max(xC[,2])+ak/5, col = colDraw, xpd = NA, lwd = lwdDraw)
+#   }
+#   return(out)
+# }
+# load(file = "./Results/SimulationAggreationFig2.RData")
+# cols =c("#bfa23d",
+# "#5d3686",
+# "#6ca24d",
+# "#c26abb",
+# "#46c19a",
+# "#ba496b",
+# "#6c7ed7",
+# "#b55c36")
+# names(cols) = c("dnn","cnn","knn","SVM","naive","RFranger","boost", "glm")
+# cexP = 1.3
+# cexA = 0.7
+# nPixel = 10
+# xText = -.23
+# yText = 1.15
+# font = 1
+# 
+# 
+# 
+# pdf(file = "./Figures/Fig2a.pdf", width = 5.50, height = 4.40)
+# par(mfrow = c(1,1), mar = c(1,3.2,0.5,0.4), oma = c(0,0.1,0.0,0.0), mgp = c(2.2,0.9,0))
+# dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
+# names(dictonary) = c("dnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
+# ord = order(tss[1,], decreasing = TRUE)
+# not = -which(names(tss[1,ord]) %in% c("glm", "glm_step"), arr.ind = TRUE)
+# dataTop = (tss[1,ord] - tss$glm[1])[,not]
+# data = tss[1,ord][,not]
+# coords = comparePlot(data, dataTop, cols = cols[names(dataTop)], neg = TRUE, bValues = FALSE, sk = 0.95, ylab = "", alpha1 = 1, drawBase = TRUE, lwdDraw = 1, colDraw = "darkgrey") # cols["glm"]
+# axis(2, las = 2, font = font, cex.axis = cexP)
+# #text(labels  = "(a)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# text(labels = dictonary[names(data)], x = apply(coords[[1]], 1, mean), 
+#      pos = 1, y = 0.00, xpd = NA, cex = cexP)
+# # text(labels = "GLM", y = tss$glm[1], x = 0.95, pos = 4, xpd = NA, cex = cexP)
+# dev.off()
+# 
+# 
+# pdf(file = "./Figures/Fig2c.pdf", width = 5.50, height = 4.40)
+# par(mfrow = c(1,1), mar = c(1,3.2,0.5,0.4), oma = c(0,0.1,0.0,0.0), mgp = c(2.2,0.9,0))
+# dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
+# names(dictonary) = c("dnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
+# ord = order(tssAB[1,], decreasing = TRUE)
+# not = -which(names(tssAB[1,ord]) %in% c("glm", "glm_step"), arr.ind = TRUE)
+# dataTop = (tssAB[1,ord] - tssAB$glm[1])[,not]
+# data = tssAB[1,ord][,not]
+# coords = comparePlot(data, dataTop, cols = cols[names(dataTop)], neg = TRUE, bValues = FALSE, sk = 0.95, ylab = "", alpha1 = 1, drawBase = TRUE, lwdDraw = 1, colDraw = "darkgrey") # cols["glm"]
+# axis(2, las = 2, font = font, cex.axis = cexP)
+# #text(labels  = "(a)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# text(labels = dictonary[names(data)], x = apply(coords[[1]], 1, mean), 
+#      pos = 1, y = 0.00, xpd = NA, cex = cexP)
+# # text(labels = "GLM", y = tssAB$glm[1], x = 0.95, pos = 4, xpd = NA, cex = cexP)
+# dev.off()
+# 
+# 
+# pdf(file = "./Figures/Fig2b.pdf", width = 5.50, height = 4.40)
+# par(mfrow = c(1,1), mar = c(1,3.4,0.5,0.4), oma = c(0,0.1,0.0,0.0), mgp = c(2.4,0.9,0))
+# dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
+# names(dictonary) = c("negBinDnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
 # namesSpear = colnames(spear)
-# namesSpear = namesSpear[-which((namesSpear) == "glm",arr.ind = TRUE)]
+# namesSpear = namesSpear[-which((namesSpear) %in% c("glm", "glm_step"),arr.ind = TRUE)]
 # namesSpear[1] = "dnn"
 # which(names(cols) %in% namesSpear, arr.ind = T)
 # colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
-# 
-# 
-# dataTop = (spear - spear$glm)[1,-5]
-# data = spear[1,-5]
-# coords = comparePlot(data, dataTop, cols = colsReg, neg = TRUE, sk = 1, bValues = TRUE, ylab = "Spearman", alpha1 = 1, cex.lab = cexP)
+# ord = order(spear[1,], decreasing = TRUE)
+# not = -which(names(spear[1,ord]) %in% c("glm", "glm_step"), arr.ind = TRUE)
+# dataTop = (spear[1,ord] - spear$glm[1])[1,not]
+# data = spear[1,ord][,not]
+# coords = comparePlot(data, dataTop, cols = colsReg[ord][!is.na(colsReg[ord])], neg = TRUE, sk = 0.95, 
+#                      bValues = FALSE, ylab = "", 
+#                      alpha1 = 1, drawBase = TRUE, lwdDraw = 1, colDraw = "darkgrey")
 # axis(2, las = 2, font = font, cex.axis = cexP)
-# text(labels  = "(c)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
-# text(labels = c("Network Size: 20*50"), x = sapply(coords, mean, simplify = TRUE)[1],y = 0, 
-#      pos = 1, xpd = NA,cex = cexP, font = font)
-# text(cex = cexP, labels = paste0("GLM: ", round(spear$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
+# text(labels = dictonary[names(data)], x = apply(coords[[1]], 1, mean), 
+#      pos = 1, y = 0.00, xpd = NA, cex = cexP)
+# #text(labels = "GLM", y = spear$glm[1], x = 0.95, pos = 4, xpd = NA, cex = cexP)
+# #text(labels  = "(c)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# #text(labels = c("Network Size: 20*50"), x = sapply(coords, mean, simplify = TRUE)[1],y = 0, 
+# #     pos = 1, xpd = NA,cex = 0.9, font = font)
+# #text(cex = cexP, labels = paste0("GLM: ", round(spear$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
+# dev.off()
 # 
-
-
-
-# dataTop = (spearAB - spearAB$glm)[,-5]
-# data = spearAB[,-5]
-# coords = comparePlot(data, dataTop, cols = colsReg, sk = 1, bValues = TRUE, ylab = "Spearman", alpha1 = 1)
+# 
+# 
+# pdf(file = "./Figures/Fig2d.pdf", width = 5.50, height = 4.40)
+# par(mfrow = c(1,1), mar = c(1,3.3,0.5,0.4), oma = c(0,0.1,0.0,0.0), mgp = c(2.4,0.9,0))
+# dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
+# names(dictonary) = c("negBinDnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
+# namesSpear = colnames(spear)
+# namesSpear = namesSpear[-which((namesSpear) %in% c("glm", "glm_step"),arr.ind = TRUE)]
+# namesSpear[1] = "dnn"
+# which(names(cols) %in% namesSpear, arr.ind = T)
+# colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
+# ord = order(spearAB[1,], decreasing = TRUE)
+# not = -which(names(spear[1,ord]) %in% c("glm", "glm_step"), arr.ind = TRUE)
+# 
+# dataTop = (spearAB[1,ord] - spearAB$glm[1])[1,not]
+# data = spearAB[1,ord][,not]
+# coords = comparePlot(data, dataTop, cols = colsReg[ord][!is.na(colsReg[ord])], neg = TRUE, sk = 0.95, 
+#                      bValues = FALSE, ylab = "", 
+#                      alpha1 = 1, drawBase = TRUE, lwdDraw = 1, colDraw = "darkgrey")
 # axis(2, las = 2, font = font, cex.axis = cexP)
-# text(labels  = "(d)",x = xText, y =  yText,pos = 4, xpd = NA,font = font,cex = cexP)
-# mean(coords[[1]])
-# text(labels = c("Abundance"), x = mean(coords[[1]]),y = 0, 
-#      pos = 1, xpd = NA,cex = 0.9, font = font)
-# text(cex = cexP, labels = paste0("GLM: ", round(spearAB$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
-pdf(file = "./Figures/Fig2e.pdf", width = 3.50, height = 3.40)
-par(mfrow = c(1,1), mar = c(2,3.3,0.5,0.5), oma = c(0,0.1,0.0,0.0), mgp = c(2.2,0.9,0))
-
-plot(NULL, NULL, axes = FALSE, xlim = c(0,1), ylim = c(0,1), ylab = "", xlab = "", cex.lab = cexP)
-for(i in 1:4) lines(x = seq(0,1, length.out = 3), y = tssObs[,c(1,5,6,7)][,i], type = "o", col = c(cols[names(tssObs[,c(1,5,6)])], "dimgray")[i], pch = 21, cex = cexP, bg = "white", lwd = 1.7)
-axis(2, las = 2, font = font, cex.axis = cexP)
-axis(1,at = seq(0,1, length.out = 3),labels = c("0.007", "0.032", "0.12"), font = font, cex.axis = cexP)
-text(labels  = "(e)",x = xText, y =  yText,pos = 4, xpd = NA,font = font,cex = cexP)
-text(labels = c("Observation time"), x = 0.5,y = -0.28, 
-     pos = 1, xpd = NA,cex = cexP, font = font)
-
-dev.off()
-
-
-# legend(x=0.0, y = -0.4,col = cols, legend = c("DNN","CNN","kNN","naive", "RF","BRT","SVM", "GLMstep"), pch = 16,
-     #  xpd = NA, bty = "n", cex = cexP, text.font = 1, y.intersp = 1.7, x.intersp = 0.7,horiz = T, pt.cex = 0.9)
+# text(labels = dictonary[names(data)], x = apply(coords[[1]], 1, mean), 
+#      pos = 1, y = 0.00, xpd = NA, cex = cexP)
+# #text(labels = "GLM", y = spearAB$glm[1], x = 0.95, pos = 4, xpd = NA, cex = cexP)
+# #text(labels  = "(c)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# #text(labels = c("Network Size: 20*50"), x = sapply(coords, mean, simplify = TRUE)[1],y = 0, 
+# #     pos = 1, xpd = NA,cex = 0.9, font = font)
+# #text(cex = cexP, labels = paste0("GLM: ", round(spear$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
+# dev.off()
 # 
-# spearObs[,c(1,2,4,5)]
-# plot(NULL, NULL, axes = FALSE, xlim = c(0,1), ylim = c(0,1), ylab = "Spearman", xlab = "")
-# for(i in 1:4) lines(x = seq(0,1, length.out = 3), y = spearObs[,c(1,2,4,5)][,i], type = "o", col = c(colsReg[c("dnn", "RFranger", "boost")], "dimgray")[i], pch = 21, cex = cexP, bg = "white")
+# 
+# 
+# # dataTop = (tssAB - tssAB$glm)[,-7]
+# # data = tssAB[,-7]
+# # coords = comparePlot(data, dataTop, cols = cols, sk = 1, bValues = TRUE, ylab = "TSS", alpha1 = 1)
+# # axis(2, las = 2, font = font, cex.axis = cexP)
+# # text(labels  = "(b)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# # text(labels = c("Abundance"), x = mean(coords[[1]]),y = 0, 
+# #      pos = 1, xpd = NA,cex = 0.9, font = font)
+# # text(cex = cexP, labels = paste0("GLM: ", round(tssAB$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
+# # 
+# # namesSpear = colnames(spear)
+# # namesSpear = namesSpear[-which((namesSpear) == "glm",arr.ind = TRUE)]
+# # namesSpear[1] = "dnn"
+# # which(names(cols) %in% namesSpear, arr.ind = T)
+# # colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
+# # 
+# # 
+# # dataTop = (spear - spear$glm)[1,-5]
+# # data = spear[1,-5]
+# # coords = comparePlot(data, dataTop, cols = colsReg, neg = TRUE, sk = 1, bValues = TRUE, ylab = "Spearman", alpha1 = 1, cex.lab = cexP)
+# # axis(2, las = 2, font = font, cex.axis = cexP)
+# # text(labels  = "(c)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# # text(labels = c("Network Size: 20*50"), x = sapply(coords, mean, simplify = TRUE)[1],y = 0, 
+# #      pos = 1, xpd = NA,cex = cexP, font = font)
+# # text(cex = cexP, labels = paste0("GLM: ", round(spear$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
+# # 
+# 
+# 
+# 
+# # dataTop = (spearAB - spearAB$glm)[,-5]
+# # data = spearAB[,-5]
+# # coords = comparePlot(data, dataTop, cols = colsReg, sk = 1, bValues = TRUE, ylab = "Spearman", alpha1 = 1)
+# # axis(2, las = 2, font = font, cex.axis = cexP)
+# # text(labels  = "(d)",x = xText, y =  yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# # mean(coords[[1]])
+# # text(labels = c("Abundance"), x = mean(coords[[1]]),y = 0, 
+# #      pos = 1, xpd = NA,cex = 0.9, font = font)
+# # text(cex = cexP, labels = paste0("GLM: ", round(spearAB$glm[1], digits = 2)), col ="dimgray", x = 0, y = 0.1, pos = 4)
+# pdf(file = "./Figures/Fig2e.pdf", width = 3.50, height = 3.40)
+# par(mfrow = c(1,1), mar = c(2,3.3,0.5,0.5), oma = c(0,0.1,0.0,0.0), mgp = c(2.2,0.9,0))
+# 
+# plot(NULL, NULL, axes = FALSE, xlim = c(0,1), ylim = c(0,1), ylab = "", xlab = "", cex.lab = cexP)
+# for(i in 1:4) lines(x = seq(0,1, length.out = 3), y = tssObs[,c(1,5,6,7)][,i], type = "o", col = c(cols[names(tssObs[,c(1,5,6)])], "dimgray")[i], pch = 21, cex = cexP, bg = "white", lwd = 1.7)
 # axis(2, las = 2, font = font, cex.axis = cexP)
 # axis(1,at = seq(0,1, length.out = 3),labels = c("0.007", "0.032", "0.12"), font = font, cex.axis = cexP)
-# text(labels  = "(f)",x = xText, y =  yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# text(labels  = "(e)",x = xText, y =  yText,pos = 4, xpd = NA,font = font,cex = cexP)
 # text(labels = c("Observation time"), x = 0.5,y = -0.28, 
 #      pos = 1, xpd = NA,cex = cexP, font = font)
+# 
 # dev.off()
-
+# 
+# 
+# # legend(x=0.0, y = -0.4,col = cols, legend = c("DNN","CNN","kNN","naive", "RF","BRT","SVM", "GLMstep"), pch = 16,
+#      #  xpd = NA, bty = "n", cex = cexP, text.font = 1, y.intersp = 1.7, x.intersp = 0.7,horiz = T, pt.cex = 0.9)
+# # 
+# # spearObs[,c(1,2,4,5)]
+# # plot(NULL, NULL, axes = FALSE, xlim = c(0,1), ylim = c(0,1), ylab = "Spearman", xlab = "")
+# # for(i in 1:4) lines(x = seq(0,1, length.out = 3), y = spearObs[,c(1,2,4,5)][,i], type = "o", col = c(colsReg[c("dnn", "RFranger", "boost")], "dimgray")[i], pch = 21, cex = cexP, bg = "white")
+# # axis(2, las = 2, font = font, cex.axis = cexP)
+# # axis(1,at = seq(0,1, length.out = 3),labels = c("0.007", "0.032", "0.12"), font = font, cex.axis = cexP)
+# # text(labels  = "(f)",x = xText, y =  yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# # text(labels = c("Observation time"), x = 0.5,y = -0.28, 
+# #      pos = 1, xpd = NA,cex = cexP, font = font)
+# # dev.off()
+# 
 
 ```
 
 
-## NEW new FIGURE 2
+## Figure 2
 ```{r}
-load(file = "../Results/SimulationAggreationFig2.RData")
-load(file = "../Results/SimulationAggreationCIFig2.RData")
+load(file = "Results/SimulationAggreationFig2.RData")
+load(file = "Results/SimulationAggreationCIFig2.RData")
 
 plotCI = function(x,y, ci, col, xLine = 0.07, lwd = 0.4) {
   segments(x0 = x, x1 = x, y0 =y-ci, y1 = y+ci, col = col, lwd = lwd)
@@ -254,6 +254,8 @@ plotCI = function(x,y, ci, col, xLine = 0.07, lwd = 0.4) {
 
 pdf("../Figures/Fig2.pdf",width = 5.5, height = 2.3, compress = FALSE)
 par(mfrow = c(1,3), mar = c(2,1.6,1,0.3), mgp = c(1.8,0.5,0), oma = c(0.6,0,1,0))
+
+## A
 cex = 0.65
 cexP = 0.7
 offset = c(0,0.07,0.14)
@@ -283,9 +285,6 @@ CIdata = CIdata[names(data)]
 
 
 pch = c(16, 17,15)
-#gr <- seq(0.8, 0, length.out = 4)
-#col = c(rgb(0, 0, 0, 0.25),  rgb(0, 160, 176, alpha = 0.25*255, max = 255), rgb(235, 104, 65, alpha = 0.25*255, max = 255))
-#col_full = c(rgb(0, 0, 0, 0.8),  rgb(0, 160, 176, max = 255), rgb(235, 104, 65, max = 255))
 
 col_full = gray.colors(3, start = 0.0, end = 0.8, gamma = 2.2, alpha = NULL)
 col = TraitMatching:::addA(col_full, 0.25)
@@ -307,9 +306,8 @@ text(x-0.2, par("usr")[3] - 0.07, labels = dictonary[names(data)], srt = 45, pos
 text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "(a)", cex = cex*1.1, font = 2)
 text(x = 0.5*max(x), pos = 4, y = -0.4, xpd = NA, labels = "TSS", cex = cex, font = 1)
 
-#text(x = max(x)-1.2,y = 1+0.16, pos = 4, cex = cex, labels = "Presence-absence data", font = 2, xpd = NA)
 
-
+## B
 data = 
   rbind(
     auc[2,,drop = FALSE],
@@ -347,15 +345,13 @@ text(x-0.2, par("usr")[3] - 0.035, labels = dictonary[names(data)], srt = 45, po
 text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "(b)", cex = cex*1.1, font = 2)
 text(x = 0.5*max(x), pos = 4, y = 0.3, xpd = NA, labels = "AUC", cex = cex, font = 1)
 #text(x = 0.5*max(x), pos = 4, y = -0.4, xpd = NA, labels = "TSS", cex = cex, font = 1)
-
-
- points(x = c(-8,0,9), y = rep(-0.22,3), pch = rev(pch), col = rev(col_full), xpd = NA)
- text(x =  c(-8,0,9), y = rep(-0.22,3), pos = 4, 
-      labels = rev(c("TraitMatching, even species abundances ", 
+points(x = c(-8,0,9), y = rep(-0.22,3), pch = rev(pch), col = rev(col_full), xpd = NA)
+text(x =  c(-8,0,9), y = rep(-0.22,3), pos = 4, 
+    labels = rev(c("TraitMatching, even species abundances ", 
                  "Random interactions, uneven species abundances", 
                  "Random interactions, even species abundances")), xpd = NA, cex = cex)
 
-
+## C
 dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
 names(dictonary) = c("negBinDnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
 data = 
@@ -376,7 +372,6 @@ data = data[,ord]
 not = -which(names(data) == c("glm_step"), arr.ind = TRUE)
 data = data[,not]
 CIdata = CIdata[names(data)]
-
 x = 1:ncol(data)
 matplot(y = t(data),
         x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(-1, 1), type = "p", pch = pch, col = col_full, cex = cexP,
@@ -386,7 +381,158 @@ matplot(y = t(data),
 lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
 lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
 lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
+for(i in 1:3){
+  for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
+}
+axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2, tck=tck)
+text(x-0.17, par("usr")[3] - 0.07, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
+text(x = 0.63, pos = 4, y = 1, xpd = NA, labels = "(c)", cex = cex*1.1, font = 2)
+#text(x = 0.76*max(x), pos = 4, y = 1, xpd = NA, labels = "Spearman", cex = cex, font = 1)
+text(x = 0.5*max(x), pos = 4, y = -0.4, xpd = NA, labels = "Spearman", cex = cex, font = 1)
+dev.off()
+```
 
+
+## Figure S2
+```{r}
+load(file = "Results/SimulationAggreationFig2.RData")
+load(file = "Results/SimulationAggreationCIFig2.RData")
+
+plotCI = function(x,y, ci, col, xLine = 0.07, lwd = 0.4) {
+  segments(x0 = x, x1 = x, y0 =y-ci, y1 = y+ci, col = col, lwd = lwd)
+  segments(x0 = x-xLine, x1 = x+xLine, y0 =y-ci, y1 = y-ci, col = col, lwd = lwd)
+  segments(x0 = x-xLine, x1 = x+xLine, y0 =y+ci, y1 = y+ci, col = col, lwd = lwd)
+}
+
+pdf("Figures/FigS2_new.pdf",width = 5.5, height = 4.6, compress = FALSE)
+par(mfrow = c(2,3), mar = c(2,1.6,1,0.3), mgp = c(1.8,0.5,0), oma = c(0.6,0,1,0))
+
+## A
+cex = 0.65
+cexP = 0.7
+offset = c(0,0.07,0.14)
+lwd = 0.7
+tck=-0.03
+dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
+names(dictonary) = c("dnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
+data = 
+  rbind(
+    tss[1,,drop = FALSE],
+    tss[2,,drop = FALSE],
+    tss[3,,drop = FALSE]
+  )
+ord = order(data[1,], decreasing = TRUE)
+
+CIdata = 
+  rbind(
+    tssCI[1,,drop = FALSE],
+    tssCI[2,,drop = FALSE],
+    tssCI[3,,drop = FALSE]
+  )
+
+data = data[,ord]
+not = -which(names(data) == c("glm_step"), arr.ind = TRUE)
+data = data[,not]
+CIdata = CIdata[names(data)]
+
+
+pch = c(16, 17,15)
+
+col_full = gray.colors(3, start = 0.0, end = 0.8, gamma = 2.2, alpha = NULL)
+col = TraitMatching:::addA(col_full, 0.25)
+
+x = 1:ncol(data)
+matplot(y = t(data),
+        x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(-1, 1), type = "p", pch = pch, col = col_full, cex = cexP,
+        axes = TRUE,
+        xlab = "",
+        ylab = "", las =2,  xaxt="n", cex.axis = cex, cex.lab = cex, tck=tck)
+lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
+lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
+lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
+for(i in 1:3){
+  for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
+}
+axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2, tck=tck)
+text(x-0.2, par("usr")[3] - 0.07, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
+text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "(a)", cex = cex*1.1, font = 2)
+text(x = 0.5*max(x), pos = 4, y = -0.4, xpd = NA, labels = "TSS", cex = cex, font = 1)
+
+
+## B
+data = 
+  rbind(
+    auc[1,,drop = FALSE],
+    auc[2,,drop = FALSE],
+    auc[3,,drop = FALSE]
+  )
+CIdata = 
+  rbind(
+    aucCI[1,,drop = FALSE],
+    aucCI[2,,drop = FALSE],
+    aucCI[3,,drop = FALSE]
+  )
+ord = order(data[1,], decreasing = TRUE)
+
+data = data[,ord]
+not = -which(names(data) == c("glm_step"), arr.ind = TRUE)
+data = data[,not]
+CIdata = CIdata[names(data)]
+
+x = 1:ncol(data)
+matplot(y = t(data),
+        x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(0, 1), type = "p", pch = pch, col = col_full, cex = cexP,
+        axes = TRUE,
+        xlab = "",
+        ylab = "", las =2,  xaxt="n",  cex.axis = cex, cex.lab = cex, tck=tck)
+lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
+lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
+lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
+for(i in 1:3){
+  for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
+}
+
+axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2, tck=tck)
+text(x-0.2, par("usr")[3] - 0.035, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
+text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "(b)", cex = cex*1.1, font = 2)
+text(x = 0.5*max(x), pos = 4, y = 0.3, xpd = NA, labels = "AUC", cex = cex, font = 1)
+#text(x = 0.5*max(x), pos = 4, y = -0.4, xpd = NA, labels = "TSS", cex = cex, font = 1)
+points(x = c(-8,0,9), y = rep(-0.22,3), pch = rev(pch), col = rev(col_full), xpd = NA)
+text(x =  c(-8,0,9), y = rep(-0.22,3), pos = 4, 
+    labels = rev(c("25 * 50 (plants * pollinators)", 
+                 "50 * 100 (plants * pollinators)", 
+                 "100 * 200 (plants * pollinators)")), xpd = NA, cex = cex)
+
+## C
+dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
+names(dictonary) = c("negBinDnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
+data = 
+  rbind(
+    spear[1,,drop = FALSE],
+    spear[2,,drop = FALSE],
+    spear[3,,drop = FALSE]
+  )
+CIdata = 
+  rbind(
+    spearCI[1,,drop = FALSE],
+    spearCI[2,,drop = FALSE],
+    spearCI[3,,drop = FALSE]
+  )
+ord = order(data[1,], decreasing = TRUE)
+
+data = data[,ord]
+not = -which(names(data) == c("glm_step"), arr.ind = TRUE)
+data = data[,not]
+CIdata = CIdata[names(data)]
+x = 1:ncol(data)
+matplot(y = t(data),
+        x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(-1, 1), type = "p", pch = pch, col = col_full, cex = cexP,
+        axes = TRUE,
+        xlab = "",
+        ylab = "", las =2,  xaxt="n",  cex.axis = cex, cex.lab = cex, tck=tck)
+lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
+lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
+lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
 for(i in 1:3){
   for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
 }
@@ -396,155 +542,288 @@ text(x = 0.63, pos = 4, y = 1, xpd = NA, labels = "(c)", cex = cex*1.1, font = 2
 #text(x = 0.76*max(x), pos = 4, y = 1, xpd = NA, labels = "Spearman", cex = cex, font = 1)
 text(x = 0.5*max(x), pos = 4, y = -0.4, xpd = NA, labels = "Spearman", cex = cex, font = 1)
 
-#text(x = 3, y = 1+0.16, pos = 4, cex = cex, labels = "Count data", font = 2, xpd = NA)
+
+# Abundance
+## D
+cex = 0.65
+cexP = 0.7
+offset = c(0,0.07,0.14)
+lwd = 0.7
+tck=-0.03
+dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
+names(dictonary) = c("dnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
+data = 
+  rbind(
+    tssObs[1,,drop = FALSE],
+    tssObs[2,,drop = FALSE],
+    tssObs[3,,drop = FALSE]
+  )
+ord = order(data[1,], decreasing = TRUE)
+
+CIdata = 
+  rbind(
+    tssObsCI[1,,drop = FALSE],
+    tssObsCI[2,,drop = FALSE],
+    tssObsCI[3,,drop = FALSE]
+  )
+
+data = data[,ord]
+not = -which(names(data) == c("glm_step"), arr.ind = TRUE)
+data = data[,not]
+CIdata = CIdata[names(data)]
+
+
+pch = c(16, 17,15)
+
+col_full = gray.colors(3, start = 0.0, end = 0.8, gamma = 2.2, alpha = NULL)
+col = TraitMatching:::addA(col_full, 0.25)
+
+x = 1:ncol(data)
+matplot(y = t(data),
+        x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(-1, 1), type = "p", pch = pch, col = col_full, cex = cexP,
+        axes = TRUE,
+        xlab = "",
+        ylab = "", las =2,  xaxt="n", cex.axis = cex, cex.lab = cex, tck=tck)
+lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
+lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
+lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
+for(i in 1:3){
+  for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
+}
+axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2, tck=tck)
+text(x-0.2, par("usr")[3] - 0.07, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
+text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "(d)", cex = cex*1.1, font = 2)
+text(x = 0.5*max(x), pos = 4, y = -0.4, xpd = NA, labels = "TSS", cex = cex, font = 1)
+
+
+## E
+data = 
+  rbind(
+    aucObs[1,,drop = FALSE],
+    aucObs[2,,drop = FALSE],
+    aucObs[3,,drop = FALSE]
+  )
+CIdata = 
+  rbind(
+    aucObsCI[1,,drop = FALSE],
+    aucObsCI[2,,drop = FALSE],
+    aucObsCI[3,,drop = FALSE]
+  )
+ord = order(data[1,], decreasing = TRUE)
+
+data = data[,ord]
+not = -which(names(data) == c("glm_step"), arr.ind = TRUE)
+data = data[,not]
+CIdata = CIdata[names(data)]
+
+x = 1:ncol(data)
+matplot(y = t(data),
+        x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(0, 1), type = "p", pch = pch, col = col_full, cex = cexP,
+        axes = TRUE,
+        xlab = "",
+        ylab = "", las =2,  xaxt="n",  cex.axis = cex, cex.lab = cex, tck=tck)
+lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
+lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
+lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
+for(i in 1:3){
+  for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
+}
+
+axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2, tck=tck)
+text(x-0.2, par("usr")[3] - 0.035, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
+text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "(e)", cex = cex*1.1, font = 2)
+text(x = 0.5*max(x), pos = 4, y = 0.3, xpd = NA, labels = "AUC", cex = cex, font = 1)
+#text(x = 0.5*max(x), pos = 4, y = -0.4, xpd = NA, labels = "TSS", cex = cex, font = 1)
+points(x = c(-8,0,9), y = rep(-0.22,3), pch = rev(pch), col = rev(col_full), xpd = NA)
+text(x =  c(-8,0,9), y = rep(-0.22,3), pos = 4, 
+    labels = rev(c("short observation", 
+                 "middle observation)", 
+                 "long observation")), xpd = NA, cex = cex)
+
+## F
+dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")
+names(dictonary) = c("negBinDnn", "knn", "cnn", "RFranger", "boost", "naive", "SVM", "glm")
+data = 
+  rbind(
+    spearObs[1,,drop = FALSE],
+    spearObs[2,,drop = FALSE],
+    spearObs[3,,drop = FALSE]
+  )
+CIdata = 
+  rbind(
+    spearObsCI[1,,drop = FALSE],
+    spearObsCI[2,,drop = FALSE],
+    spearObsCI[3,,drop = FALSE]
+  )
+ord = order(data[1,], decreasing = TRUE)
+
+data = data[,ord]
+not = -which(names(data) == c("glm_step"), arr.ind = TRUE)
+data = data[,not]
+CIdata = CIdata[names(data)]
+x = 1:ncol(data)
+matplot(y = t(data),
+        x = matrix(c(x,x+offset[2],x+offset[3]), ncol = 3),ylim = c(-1, 1), type = "p", pch = pch, col = col_full, cex = cexP,
+        axes = TRUE,
+        xlab = "",
+        ylab = "", las =2,  xaxt="n",  cex.axis = cex, cex.lab = cex, tck=tck)
+lines(smooth.spline(y = data[1,],x = x, spar = 0.3 ), col = col[1], lwd = lwd)
+lines(smooth.spline(y = data[2,],x = x+offset[2], spar = 0.3 ), col = col[2], lwd = lwd)
+lines(smooth.spline(y = data[3,],x = x+offset[3], spar = 0.3 ), col = col[3], lwd = lwd)
+for(i in 1:3){
+  for(j in 1:ncol(data)) plotCI(j+offset[i], data[i,j], CIdata[i,j], col = col_full[i])
+}
+axis(1, labels = FALSE, at = x,  cex.axis = cex, las = 2, tck=tck)
+text(x-0.17, par("usr")[3] - 0.07, labels = dictonary[names(data)], srt = 45, pos = 1, xpd = TRUE, cex = cex)
+text(x = 0.63, pos = 4, y = 1, xpd = NA, labels = "(f)", cex = cex*1.1, font = 2)
+#text(x = 0.76*max(x), pos = 4, y = 1, xpd = NA, labels = "Spearman", cex = cex, font = 1)
+text(x = 0.5*max(x), pos = 4, y = -0.4, xpd = NA, labels = "Spearman", cex = cex, font = 1)
+dev.off()
+
+
+
+
 
 # 
-# plot(NULL, NULL, xlim = c(1,max(x)), ylim = c(-1,1), axes = FALSE, xlab = "", ylab = "")
-# points(x = rep(1,3), y = seq(0.3, -0.3, length.out = 3), pch = pch, col = col_full, xpd = NA)
-# text(x = rep(1,3), y = seq(0.3, -0.3, length.out = 3), pos = 4, 
-#      labels = c("TraitMatching , even species abundances ", 
-#                 "Random interactions, uneven species abundances", 
-#                 "Random interactions, even species abundances"), xpd = NA, cex = cex)
-
-dev.off()
-```
-
-
-## Figure S1
-```{r}
-
-comparePlot = function(data = NULL, dataTop = NULL, cols = RColorBrewer::brewer.pal(8, "Accent"), 
-                       sk = 0.3, alpha1 = 0.3, xlab = "", ylab = "", neg = TRUE, bValues = FALSE){
-  nr = ncol(data)
-  ak = 1-(nrow(data))*sk
-  xCb = c(0, sk+ak/2, 1-sk)
-  ik = sk/nr*0.9
-  jk = sk/nr*0.1
-  plot(NULL, NULL, axes = FALSE, xlim = c(0,1), ylim = c(0,1), ylab = ylab, xlab = xlab)
-  out = list()
-  for(k in 1:nrow(data)){
-    stepX = xCb[k]
-    for(i in 1:(nr-1)){
-      stepX[i+1] = stepX[i] + ik+jk
-    }
-    xC = matrix(c(stepX, stepX+ik), ncol = 2)
-    if(!neg){
-      for(i in 1:nr){
-        rect(xleft = xC[i,1], xright = xC[i,2], ybottom = 0, ytop = data[k,i], col = addA(cols[i], alpha1))
-      }
-    } 
-    for(i in 1:nr){
-      if(dataTop[k,i]>0) {
-        rect(xleft = xC[i,1], xright = xC[i,2], ybottom = (data-dataTop)[k,i], 
-                              ytop = (data-dataTop)[k,1]+ dataTop[k,i], col = addA(cols[i], 1))
-                 if(bValues) text(x = mean(xC[i,1:2]), y = (data)[k,i], pos = 3, 
-                      labels = paste0("+", round(dataTop[k,i],digits = 2)), cex = 0.9, xpd = NA)
-
-      }
-      if(neg){
-        if(dataTop[k,i]<0) {
-          rect(xleft = xC[i,1], xright = xC[i,2], ybottom = (data)[k,i], 
-                              ytop = max((data-dataTop)[k,1]), col = addA(cols[i], alpha1))
-         if(bValues) text(x = mean(xC[i,1:2]), y = (data)[k,i], pos = 1, labels = paste0(round(dataTop[k,i],2)), cex = 0.9, xpd = NA)
-        }
-      }
-      
-    }
-    out[[k]] = xC
-    segments(y1 =max((data-dataTop)[k,1]),  y0 = max((data-dataTop)[k,1]), x0 = min(xC[,1])-ak/5, x1 = max(xC[,2])+ak/5, col = "darkgrey", xpd = NA)
-  }
-  return(out)
-}
-load(file = "./Results/SimulationAggreationFig2.RData")
-cols =c("#bfa23d",
-"#5d3686",
-"#6ca24d",
-"#c26abb",
-"#46c19a",
-"#ba496b",
-"#6c7ed7",
-"#b55c36")
-names(cols) = c("dnn","cnn","knn","SVM","naive","RFranger","boost", "glm_step")
-cexP = 0.9
-cexA = 0.7
-nPixel = 10
-xText = -.03
-yText = 1.15
-font = 1
-namesSpear = colnames(spear)
-namesSpear = namesSpear[-which((namesSpear) == "glm",arr.ind = TRUE)]
-namesSpear[1] = "dnn"
-which(names(cols) %in% namesSpear, arr.ind = T)
-colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
-
-pdf(file = "./Figures/FigS1.pdf", width = 5.50, height = 6.40)
-
-par(mfrow = c(6,1), mar = c(2.1,3,0.9,0.0), oma = c(2.4,0.1,0.75,0.0), mgp = c(2.2,0.9,0))
-cols = cols[sapply(colnames(tss)[-which(colnames(tss) == "glm", arr.ind = TRUE)], function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
-
-# SIZE
-dataTop = (tss - tss$glm)[,-7]
-data = tss[,-7]
-coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = FALSE, sk = 0.32, ylab = "TSS", alpha1 = 1)
-title(main = "Network sizes")
-axis(2, las = 2, font = font, cex.axis = cexP)
-text(labels  = "(a)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
-
-text(cex = cexP, labels = paste0("GLM: ", round(tss$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
-
-dataTop = (auc - auc$glm)[,-7]
-data = auc[,-7]
-coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "AUC", alpha1 = 1)
-axis(2, las = 2, font = font, cex.axis = cexP, labels = seq(0.5, 1, length.out = 6), at = seq(0,1, length.out = 6))
-text(labels  = "(b)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
-#text(labels = c("20*50", "50*100", "100*200"), x = sapply(coords, mean, simplify = TRUE),y = 0, 
-#     pos = 1, xpd = NA,cex = 0.9, font = font)
-text(cex = cexP, labels = paste0("GLM: ", round(auc$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
-
-dataTop = (spear - spear$glm)[,-5]
-data = spear[,-5]
-coords = comparePlot(data, dataTop, cols = colsReg, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "Spear", alpha1 = 1)
-axis(2, las = 2, font = font, cex.axis = cexP)
-axis(1, at = NULL, labels = F, tck = 0)
-text(labels  = "(c)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
-text(labels = c("20*50", "50*100", "100*200"), x = sapply(coords, mean, simplify = TRUE),y = 0, 
-     pos = 1, xpd = NA,cex = 0.9, font = font)
-text(cex = cexP, labels = paste0("GLM: ", round(spear$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
-
-# OBSERVATION TIME
-dataTop = (tssObs - tssObs$glm)[,-7]
-data = tssObs[,-7]
-coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "TSS", alpha1 = 1)
-title(main = "Observation Times")
-
-axis(2, las = 2, font = font, cex.axis = cexP)
-text(labels  = "(d)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
-#text(labels = c("20*50", "50*100", "100*200"), x = sapply(coords, mean, simplify = TRUE),y = 0, 
-#     pos = 1, xpd = NA,cex = 0.9, font = font)
-text(cex = cexP, labels = paste0("GLM: ", round(tssObs$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
-
-dataTop = (aucObs - aucObs$glm)[,-7]
-data = aucObs[,-7]
-coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "AUC", alpha1 = 1)
-axis(2, las = 2, font = font, cex.axis = cexP)
-text(labels  = "(e)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
-text(cex = cexP, labels = paste0("GLM: ", round(aucObs$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
-
-dataTop = (spearObs - spearObs$glm)[,-5]
-data = spearObs[,-5]
-coords = comparePlot(data, dataTop, cols = colsReg, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "Spear", alpha1 = 1)
-axis(2, las = 2, font = font, cex.axis = cexP)
-axis(1, at = NULL, labels = F, tck = 0)
-text(labels  = "(f)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
-text(labels = c("0.007", "0.032", "0.12"), x = sapply(coords, mean, simplify = TRUE),y = 0, 
-     pos = 1, xpd = NA,cex = 0.9, font = font)
-text(cex = cexP, labels = paste0("GLM: ", round(spearObs$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.04, pos = 4)
-legend(x=0.0, y = -0.4,col = cols, legend = c("DNN","CNN","kNN","naive", "RF","BRT","SVM", "GLMstep"), pch = 16,
-       xpd = NA, bty = "n", cex = cexP, text.font = 1, y.intersp = 1.7, x.intersp = 0.7,horiz = T, pt.cex = 0.9)
-
-dev.off()
+# 
+# comparePlot = function(data = NULL, dataTop = NULL, cols = RColorBrewer::brewer.pal(8, "Accent"), 
+#                        sk = 0.3, alpha1 = 0.3, xlab = "", ylab = "", neg = TRUE, bValues = FALSE){
+#   nr = ncol(data)
+#   ak = 1-(nrow(data))*sk
+#   xCb = c(0, sk+ak/2, 1-sk)
+#   ik = sk/nr*0.9
+#   jk = sk/nr*0.1
+#   plot(NULL, NULL, axes = FALSE, xlim = c(0,1), ylim = c(0,1), ylab = ylab, xlab = xlab)
+#   out = list()
+#   for(k in 1:nrow(data)){
+#     stepX = xCb[k]
+#     for(i in 1:(nr-1)){
+#       stepX[i+1] = stepX[i] + ik+jk
+#     }
+#     xC = matrix(c(stepX, stepX+ik), ncol = 2)
+#     if(!neg){
+#       for(i in 1:nr){
+#         rect(xleft = xC[i,1], xright = xC[i,2], ybottom = 0, ytop = data[k,i], col = addA(cols[i], alpha1))
+#       }
+#     } 
+#     for(i in 1:nr){
+#       if(dataTop[k,i]>0) {
+#         rect(xleft = xC[i,1], xright = xC[i,2], ybottom = (data-dataTop)[k,i], 
+#                               ytop = (data-dataTop)[k,1]+ dataTop[k,i], col = addA(cols[i], 1))
+#                  if(bValues) text(x = mean(xC[i,1:2]), y = (data)[k,i], pos = 3, 
+#                       labels = paste0("+", round(dataTop[k,i],digits = 2)), cex = 0.9, xpd = NA)
+# 
+#       }
+#       if(neg){
+#         if(dataTop[k,i]<0) {
+#           rect(xleft = xC[i,1], xright = xC[i,2], ybottom = (data)[k,i], 
+#                               ytop = max((data-dataTop)[k,1]), col = addA(cols[i], alpha1))
+#          if(bValues) text(x = mean(xC[i,1:2]), y = (data)[k,i], pos = 1, labels = paste0(round(dataTop[k,i],2)), cex = 0.9, xpd = NA)
+#         }
+#       }
+#       
+#     }
+#     out[[k]] = xC
+#     segments(y1 =max((data-dataTop)[k,1]),  y0 = max((data-dataTop)[k,1]), x0 = min(xC[,1])-ak/5, x1 = max(xC[,2])+ak/5, col = "darkgrey", xpd = NA)
+#   }
+#   return(out)
+# }
+# load(file = "./Results/SimulationAggreationFig2.RData")
+# cols =c("#bfa23d",
+# "#5d3686",
+# "#6ca24d",
+# "#c26abb",
+# "#46c19a",
+# "#ba496b",
+# "#6c7ed7",
+# "#b55c36")
+# names(cols) = c("dnn","cnn","knn","SVM","naive","RFranger","boost", "glm_step")
+# cexP = 0.9
+# cexA = 0.7
+# nPixel = 10
+# xText = -.03
+# yText = 1.15
+# font = 1
+# namesSpear = colnames(spear)
+# namesSpear = namesSpear[-which((namesSpear) == "glm",arr.ind = TRUE)]
+# namesSpear[1] = "dnn"
+# which(names(cols) %in% namesSpear, arr.ind = T)
+# colsReg = cols[sapply(namesSpear, function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
+# 
+# pdf(file = "./Figures/FigS1.pdf", width = 5.50, height = 6.40)
+# 
+# par(mfrow = c(6,1), mar = c(2.1,3,0.9,0.0), oma = c(2.4,0.1,0.75,0.0), mgp = c(2.2,0.9,0))
+# cols = cols[sapply(colnames(tss)[-which(colnames(tss) == "glm", arr.ind = TRUE)], function(x) which(x == names(cols), arr.ind = T),simplify = TRUE)]
+# 
+# # SIZE
+# dataTop = (tss - tss$glm)[,-7]
+# data = tss[,-7]
+# coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = FALSE, sk = 0.32, ylab = "TSS", alpha1 = 1)
+# title(main = "Network sizes")
+# axis(2, las = 2, font = font, cex.axis = cexP)
+# text(labels  = "(a)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# 
+# text(cex = cexP, labels = paste0("GLM: ", round(tss$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
+# 
+# dataTop = (auc - auc$glm)[,-7]
+# data = auc[,-7]
+# coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "AUC", alpha1 = 1)
+# axis(2, las = 2, font = font, cex.axis = cexP, labels = seq(0.5, 1, length.out = 6), at = seq(0,1, length.out = 6))
+# text(labels  = "(b)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# #text(labels = c("20*50", "50*100", "100*200"), x = sapply(coords, mean, simplify = TRUE),y = 0, 
+# #     pos = 1, xpd = NA,cex = 0.9, font = font)
+# text(cex = cexP, labels = paste0("GLM: ", round(auc$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
+# 
+# dataTop = (spear - spear$glm)[,-5]
+# data = spear[,-5]
+# coords = comparePlot(data, dataTop, cols = colsReg, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "Spear", alpha1 = 1)
+# axis(2, las = 2, font = font, cex.axis = cexP)
+# axis(1, at = NULL, labels = F, tck = 0)
+# text(labels  = "(c)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# text(labels = c("20*50", "50*100", "100*200"), x = sapply(coords, mean, simplify = TRUE),y = 0, 
+#      pos = 1, xpd = NA,cex = 0.9, font = font)
+# text(cex = cexP, labels = paste0("GLM: ", round(spear$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
+# 
+# # OBSERVATION TIME
+# dataTop = (tssObs - tssObs$glm)[,-7]
+# data = tssObs[,-7]
+# coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "TSS", alpha1 = 1)
+# title(main = "Observation Times")
+# 
+# axis(2, las = 2, font = font, cex.axis = cexP)
+# text(labels  = "(d)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# #text(labels = c("20*50", "50*100", "100*200"), x = sapply(coords, mean, simplify = TRUE),y = 0, 
+# #     pos = 1, xpd = NA,cex = 0.9, font = font)
+# text(cex = cexP, labels = paste0("GLM: ", round(tssObs$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
+# 
+# dataTop = (aucObs - aucObs$glm)[,-7]
+# data = aucObs[,-7]
+# coords = comparePlot(data, dataTop, cols = cols, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "AUC", alpha1 = 1)
+# axis(2, las = 2, font = font, cex.axis = cexP)
+# text(labels  = "(e)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# text(cex = cexP, labels = paste0("GLM: ", round(aucObs$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.1, pos = 4)
+# 
+# dataTop = (spearObs - spearObs$glm)[,-5]
+# data = spearObs[,-5]
+# coords = comparePlot(data, dataTop, cols = colsReg, neg = TRUE, bValues = FALSE, sk = 0.3, ylab = "Spear", alpha1 = 1)
+# axis(2, las = 2, font = font, cex.axis = cexP)
+# axis(1, at = NULL, labels = F, tck = 0)
+# text(labels  = "(f)",x = xText, y = yText,pos = 4, xpd = NA,font = font,cex = cexP)
+# text(labels = c("0.007", "0.032", "0.12"), x = sapply(coords, mean, simplify = TRUE),y = 0, 
+#      pos = 1, xpd = NA,cex = 0.9, font = font)
+# text(cex = cexP, labels = paste0("GLM: ", round(spearObs$glm, digits = 2)), col ="dimgray", x = unlist(lapply(coords, min)), y = 0.04, pos = 4)
+# legend(x=0.0, y = -0.4,col = cols, legend = c("DNN","CNN","kNN","naive", "RF","BRT","SVM", "GLMstep"), pch = 16,
+#        xpd = NA, bty = "n", cex = cexP, text.font = 1, y.intersp = 1.7, x.intersp = 0.7,horiz = T, pt.cex = 0.9)
+# 
+# dev.off()
 
 ```
+
+
+
+
+
+
 
 ## Table S1 and S2 
 ```{r}
@@ -822,72 +1101,63 @@ text(labels = "(b)", x = 0.02, y = 1.09, xpd = NA, pos = 2, cex = cexP*1.1, font
 
 dev.off()
 
-# 
-# barInf = function(res, xlab = "", ylab = "", col = rep("white", 7)){
-#   nC = ncol(res)
-#   xX = 1/(nC+1)
-#   xS = xX/(nC-1)
-#   nR = nrow(res)
-#   xC = seq(0, 1-xX, length.out = nC+1)
-#   for(i in 1:4) xC[i+1] = xC[i+1]+i*xS
-#   xC = xC[1:nC]
-#   xSS = xX/nR
-#   coords = NULL
-#   counter = 1
-#   plot(NULL, NULL, xlim = c(0,1), ylim = c(0,1), axes = FALSE, xlab = xlab , ylab = ylab)
-#   for(i in 1:nC){
-#     tmp = res[,i]
-#     for(j in 1:nR){
-#       rect(xleft = xC[i]+(j-1)*xSS, xright = xC[i]+j*xSS, ybottom = 0, ytop = tmp[j], col = col[i])
-#       coords[counter] = mean(c(xC[i]+(j-1)*xSS, xC[i]+j*xSS))
-#       counter = counter + 1
-#     }
-#   }
-#   km = apply(res,2,mean)
-#   for(i in 1:5){
-#     segments(x0 = xC[i] - xX*0.08, x1 = (xC[i])+xX*1.08, y0 = km[i], y1 = km[i], lty = 1, col = "red")
-#   }
-#   return(coords)
-# }
-# addA = TraitMatching:::addA
-# cexP = 0.5
-# #pdf(file = "./Figures/Fig4.pdf", width = 5.50, height = 1.8)
-# par(mfrow = c(1,1),  mar = c(1.2,1.6,0.2, 0.3), oma = c(0,0.0,0.4,0), mgp = c(3,0.6,0))
-# dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
-# names(dictonary) = c("classif.keras_seq.tuned", "classif.kknn.tuned", "classif.randomForest.tuned", "classif.xgboost.tuned","glm")
-# ResClass = bind_rows(resAggSmallClass[,c(1,2,3)], smallClassGLM)
-# ResClass = tapply(ResClass$trp, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
-# means = apply(ResClass, 2, mean)
-# ord = order(means, decreasing = TRUE)
-# coords = barInf(ResClass[,ord], col = addA(cols[dictonary[colnames(ResClass)[ord]]], 0.4) )
-# axis(2, las = 2, cex.axis = cexP)
-# text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
-# .a = apply(matrix(1:20, nrow = 5, byrow = TRUE)[,c(1,4)], 1, 
-#            function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
-# text(labels = dictonary[colnames(ResClass)[ord]], 
-#      x = apply(matrix(coords, nrow = 5, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
-# text(labels = "(a)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font =2)
-# 
-# 
-# dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
-# names(dictonary) = c("regr.negBinDnn.tuned", "regr.kknn.tuned", "regr.randomForest.tuned", "regr.xgboost.tuned","glm")
-# ResReg = bind_rows(resAggSmallReg[,c(1,2,3)], smallRegGLM)
-# ResReg = tapply(ResReg$trp, list(factor(ResReg$len_true),ResReg$model), simplify = TRUE, FUN = function(i)i)
-# means = apply(ResReg, 2, mean)
-# ord = order(means, decreasing = TRUE)
-# coords = barInf(ResReg[,ord], col = addA(cols[dictonary[colnames(ResReg)[ord]]], 0.4) )
-# axis(2, las = 2, cex.axis = cexP)
-# text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
-# .a = apply(matrix(1:20, nrow = 5, byrow = TRUE)[,c(1,4)], 1, 
-#            function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
-# text(labels = dictonary[colnames(ResReg)[ord]], 
-#      x = apply(matrix(coords, nrow = 5, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
-# text(labels = "(b)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font = 2)
-# 
-# dev.off()
 
 
 ```
+
+## Figure 5
+```{r,results=FALSE}
+load(file = "../Results/HummingInferenceResult.RData")
+humT = c( "Bill.Length", "Bill.Curvature", "Body.Mass","Wing" , "Tail" , "plot.Low", "plot.Mid", "plot.High")
+plantT = c( "Corolla.Length","Corolla.Curvature", "Corolla.Volumen","Inner.Diameter", "Ext.Diameter")
+interHum = apply(rbind(expand.grid(humT, plantT), expand.grid( plantT, humT)), 1, function(x) paste0(x[1],":", x[2]))
+reset()
+cexP = 0.9
+
+pdf(file = "../Figures/Fig5.pdf", width = 5.5, height = 3.7)
+par(mfrow = c(1,2),mar = c(0.3,1,1,3)+0.0,oma = c(1,0.3,2,1))
+# Fig5a
+plot(NULL,NULL, xlim = c(0,1), ylim = c(0,1), axes = F, xlab = "", ylab = "")
+#text(x = -0.06, y = 1.03, labels = "(a)", cex = 0.9, xpd = NA, font = 2)
+polygon(c(0,0.125,0.17,0.19,0.35,0.51,0.65,0.85), c(0,0.25,0.5,0.42,1,0.35,0.09,0), lwd = 2, col = "lightgrey", xpd = NA)
+baseX = 0.72
+baseYv = c(0.1,0.4,0.7)
+cols = RColorBrewer::brewer.pal(3, "Accent")
+altitude = c("50 m.a.s.l", "1000 m.a.s.l", "2000 m.a.s.l")
+lineY = baseYv+0.05
+for(i in 1:3) {
+  baseY = baseYv[i]
+  rect(xleft = baseX, xright = baseX+0.025,ybottom = baseY,ytop = baseY+0.1, col = cols[i], lwd = 0.8)
+  rect(xleft = baseX+0.035, xright = baseX+0.135,ybottom = baseY,ytop = baseY+0.1, col = cols[i], lwd = 0.8)
+  rect(xleft = baseX+0.035, xright = baseX+0.135,ybottom = baseY+0.11,ytop = baseY+0.135, col = cols[i], lwd = 0.8)
+  y = lineY[i]
+  lines(y = rep(y,2), x = c(0.0,baseX-0.05), lty = 3, lwd = 1.2, xpd = NA)
+  text(y = y+0.03, x = -0.15, labels = altitude[i], cex = 0.7, pos = 4, xpd = NA, font = 2)
+}
+text(x = 0.85, y = baseYv[1]+0.05,pos = 4, xpd = NA, cex = 0.9, labels = "Low", font = 2)
+text(x = 0.85, y = baseYv[2]+0.05,pos = 4, xpd = NA, cex = 0.9, labels = "Mid", font = 2)
+text(x = 0.85, y = baseYv[3]+0.05,pos = 4, xpd = NA, cex = 0.9, labels = "High", font = 2)
+text(x = 0.35, y = 0, pos = 3, labels = "Costa Rica", cex = 0.9, font = 2)
+
+par(mar = c(1,3,2,0.2)+0.0)
+
+best = ResultInterCombined$rf
+best$pairwise_interactions = best$pairwise_interactions[order(best$pairwise_interactions$Interactions,decreasing = TRUE),, drop = FALSE]
+
+groups = list(a = humT, b = plantT)
+drawRankingMatrix2(best, groups = groups, cex = 0.7, top_n = 8)
+
+#text(x = -0.01, y = 1.03, labels = "(b)", cex = 0.9, xpd = NA, font = 2)
+
+for(i in 8:1){
+  rect(ytop = -0.04,ybottom = -0.07,xleft = seq(0.0,1,length.out = 9)[i],xright = seq(0,1,length.out = 9)[i+1], col = rev(RColorBrewer::brewer.pal(8,name = "YlGnBu"))[i],border = NA, xpd = NA)
+}
+text(y= -0.07,x = rev(seq(0, seq(0,1,length.out = 9)[8], length.out = 8))+0.03, labels = 8:1, pos = 1, font = 2, cex = 0.7, xpd = NA)
+mtext(side = 3, text = c("(a)", "(b)"),line = 3,at = c(-1.7,-0.5), font = 2, cex = 0.9)
+dev.off()
+```
+
+
 
 ## Figure S3
 ```{r}
@@ -1014,114 +1284,12 @@ dev.off()
 
 
 
-
-
-# reset()
-# pdf(file = "./Figures/FigS3.pdf",width = 5.5,height = 3.5)
-# par(mfrow = c(1,2), mar = c(1,2,0.6,0.1)+0.1,oma = c(0.0,0.2,1.2,0.1))
-# plotResAgg(resAggMiddleClass,labels = c("DNN", "BRT"), col = "darkred")
-# text(xpd = NA, x = -0.1, y = 1.1, labels = "a)", font = 1)
-# plotResAgg(resAggMiddleReg ,labels = c("DNN", "BRT"), col = "darkred")
-# text(xpd = NA, x = -0.1, y = 1.1, labels = "b)", font = 1)
-# dev.off()
-# 
-# 
-# 
-# addA = TraitMatching:::addA
-# cexP = 0.5
-# pdf(file = "./Figures/FigS3.pdf", width = 5.50, height = 1.8)
-# par(mfrow = c(1,2),  mar = c(1.2,1.6,0.2, 0.3), oma = c(0,0.0,0.4,0), mgp = c(3,0.6,0))
-# dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
-# names(dictonary) = c("classif.keras_seq.tuned", "classif.kknn.tuned", "classif.randomForest.tuned", "classif.xgboost.tuned","glm")
-# ResClass = resAggMiddleClass[,c(1,2,3)]
-# ResClass = tapply(ResClass$trp, list(factor(ResClass$len_true),ResClass$model), simplify = TRUE, FUN = function(i)i)
-# means = apply(ResClass, 2, mean)
-# ord = order(means, decreasing = TRUE)
-# coords = barInf(ResClass[,ord], col = addA(cols[dictonary[colnames(ResClass)[ord]]], 0.4) )
-# axis(2, las = 2, cex.axis = cexP)
-# text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
-# .a = apply(matrix(1:8, nrow = 2, byrow = TRUE)[,c(1,4)], 1, 
-#            function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
-# text(labels = dictonary[colnames(ResClass)[ord]], 
-#      x = apply(matrix(coords, nrow = 2, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
-# text(labels = "(a)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font =2)
-# 
-# 
-# dictonary = c("DNN", "kNN", "RF", "BRT","GLM")
-# names(dictonary) = c("regr.negBinDnn.tuned", "regr.kknn.tuned", "regr.randomForest.tuned", "regr.xgboost.tuned","glm")
-# ResReg = resAggMiddleReg[,c(1,2,3)]
-# ResReg = tapply(ResReg$trp, list(factor(ResReg$len_true),ResReg$model), simplify = TRUE, FUN = function(i)i)
-# means = apply(ResReg, 2, mean)
-# ord = order(means, decreasing = TRUE)
-# coords = barInf(ResReg[,ord], col = addA(cols[dictonary[colnames(ResReg)[ord]]], 0.4) )
-# axis(2, las = 2, cex.axis = cexP)
-# text(labels = rep(1:4, 5), x = coords, y = 0.04, pos = 1, cex = cexP, xpd = NA)
-# .a = apply(matrix(1:8, nrow = 2, byrow = TRUE)[,c(1,4)], 1, 
-#            function(co) segments(x0 = coords[co[1]]-0.025, x1 = coords[co[2]]+0.025, y0 = -0.09, y1 = -0.09, xpd = NA))
-# text(labels = dictonary[colnames(ResReg)[ord]], 
-#      x = apply(matrix(coords, nrow = 2, byrow = T), 1, mean), y = -0.05, pos = 1, xpd = NA, cex = cexP)
-# text(labels = "(b)", x = -0.08, y = 1.08, xpd = NA, pos = 2, cex = cexP, font = 2)
-# 
-# dev.off()
-
-
 ```
 
 
 
 
 
-## Figure 5
-```{r,results=FALSE}
-load(file = "../Results/HummingInferenceResult.RData")
-humT = c( "Bill.Length", "Bill.Curvature", "Body.Mass","Wing" , "Tail" , "plot.Low", "plot.Mid", "plot.High")
-plantT = c( "Corolla.Length","Corolla.Curvature", "Corolla.Volumen","Inner.Diameter", "Ext.Diameter")
-interHum = apply(rbind(expand.grid(humT, plantT), expand.grid( plantT, humT)), 1, function(x) paste0(x[1],":", x[2]))
-reset()
-cexP = 0.9
-
-pdf(file = "../Figures/Fig5.pdf", width = 5.5, height = 3.7)
-par(mfrow = c(1,2),mar = c(0.3,1,1,3)+0.0,oma = c(1,0.3,2,1))
-# Fig5a
-plot(NULL,NULL, xlim = c(0,1), ylim = c(0,1), axes = F, xlab = "", ylab = "")
-#text(x = -0.06, y = 1.03, labels = "(a)", cex = 0.9, xpd = NA, font = 2)
-polygon(c(0,0.125,0.17,0.19,0.35,0.51,0.65,0.85), c(0,0.25,0.5,0.42,1,0.35,0.09,0), lwd = 2, col = "lightgrey", xpd = NA)
-baseX = 0.72
-baseYv = c(0.1,0.4,0.7)
-cols = RColorBrewer::brewer.pal(3, "Accent")
-altitude = c("50 m.a.s.l", "1000 m.a.s.l", "2000 m.a.s.l")
-lineY = baseYv+0.05
-for(i in 1:3) {
-  baseY = baseYv[i]
-  rect(xleft = baseX, xright = baseX+0.025,ybottom = baseY,ytop = baseY+0.1, col = cols[i], lwd = 0.8)
-  rect(xleft = baseX+0.035, xright = baseX+0.135,ybottom = baseY,ytop = baseY+0.1, col = cols[i], lwd = 0.8)
-  rect(xleft = baseX+0.035, xright = baseX+0.135,ybottom = baseY+0.11,ytop = baseY+0.135, col = cols[i], lwd = 0.8)
-  y = lineY[i]
-  lines(y = rep(y,2), x = c(0.0,baseX-0.05), lty = 3, lwd = 1.2, xpd = NA)
-  text(y = y+0.03, x = -0.15, labels = altitude[i], cex = 0.7, pos = 4, xpd = NA, font = 2)
-}
-text(x = 0.85, y = baseYv[1]+0.05,pos = 4, xpd = NA, cex = 0.9, labels = "Low", font = 2)
-text(x = 0.85, y = baseYv[2]+0.05,pos = 4, xpd = NA, cex = 0.9, labels = "Mid", font = 2)
-text(x = 0.85, y = baseYv[3]+0.05,pos = 4, xpd = NA, cex = 0.9, labels = "High", font = 2)
-text(x = 0.35, y = 0, pos = 3, labels = "Costa Rica", cex = 0.9, font = 2)
-
-par(mar = c(1,3,2,0.2)+0.0)
-
-best = ResultInterCombined$rf
-best$pairwise_interactions = best$pairwise_interactions[order(best$pairwise_interactions$Interactions,decreasing = TRUE),, drop = FALSE]
-
-groups = list(a = humT, b = plantT)
-drawRankingMatrix2(best, groups = groups, cex = 0.7, top_n = 8)
-
-#text(x = -0.01, y = 1.03, labels = "(b)", cex = 0.9, xpd = NA, font = 2)
-
-for(i in 8:1){
-  rect(ytop = -0.04,ybottom = -0.07,xleft = seq(0.0,1,length.out = 9)[i],xright = seq(0,1,length.out = 9)[i+1], col = rev(RColorBrewer::brewer.pal(8,name = "YlGnBu"))[i],border = NA, xpd = NA)
-}
-text(y= -0.07,x = rev(seq(0, seq(0,1,length.out = 9)[8], length.out = 8))+0.03, labels = 8:1, pos = 1, font = 2, cex = 0.7, xpd = NA)
-mtext(side = 3, text = c("(a)", "(b)"),line = 3,at = c(-1.7,-0.5), font = 2, cex = 0.9)
-dev.off()
-```
 
 
 <!-- ## Figure S1 -->
@@ -1179,14 +1347,14 @@ dev.off()
 <!-- ``` -->
 
 
-## Figure S2
-```{r}
-reset()
-par(oma = c(0,0,0,0))
-pdf(file = "./Figures/FigS2.pdf")
-plotOverfitting(Results, box = T)
-dev.off()
-```
+<!-- ## Figure S2 -->
+<!-- ```{r} -->
+<!-- reset() -->
+<!-- par(oma = c(0,0,0,0)) -->
+<!-- pdf(file = "./Figures/FigS2.pdf") -->
+<!-- plotOverfitting(Results, box = T) -->
+<!-- dev.off() -->
+<!-- ``` -->
 
 
 <!-- ## Figure S3 -->
