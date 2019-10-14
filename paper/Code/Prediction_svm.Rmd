@@ -1,0 +1,346 @@
+---
+# title: "PredictionSimulation"
+# author: "Max Pichler"
+# date: "26 August 2018"
+documentclass: report
+fontsize: 11pt
+output:
+  pdf_document: 
+    highlight: monochrome
+  html_document: 
+    keep_md: yes
+    
+    
+---
+# SVM
+We had to compute the SVM on a linux server because the package was too slow on our windows server.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE,warning = FALSE, error = F,tidy.opts=list(width.cutoff=40),tidy=TRUE , tidy = TRUE,size = "tiny")
+hook_output = knitr::knit_hooks$get('output')
+knitr::knit_hooks$set(output = function(x, options) {
+  if (!is.null(n<- options$linewidth)) {
+    x = knitr:::split_lines(x)
+    if (any(nchar(x) > n)) x = strwrap(x, width = n)
+    x = paste(x, collapse = '\n')
+  }
+  hook_output(x, options)
+})
+```
+# Simulation
+
+## Run Simulation for comparing predictive performance
+```{r, results = FALSE}
+library(TraitMatching)
+library(mlr)
+oldpar = par()
+reset = function() suppressWarnings(do.call(par, oldpar))
+run =TRUE
+set.seed(42)
+```
+
+
+
+```{r, echo=FALSE}
+df = data.frame("Trait Interaction" = c("A1 + B2", "A2 + B3", "A3 + B4"), 
+                "Type" = c("discrete + continuous", "continuous + continuous", "continuous + continuous"),
+                "Weight" = c(1,1,3))
+knitr::kable(df,caption = "Simulated trait combinations")
+```
+
+## meta parameter
+```{r}
+epochs = 50L
+iter = 30
+parallel = 10L
+run = TRUE
+crossValidation = list(outer = list(method = "SpCV", iters = 5, predict = "both"), 
+                                 inner = list(method = "SpCV", iters = 3))
+
+
+run = TRUE
+```
+
+### Without effects and abundances - baseline
+- wide and weak effects (gaussian with sd = 100)
+- no species abundances
+- 50*100 base network size
+```{r,results=FALSE}
+set.seed(42)
+simulatedData = simulateInteraction(main = NULL, inter = matrix(c("A1", "B1"), ncol = 2, byrow = T),
+                              weights = list(inter = 1),
+                              NumberA = 50, NumberB = 100, traitsA = c(0,6), 
+                              traitsB = c(0,6),abundance = FALSE, specRange = c(100,100))
+table(as.matrix(minOneInter(simulatedData$binar(3e2))))
+```
+
+```{r, results=FALSE}
+resultBaselineC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$binar(3e2))), 
+                         method = c( "SVM"), 
+          settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
+                          cnn = list(seed = 42, activation = "relu", 
+                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, 
+                       balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultBaselineC, file = "./Results/simBaselineC_SVM.RDS")
+
+resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$poisson(3e2)),log = FALSE ), 
+                         method =  c( "SVM"), 
+          settings = list(negBin = list(seed = 42, batch = 50, 
+                                        distribution = "poisson",  archFunction = "continous", epochs = epochs),
+                          boost = list( objective = "count:poisson"),
+                          glm = list(family = "poisson"),
+                          glm_step = list(family = "poisson")),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, tuningMetric = "spearmanrho",
+                       balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultBaselineR, file = "./Results/simBaselineR_SVM.RDS")
+```
+
+### Without effects but with abundances - baseline with abundances
+- wide and weak effects (gaussian with sd = 100)
+- species abundances
+- 50*100 base network size
+```{r,results=FALSE}
+set.seed(42)
+simulatedData = simulateInteraction(main = NULL, inter = matrix(c("A1", "B1"), ncol = 2, byrow = T),
+                              weights = list(inter = 1),
+                              NumberA = 50, NumberB = 100, traitsA = c(0,6), 
+                              traitsB = c(0,6),abundance = function(a,b) return(rexp(a, 2)), specRange = c(100,100))
+table(as.matrix(minOneInter(simulatedData$binar(4e3))))
+```
+```{r, results=FALSE}
+resultAbC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$binar(4e3))), 
+                         method =  c( "SVM"), 
+          settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
+                          cnn = list(seed = 42, activation = "relu", 
+                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, 
+                       balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultAbC, file = "./Results/simAbC_SVM.RDS")
+    
+resultAbR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$poisson(4e3)),log = FALSE), 
+                         method =  c( "SVM"),  
+          settings = list(negBin = list(seed = 42,  batch = 50, 
+                                        distribution = "poisson",  archFunction = "continous", epochs = epochs),
+                          boost = list( objective = "count:poisson"),
+                          glm = list(family = "poisson"),
+                          glm_step = list(family = "poisson")),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, tuningMetric = "spearmanrho",
+                       balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultAbR, file = "./Results/simAbR_SVM.RDS")
+```
+
+### With effects and w/o abundances - Network Sizes
+- with strong effects (gaussian with small sd and high interaction weight)
+- without species abundances 
+- varying network sizes
+
+Create Simulation:
+```{r,results=FALSE}
+set.seed(42)
+simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
+                                                                   "A2", "B2",
+                                                                   "A3", "B3"), ncol = 2, byrow = T),
+                              weights = list(inter = c(10,10,10)),
+                              NumberA = 100, NumberB = 200, traitsA = c(0,6), 
+                              traitsB = c(0,6),abundance = FALSE, specRange = c(0.5,1.2))
+table(as.matrix(minOneInter(simulatedData$binar(1.2e-1))))
+```
+
+I tested the influence of three sizes on the performance. I set the observation time $=4e3$ to get for alomost all species at least one interaction. I sampled 25 \%, 50 \% and 100 \% of the species to get three network sizes of:
+
+```{r,results=FALSE}
+interBaseP = minOneInter(simulatedData$poisson(1.2e-1))
+interBaseC = minOneInter(simulatedData$binar(1.2e-1))
+smallP = interBaseP[sample(rownames(interBaseP), 0.25*length(rownames(interBaseP))),
+                    sample(colnames(interBaseP), 0.25*length(colnames(interBaseP)))]
+smallC = interBaseC[rownames(smallP), colnames(smallP)]
+
+midP = interBaseP[sample(rownames(interBaseP), 0.5*length(rownames(interBaseP))),
+                  sample(colnames(interBaseP), 0.5*length(colnames(interBaseP)))]
+midC = interBaseC[rownames(midP), colnames(midP)]
+
+largeP = interBaseP
+largeC = interBaseC
+
+sizeC = list(smallC = smallC, midC = midC, largeC = largeC)
+sizeR = list(smallP = smallP, midP = midP, largeP = largeP)
+
+
+```
+
+
+Fit models with 30 random tuning steps, nested cross-validation (five-fold outer and three-fold inner). SpcCV = Leave out species with all of their interactions. AUC and Spearman evaluated tuning.
+```{r,results=FALSE}
+resultC = list()
+if(run){
+  resultC = list()
+  for(i in 1:length(sizeC)){
+    resultC[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeC[[i]]), 
+                         method =  c( "SVM"),  
+          settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
+                          cnn = list(seed = 42, activation = "relu", 
+                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, 
+                       balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultC, file = "./Results/simSizeC_SVM.RDS")
+  }
+  
+  
+  resultR = list()
+  for(i in 1:length(sizeC)){
+    resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, sizeR[[i]], log = F), 
+                         method =  c( "SVM"),  
+          settings = list(negBin = list(seed = 42,  batch = 50, 
+                                        distribution = "poisson",  archFunction = "continous", epochs = epochs),
+                          boost = list( objective = "count:poisson"),
+                          glm = list(family = "poisson"),
+                          glm_step = list(family = "poisson")),
+                       tune = "random", iters = iter,  fitSpecies = F,tuningMetric = "spearmanrho",
+          crossValidation = crossValidation,
+                        block = T, parallel = parallel, seed = 42, keepModels = T)
+    
+    saveRDS(resultR, file = "./Results/simSizeR_SVM.RDS")
+  }
+}
+
+```
+
+### With effects and w/o abundances - Observation time
+Varying observation times results in diffrent class distributions (classification). I choose times so, that the positive interaction had class proportions of 10 \%, 25 \% and 50 \%:
+
+```{r,results=FALSE}
+set.seed(42)
+simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
+                                                                   "A2", "B2",
+                                                                   "A3", "B3"), ncol = 2, byrow = T),
+                              weights = list(inter = c(10,10,10)),
+                              NumberA = 100, NumberB = 200, traitsA = c(0,6), 
+                              traitsB = c(0,6),abundance = FALSE, specRange = c(0.5,1.2))
+table(as.matrix(minOneInter(simulatedData$binar(1.2e-1))))
+
+obsC = list(low = minOneInter(simulatedData$binar(0.7e-2)), 
+            mid = minOneInter(simulatedData$binar(3.2e-2)), 
+            high = minOneInter(simulatedData$binar(1.2e-1)))
+
+obsR = list(low = minOneInter(simulatedData$poisson(0.7e-2)), 
+            mid = minOneInter(simulatedData$poisson(3.2e-2)), 
+            high = minOneInter(simulatedData$poisson(1.2e-1)))
+```
+
+
+Fit models with 30 random tuning steps, nested cross-validation (five-fold outer and three-fold inner). SpcCV = Leave out species with all of their interactions. AUC and Spearman evaluated tuning.
+```{r,results=FALSE}
+if(run){
+resultC = list()
+  for(i in 1:length(obsC)){
+    if(i != 3) bc = "Over"
+    else bc = "None"
+    resultC[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, obsC[[i]]), 
+                         method =  c( "SVM"),  
+          settings = list(dnn = list(seed = 42,  activation = "relu",  archFunction = "continous",  epochs = epochs),
+                          cnn = list(seed = 42,  activation = "relu", 
+                                     drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)),
+                       tune = "random", iters = iter,  fitSpecies = F,
+                       crossValidation = crossValidation, 
+                       balanceClasses = bc, block = T, parallel = parallel, seed = 42, keepModels = T)
+    saveRDS(resultC, file = "./Results/simObsC_SVM.RDS")
+  }
+  
+  resultR = list()
+  for(i in 1:length(obsR)){
+      resultR[[i]] = runTM(createCommunity(simulatedData$A, simulatedData$B, obsR[[i]], log = F), 
+                           method =  c( "SVM"),  
+          settings = list(negBin = list(seed = 42,  batch = 50, 
+                                        distribution = "poisson",  archFunction = "continous", epochs = epochs),
+                          boost = list( objective = "count:poisson"), 
+                          glm = list(family = "poisson"),
+                          glm_step = list(family = "poisson")),
+                       tune = "random", iters = iter,  fitSpecies = F,tuningMetric = "spearmanrho",
+          crossValidation = crossValidation,
+                        block = T, parallel = parallel, seed = 42, keepModels = T)
+    
+    saveRDS(resultR, file = "./Results/simObsR_SVM.RDS")
+  }
+}
+```
+
+
+
+
+
+
+# Plant-pollinator network
+
+## Prepare Data 
+```{r}
+set.seed(42)
+library(dplyr)
+plantPollRaw<-read.csv("./Data/Raw/traits2_florian.csv",sep=";")
+
+plantTraitsRaw<-plantPollRaw[,1:11]
+insectTraitsRaw<-plantPollRaw[,12:ncol(plantPollRaw)]
+
+colnames(plantTraitsRaw)[1] = "plant"
+colnames(insectTraitsRaw)[1] = "insect"
+
+interactionMatrix<-plantPollRaw[,-c(2:11,13:ncol(plantPollRaw))]
+interactionMatrix<-xtabs(~.,data=interactionMatrix)
+interactionMatrix<-as.data.frame.matrix(interactionMatrix)
+
+data = TraitMatching::createCommunity(plantTraitsRaw, insectTraitsRaw, z = interactionMatrix)
+
+saveRDS(data, file = "./Data/plantPoll.RDS")
+
+```
+
+
+
+
+
+
+## Predictive comparison on empirical plant-pollinator network
+```{r,results=FALSE}
+library(mlr)
+library(TraitMatching)
+library(tidyverse)
+oldpar = par()
+reset = function() suppressWarnings(do.call(par, oldpar))
+source("./Code/helpFunctions.R")
+```
+
+### Train models
+Training was splitted due to high computional cost
+- 20 random tuning steps of hyper-parameter
+- AUC evaluates tuning
+- Nested cross-validation: ten-fold outer and three-fold inner with leaving out insect species+all of their interactions
+
+```{r,results=FALSE}
+set.seed(42)
+if(run){
+  cv = list(outer = list(method = "SpCV", iters = 10, predict = "both"), inner = list(method = "SpCV", iters = 5))
+  
+  
+  
+  cC = readRDS(file = "./Data/plantPoll.RDS")
+  
+  
+  result = runTM(cC, tune = "random", iters = iter, tuningMetric = "auc", crossValidation = cv, block = T, parallel = parallel, fitSpecies = F, balanceClasses = c("Over", "SMOTE", "Under"),
+                 method =  c( "SVM"),  
+                settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
+                          cnn = list(seed = 42, activation = "relu", drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs))
+                )
+  saveRDS(result, file = "./Results/CaseStudy1_SVM.RDS")
+  
+}
+```
+
+
+
+
+
