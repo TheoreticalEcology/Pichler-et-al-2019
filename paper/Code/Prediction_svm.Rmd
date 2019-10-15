@@ -43,8 +43,7 @@ set.seed(42)
 
 ```{r, echo=FALSE}
 df = data.frame("Trait Interaction" = c("A1 + B2", "A2 + B3", "A3 + B4"), 
-                "Type" = c("discrete + continuous", "continuous + continuous", "continuous + continuous"),
-                "Weight" = c(1,1,3))
+                "Type" = c("continuous + continuous", "continuous + continuous", "continuous + continuous"))
 knitr::kable(df,caption = "Simulated trait combinations")
 ```
 
@@ -151,7 +150,7 @@ simulatedData = simulateInteraction( main = NULL, inter = matrix(c("A1", "B1",
 table(as.matrix(minOneInter(simulatedData$binar(1.2e-1))))
 ```
 
-I tested the influence of three sizes on the performance. I set the observation time $=4e3$ to get for alomost all species at least one interaction. I sampled 25 \%, 50 \% and 100 \% of the species to get three network sizes of:
+We tested the influence of three sizes on the performance. We set the observation time $=4e3$ to get for alomost all species at least one interaction. We sampled 25 \%, 50 \% and 100 \% of the species to get three network sizes of:
 
 ```{r,results=FALSE}
 interBaseP = minOneInter(simulatedData$poisson(1.2e-1))
@@ -212,7 +211,7 @@ if(run){
 ```
 
 ### With effects and w/o abundances - Observation time
-Varying observation times results in diffrent class distributions (classification). I choose times so, that the positive interaction had class proportions of 10 \%, 25 \% and 50 \%:
+Varying observation times results in diffrent class distributions (classification). We choose times so, that the positive interaction had class proportions of 10 \%, 25 \% and 50 \%:
 
 ```{r,results=FALSE}
 set.seed(42)
