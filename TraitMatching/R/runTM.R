@@ -35,21 +35,7 @@
 #' \item \code{parallel}: Boolean or numeric vector. If TRUE, all available cores will be used. If numeric vector, "double" parallelization will be used. Each model will get its own cluster and the tuning will be parallelized.
 #' \item \code{crossValidation}: list of two named list that define the outer and inner resampling strategy. \code{list = list(outer = list(method = "CV", iters), inner = list(method = "CV", iters))}. Methods can be change to SpCV. With SpCV, Species from the b Matrix will be left out with all its interactions (structured CV).
 #' }
-#' @example \code{
-#' species = simulateInteraction(inter = matrix(c("A1", "B1"), nrow = 1L),
-#'                weights = list(main = 0, inter = 10),setSeed = 42, abundance = FALSE)
-#' # We have to transform our three matrices into a community object with the createCommunity function.
-#' # Here, you can replace the simulated data with your empiricial data.
-#' # The minOneInter function trims our interaction matrix z
-#' # because probably we observe only species that interaction at least once:
-#' community = createCommunity(species$A, species$B, minOneInter(species$binar(0.3)))
-#' # binar for 0/1 interactions, we have to provide an observation time value,
-#' # the longer we observe the network, the more interactions we will observe.
-#' summary(community$data)
-#' ## Fit model
-#' results = runTM(community, iters = 5L)
-#' print(results)
-#' }
+#' @example /inst/examples/runTM_example.R
 #' @author Maximilian Pichler
 #' @export
 
