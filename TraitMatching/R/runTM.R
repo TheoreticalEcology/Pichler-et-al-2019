@@ -40,7 +40,8 @@
 #'                weights = list(main = 0, inter = 10),setSeed = 42, abundance = FALSE)
 #' # We have to transform our three matrices into a community object with the createCommunity function.
 #' # Here, you can replace the simulated data with your empiricial data.
-#' # The minOneInter function trims our interaction matrix z because probably we observe only species that interaction at least once:
+#' # The minOneInter function trims our interaction matrix z
+#' # because probably we observe only species that interaction at least once:
 #' community = createCommunity(species$A, species$B, minOneInter(species$binar(0.3)))
 #' # binar for 0/1 interactions, we have to provide an observation time value,
 #' # the longer we observe the network, the more interactions we will observe.
