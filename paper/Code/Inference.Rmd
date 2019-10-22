@@ -40,15 +40,9 @@ set.seed(42)
 ```
 
 
-## Test whether the top predictive models recognized simulated trait-matching
-
-
-
-
-
+## Test whether the top predictive models recognized simulated trait-trait interactions in the simulated plant-pollinator networks
 ### Simulating TraitN and Trait Strengths 
-#### Small
-
+#### Small: Networks (25*50 species) DNN, RF, BRT, kNN
 
 ```{r}
 library(TraitMatching)
@@ -70,7 +64,7 @@ for(i in 1:length(simulation$data)){
                          crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
                                                 inner = list(method = "Holdout", split = 4/5, predict = "both")), 
                          balanceClasses = "None", block = T, parallel = 10, seed = 42, keepModels = T,tuningMetric = "spearmanrho")
-      saveRDS(resultR, file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS")
+      saveRDS(resultR, file = "Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS")
   }
 }
 
@@ -86,23 +80,23 @@ for(i in 1:length(simulation$data)){
                        crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
                                               inner = list(method = "Holdout", split = 4/5, predict = "both")), 
                        balanceClasses = "None", block = T, parallel = 10, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS")
+    saveRDS(resultC, file = "Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS")
   }
 }
 
 
-save(simulation, file = "./Results/simulationInterMetaDataSMALL.RData")
+save(simulation, file = "Results/simulationInterMetaDataSMALL.RData")
 
 
 
 
 ```
 
-#### GLM
+#### Small:  Networks (25*50 species) GLM
 ```{r}
 library(TraitMatching)
 set.seed(42)
-load(file = "./Results/simulationInterMetaDataSMALL.RData")
+load(file = "Results/simulationInterMetaDataSMALL.RData")
 
 resultR = vector("list",4)
 
@@ -117,7 +111,7 @@ for(i in 1:length(simulation$data)){
                          crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
                                                 inner = list(method = "Holdout", split = 4/5, predict = "both")), 
                          balanceClasses = "None", block = T, parallel = 30, seed = 42, keepModels = T,tuningMetric = "spearmanrho")
-      saveRDS(resultR, file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALLglm.RDS")
+      saveRDS(resultR, file = "Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALLglm.RDS")
   }
 }
 
@@ -132,23 +126,24 @@ for(i in 1:length(simulation$data)){
                        crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
                                               inner = list(method = "Holdout", split = 4/5, predict = "both")), 
                        balanceClasses = "None", block = T, parallel = 30, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALLglm.RDS")
+    saveRDS(resultC, file = "Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALLglm.RDS")
   }
 }
 
 
-save(simulation, file = "./Results/simulationInterMetaDataSMALL.RData")
+save(simulation, file = "Results/simulationInterMetaDataSMALL.RData")
 
 
 
 
 ```
 
-#### Small Interaction
+#### Small: Calculate trait-trait interaction strenghts - H-statistic
+Be careful about parallelization and grid size. It is computationally expensive!
 ```{r}
 library(TraitMatching)
 set.seed(42)
-resultRegrWoAb = readRDS(file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS")
+resultRegrWoAb = readRDS(file = "Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS")
 sim_len = sapply(resultRegrWoAb, length)
 ind_matrix = data.frame(ind1 = rep(1:4,sim_len), ind2 = abind::abind(sapply(1:4, function(i) do.call(seq, list(1, sim_len[i])))))
 
@@ -176,7 +171,7 @@ system.time({result_reg_small = snow::parSapply(cl = cl,X = 1:nrow(ind_matrix), 
 
 })
 
-saveRDS(result_reg_small, file = "./Results/res_reg_small.RDS")
+saveRDS(result_reg_small, file = "Results/res_reg_small.RDS")
 
 ```
 
@@ -184,7 +179,7 @@ saveRDS(result_reg_small, file = "./Results/res_reg_small.RDS")
 ```{r}
 library(TraitMatching)
 set.seed(42)
-resultClassifWoAb = readRDS(file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS")
+resultClassifWoAb = readRDS(file = "Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS")
 sim_len = sapply(resultClassifWoAb, length)
 ind_matrix = data.frame(ind1 = rep(1:4,sim_len), ind2 = abind::abind(sapply(1:4, function(i) do.call(seq, list(1, sim_len[i])))))
 
@@ -212,17 +207,16 @@ system.time({result_classif_small = snow::parSapply(cl = cl,X = 1:nrow(ind_matri
 
 })
 
-saveRDS(result_classif_small, file = "./Results/res_classif_small.RDS")
+saveRDS(result_classif_small, file = "Results/res_classif_small.RDS")
 
 ```
 
 
-#### Middle
+#### Middle: Networks (50*100 species) DNN, BRT
 ```{r}
 library(TraitMatching)
 set.seed(42)
 simulation = simulate_batch(numberTraitsA = 7, numberTraitsB = 7, one_way = TRUE, NumberA = 50, NumberB = 100, cutoff = 0.5, strength_range = c(10,10), specRange = c(0.5, 1.2))
-
 
 
 resultR = vector("list",4)
@@ -239,7 +233,7 @@ for(i in 1:length(simulation$data)){
                          crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
                                                 inner = list(method = "Holdout", split = 4/5, predict = "both")), 
                          balanceClasses = "None", block = T, parallel = 10, seed = 42, keepModels = T,tuningMetric = "poisson")
-      saveRDS(resultR, file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS")
+      saveRDS(resultR, file = "Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS")
   }
 }
 
@@ -255,7 +249,7 @@ for(i in 1:length(simulation$data)){
                        crossValidation = list(outer = list(method = "Holdout", split = 4/5, predict = "both"), 
                                               inner = list(method = "Holdout", split = 4/5, predict = "both")), 
                        balanceClasses = "None", block = T, parallel = 10, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS")
+    saveRDS(resultC, file = "Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS")
   }
 }
 
@@ -263,17 +257,18 @@ for(i in 1:length(simulation$data)){
 
 
 
-save(simulation, file = "./Results/simulationInterMetaDataSMIDDLE.RData")
+save(simulation, file = "Results/simulationInterMetaDataSMIDDLE.RData")
 
 
 ```
 
 
-#### Middle Interaction
+#### Middle: Calculate trait-trait interaction strengths - H-statistic
+Be careful about parallelization and grid size. It is computationally expensive!
 ```{r}
 library(TraitMatching)
 set.seed(42)
-resultRegrWoAb = readRDS(file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS")
+resultRegrWoAb = readRDS(file = "Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS")
 sim_len = sapply(resultRegrWoAb, length)
 ind_matrix = data.frame(ind1 = rep(1:4,sim_len), ind2 = abind::abind(sapply(1:4, function(i) do.call(seq, list(1, sim_len[i])), simplify = F) ))
 
@@ -302,14 +297,14 @@ system.time({result_reg_small = snow::parSapply(cl = cl,X = 1:nrow(ind_matrix), 
 
 })
 
-saveRDS(result_reg_small, file = "./Results/res_reg_middle.RDS")
+saveRDS(result_reg_small, file = "Results/res_reg_middle.RDS")
 
 ```
 
 ```{r}
 library(TraitMatching)
 set.seed(42)
-resultClassifWoAb = readRDS(file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS")
+resultClassifWoAb = readRDS(file = "Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS")
 sim_len = sapply(resultClassifWoAb, length)
 ind_matrix = data.frame(ind1 = rep(1:4,sim_len), ind2 = abind::abind(sapply(1:4, function(i) do.call(seq, list(1, sim_len[i])),simplify = F)))
 
@@ -337,23 +332,23 @@ system.time({result_classif_middle = snow::parSapply(cl = cl,X = 1:nrow(ind_matr
 
 })
 
-saveRDS(result_classif_middle, file = "./Results/res_classif_middle.RDS")
+saveRDS(result_classif_middle, file = "Results/res_classif_middle.RDS")
 
 ```
 
 ### Results
-#### Small
+#### Small: DNN, RF, BRT, kNN with H-statistic
 ```{r}
 library(TraitMatching)
 library(tidyverse)
-source("./Code/helpFunctions.R")
-regrRes = readRDS(file = "./Results/res_reg_small.RDS")
-classRes = readRDS(file = "./Results/res_classif_small.RDS")
+source("Code/helpFunctions.R")
+regrRes = readRDS(file = "Results/res_reg_small.RDS")
+classRes = readRDS(file = "Results/res_classif_small.RDS")
 
-studyResReg = readRDS(file = './Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS')
-studyClassReg = readRDS(file = './Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS')
+studyResReg = readRDS(file = 'Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALL.RDS')
+studyClassReg = readRDS(file = 'Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALL.RDS')
 
-load(file = './Results/simulationInterMetaDataSMALL.RData')
+load(file = 'Results/simulationInterMetaDataSMALL.RData')
 
 
 
@@ -396,16 +391,16 @@ aggResClass$repetition = rep(unlist(apply(ind_matrix, 1, function(x) rep(x[2], x
 
 resAggSmallReg = aggTrpRep(aggTrp(aggResRegr), aggResRegr)
 resAggSmallClass = aggTrpRep(aggTrp(aggResClass), aggResClass)
-saveRDS(resAggSmallReg, file = "./Results/resAggSmallReg.RDS")
-saveRDS(resAggSmallClass, file = "./Results/resAggSmallClass.RDS")
+saveRDS(resAggSmallReg, file = "Results/resAggSmallReg.RDS")
+saveRDS(resAggSmallClass, file = "Results/resAggSmallClass.RDS")
 
 ```
 
-#### Small GLM
+#### Small: GLM with p-values
 ```{r}
-load(file = './Results/simulationInterMetaDataSMALL.RData')
-regrResGlm = readRDS(file = "./Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALLglm.RDS")
-regrClassGlm = readRDS(file = "./Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALLglm.RDS")
+load(file = 'Results/simulationInterMetaDataSMALL.RData')
+regrResGlm = readRDS(file = "Results/simulationTraitsAndStrengthsRegrWOabSimpleSMALLglm.RDS")
+regrClassGlm = readRDS(file = "Results/simulationTraitsAndStrengthsClassifWOabSimpleSMALLglm.RDS")
 
 
 TPRestR = NULL
@@ -462,16 +457,16 @@ for(i in 1:4){
 
 
 
-#### Middle
+#### Middle: DNN, BRT with H-statistic
 ```{r}
 
-regrRes = readRDS(file = "./Results/res_reg_middle.RDS")
-classRes = readRDS(file = "./Results/res_classif_middle.RDS")
+regrRes = readRDS(file = "Results/res_reg_middle.RDS")
+classRes = readRDS(file = "Results/res_classif_middle.RDS")
 
-studyResReg = readRDS(file = './Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS')
-studyClassReg = readRDS(file = './Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS')
+studyResReg = readRDS(file = 'Results/simulationTraitsAndStrengthsRegrWOabSimpleMIDDLE.RDS')
+studyClassReg = readRDS(file = 'Results/simulationTraitsAndStrengthsClassifWOabSimpleMIDDLE.RDS')
 
-load(file = './Results/simulationInterMetaDataSMIDDLE.RData')
+load(file = 'Results/simulationInterMetaDataSMIDDLE.RData')
 
 library(TraitMatching)
 
@@ -520,24 +515,28 @@ saveRDS(resAggMiddleClass, file = "./Results/resAggMiddleClass.RDS")
 
 
 
-
-
 # Hummingbird-plant network
-
+Approach:
+- normalize each plant-hummingbird network
+- combine plant-hummingbird networks with "plot" variable as identifier
+- correct interaction frequencies with species abundances (within the sub networks)
+- Tune models with cross-validation
+- Fit models with optimal hyperparameters
+- calculate trait-trait interaction strengths (H-statistic)
 
 ```{r,results=FALSE}
 
-inH = read.csv("./PlantBird/interact_matrix_high.csv")
-inM = read.csv("./PlantBird/interact_matrix_mid.csv")
-inL = read.csv("./PlantBird/interact_matrix_low.csv")
+inH = read.csv("PlantBird/interact_matrix_high.csv")
+inM = read.csv("PlantBird/interact_matrix_mid.csv")
+inL = read.csv("PlantBird/interact_matrix_low.csv")
 
-tbH = read.csv("./PlantBird/traitbird_high.csv",col.names = c("Hummingbird", "Bill.Length", "Bill.Curvature", "Body.Mass", "Wing", "Tail")) %>% normalizeFeatures(method = "center")
-tbM = read.csv("./PlantBird/traitbird_mid.csv",col.names = c("Hummingbird", "Bill.Length", "Bill.Curvature", "Body.Mass", "Wing", "Tail")) %>% normalizeFeatures(method = "center")
-tbL = read.csv("./PlantBird/traitbird_low.csv",col.names = c("Hummingbird", "Bill.Length", "Bill.Curvature", "Body.Mass", "Wing", "Tail")) %>% normalizeFeatures(method = "center")
+tbH = read.csv("PlantBird/traitbird_high.csv",col.names = c("Hummingbird", "Bill.Length", "Bill.Curvature", "Body.Mass", "Wing", "Tail")) %>% normalizeFeatures(method = "center")
+tbM = read.csv("PlantBird/traitbird_mid.csv",col.names = c("Hummingbird", "Bill.Length", "Bill.Curvature", "Body.Mass", "Wing", "Tail")) %>% normalizeFeatures(method = "center")
+tbL = read.csv("PlantBird/traitbird_low.csv",col.names = c("Hummingbird", "Bill.Length", "Bill.Curvature", "Body.Mass", "Wing", "Tail")) %>% normalizeFeatures(method = "center")
 
-tpH = read.csv("./PlantBird/traitplant_high.csv", col.names = c("Plant", "Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter", "NumIndividuals")) %>% normalizeFeatures(method = "center", cols = c("Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter"))
-tpM = read.csv("./PlantBird/traitplant_mid.csv", col.names = c("Plant", "Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter", "NumIndividuals")) %>% normalizeFeatures(method = "center", cols = c("Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter"))
-tpL = read.csv("./PlantBird/traitplant_low.csv", col.names = c("Plant", "Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter", "NumIndividuals")) %>% normalizeFeatures(method = "center", cols = c("Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter"))
+tpH = read.csv("PlantBird/traitplant_high.csv", col.names = c("Plant", "Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter", "NumIndividuals")) %>% normalizeFeatures(method = "center", cols = c("Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter"))
+tpM = read.csv("PlantBird/traitplant_mid.csv", col.names = c("Plant", "Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter", "NumIndividuals")) %>% normalizeFeatures(method = "center", cols = c("Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter"))
+tpL = read.csv("PlantBird/traitplant_low.csv", col.names = c("Plant", "Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter", "NumIndividuals")) %>% normalizeFeatures(method = "center", cols = c("Corolla.Length", "Corolla.Curvature", "Corolla.Volumen", "Inner.Diameter", "Ext.Diameter"))
 
 
 rownames(inH) = as.character(inH$X)
@@ -642,6 +641,8 @@ if(run){
   trainLearner.regr.negBinDnn = TraitMatching:::trainLearner.regr.negBinDnn
   parallelMap::parallelExport("trainLearner.regr.negBinDnn", "predictLearner.regr.negBinDnn", level = "mlr.tuneParams")
   
+  # Tune models with crossvalidation and fit models with optimized hyperparameters:
+  
   set.seed(42)
   
   for(i in 1:7){
@@ -674,7 +675,7 @@ if(run){
   names(modelRF) = names(community)
   names(modelBoost) = names(community)
   
-  save(modelRF, modelBoost, modelNegBin, modelPoisson, community, file = "./Results/HummingBirdResult.RData")
+  save(modelRF, modelBoost, modelNegBin, modelPoisson, community, file = "Results/HummingBirdResult.RData")
 }
 
 
@@ -682,11 +683,10 @@ if(run){
 
 
 ```{r,results=FALSE}
-load(file = "./Results/HummingBirdResult.RData")
+load(file = "Results/HummingBirdResult.RData")
 ```
 
-### Compute overall+pairwise interaction strengths
-
+### Compute overall and pairwise interaction strengths - H-statistics
 
 ```{r,results=FALSE}
 if(run){
@@ -737,7 +737,7 @@ if(run){
     gc()
   }
   
-  save(ResultInterLow,ResultInterMid,ResultInterHigh,ResultInterCombined, file = "./Results/HummingInferenceResult.RData")
+  save(ResultInterLow,ResultInterMid,ResultInterHigh,ResultInterCombined, file = "Results/HummingInferenceResult.RData")
 }
 
 ```

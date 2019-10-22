@@ -1,6 +1,6 @@
 ---
 # title: "PredictionSimulation"
-# author: "Max Pichler"
+# author: "Maximilian Pichler"
 # date: "26 August 2018"
 documentclass: report
 fontsize: 11pt
@@ -26,9 +26,9 @@ knitr::knit_hooks$set(output = function(x, options) {
   hook_output(x, options)
 })
 ```
-# Simulation
-
+# Simulated plant-pollinator networks
 ## Run Simulation for comparing predictive performance
+
 ```{r, results = FALSE}
 library(TraitMatching)
 library(mlr)
@@ -37,7 +37,6 @@ reset = function() suppressWarnings(do.call(par, oldpar))
 run =TRUE
 set.seed(42)
 ```
-
 
 
 ```{r, echo=FALSE}
@@ -81,7 +80,7 @@ resultBaselineC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOne
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultBaselineC, file = "./Results/simBaselineC_GLM.RDS")
+    saveRDS(resultBaselineC, file = "Results/simBaselineC_GLM.RDS")
 
 resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$poisson(3e2)),log = FALSE ), 
                          method =  c( "glm", "glm_step"), 
@@ -93,7 +92,7 @@ resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOne
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, tuningMetric = "spearmanrho",
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultBaselineR, file = "./Results/simBaselineR_GLM.RDS")
+    saveRDS(resultBaselineR, file = "Results/simBaselineR_GLM.RDS")
 ```
 
 ### Without effects but with abundances - baseline with abundances
@@ -117,7 +116,7 @@ resultAbC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultAbC, file = "./Results/simAbC_GLM.RDS")
+    saveRDS(resultAbC, file = "Results/simAbC_GLM.RDS")
     
 resultAbR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$poisson(4e3)),log = FALSE), 
                          method =  c( "glm", "glm_step"),  
@@ -129,7 +128,7 @@ resultAbR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, tuningMetric = "spearmanrho",
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultAbR, file = "./Results/simAbR_GLM.RDS")
+    saveRDS(resultAbR, file = "Results/simAbR_GLM.RDS")
 ```
 
 ### With effects and w/o abundances - Network Sizes
@@ -186,7 +185,7 @@ if(run){
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "./Results/simSizeC_GLM.RDS")
+    saveRDS(resultC, file = "Results/simSizeC_GLM.RDS")
   }
   
   
@@ -203,7 +202,7 @@ if(run){
           crossValidation = crossValidation,
                         block = T, parallel = parallel, seed = 42, keepModels = T)
     
-    saveRDS(resultR, file = "./Results/simSizeR_GLM.RDS")
+    saveRDS(resultR, file = "Results/simSizeR_GLM.RDS")
   }
 }
 
@@ -247,7 +246,7 @@ resultC = list()
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = bc, block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultC, file = "./Results/simObsC_GLM.RDS")
+    saveRDS(resultC, file = "Results/simObsC_GLM.RDS")
   }
   
   resultR = list()
@@ -263,7 +262,7 @@ resultC = list()
           crossValidation = crossValidation,
                         block = T, parallel = parallel, seed = 42, keepModels = T)
     
-    saveRDS(resultR, file = "./Results/simObsR_GLM.RDS")
+    saveRDS(resultR, file = "Results/simObsR_GLM.RDS")
   }
 }
 ```
@@ -272,243 +271,243 @@ resultC = list()
 
 
 
-##  Results
-```{r, echo = FALSE,results=FALSE}
-if(run){
-  ResultSizeC = readRDS(file = "./Results/simSizeC.RDS")
-  ResultSizeR = readRDS(file = "./Results/simSizeR.RDS")
-  
-  ResultObsC = readRDS(file = "./Results/simObsC.RDS")
-  ResultObsR = readRDS(file = "./Results/simObsR.RDS")
-  
-  ResultAbC = readRDS(file = "./Results/simAbC.RDS")
-  ResultAbR = readRDS(file = "./Results/simAbR.RDS")
-  
-  ResultBaselineC = readRDS(file = "./Results/simBaselineC.RDS")
-  ResultBaselineR = readRDS(file = "./Results/simBaselineR.RDS")
-  
-  ResultSizeC_SVM = readRDS(file = "./Results/simSizeC_SVM.RDS")
-  ResultSizeR_SVM = readRDS(file = "./Results/simSizeR_SVM.RDS")
-  
-  ResultObsC_SVM = readRDS(file = "./Results/simObsC_SVM.RDS")
-  ResultObsR_SVM = readRDS(file = "./Results/simObsR_SVM.RDS")
-  
-  ResultAbC_SVM = readRDS(file = "./Results/simAbC_SVM.RDS")
-  ResultAbR_SVM = readRDS(file = "./Results/simAbR_SVM.RDS")
-  
-  ResultBaselineC_SVM = readRDS(file = "./Results/simBaselineC_SVM.RDS")
-  ResultBaselineR_SVM = readRDS(file = "./Results/simBaselineR_SVM.RDS")
-  source("./Code/helpFunctions.R")
-  
-  for(i in 1:3){
-    ResultSizeC[[i]]$Result[["SVM"]] = ResultSizeC_SVM[[i]]$Result$SVM
-    ResultSizeR[[i]]$Result[["SVM"]] = ResultSizeR_SVM[[i]]$Result$SVM
-    
-    ResultObsC[[i]]$Result[["SVM"]] = ResultObsC_SVM[[i]]$Result$SVM
-    ResultObsR[[i]]$Result[["SVM"]] = ResultObsR_SVM[[i]]$Result$SVM
-  }
-  
-  ResultBaselineC$Result[["SVM"]] = ResultSizeBaselineC_SVM$Result$SVM
-  ResultBaselineR$Result[["SVM"]] = ResultSizeBaselineR_SVM$Result$SVM
-  
-  ResultAbR$Result[["SVM"]] = ResultAbR_SVM$Result$SVM
-  ResultAbC$Result[["SVM"]] = ResultAbC_SVM$Result$SVM
+<!-- ##  Results -->
+<!-- ```{r, echo = FALSE,results=FALSE} -->
+<!-- if(run){ -->
+<!--   ResultSizeC = readRDS(file = "./Results/simSizeC.RDS") -->
+<!--   ResultSizeR = readRDS(file = "./Results/simSizeR.RDS") -->
 
-  
-}
-```
+<!--   ResultObsC = readRDS(file = "./Results/simObsC.RDS") -->
+<!--   ResultObsR = readRDS(file = "./Results/simObsR.RDS") -->
 
-Tune classifiers' thresholds with the true skill statistic and aggregate results for both (classifier and regressor):
-```{r,results=FALSE}
-if(run){
-  tune = tuneAndAggregate
-  ResultSizeCagg = lapply(ResultSizeC, 
-                          function(x) return(tune(x, tuneT = tss, bc = "None", onlyTest = F)))
-  ResultObsCagg = lapply(ResultObsC, 
-                         function(x) return(tune(x, TraitMatching::tss,"None", onlyTest = F)))
-  ResultAbCagg = tune(ResultAbC, tuneT = TraitMatching::tss, bc = "None", onlyTest = F)
-  
-  ResultBaselineCagg = tune(ResultBaselineC, tuneT = TraitMatching::tss, bc = "None", onlyTest = F) 
-  
-  tune = tuneAndAggregateRegression
-  ResultSizeRagg = lapply(ResultSizeR, 
-                          function(x) return(tune(x,onlyTest = F)))
-  ResultObsRagg = lapply(ResultObsR, 
-                         function(x) return(tune(x, onlyTest = F))
-                         )
-  ResultAbRagg = tune(ResultAbR, onlyTest = F)
-  ResultBaselineRagg = tune(ResultBaselineR, onlyTest = F) 
+<!--   ResultAbC = readRDS(file = "./Results/simAbC.RDS") -->
+<!--   ResultAbR = readRDS(file = "./Results/simAbR.RDS") -->
 
-  
-  save(ResultSizeCagg, ResultSizeRagg,ResultObsRagg, ResultObsCagg, ResultAbCagg, ResultAbRagg, ResultBaselineCagg, ResultBaselineRagg,
-       file = "./Results/ResultsSimulationAgg_GLM.RData")
-}
-```
+<!--   ResultBaselineC = readRDS(file = "./Results/simBaselineC.RDS") -->
+<!--   ResultBaselineR = readRDS(file = "./Results/simBaselineR.RDS") -->
+
+<!--   ResultSizeC_SVM = readRDS(file = "./Results/simSizeC_SVM.RDS") -->
+<!--   ResultSizeR_SVM = readRDS(file = "./Results/simSizeR_SVM.RDS") -->
+
+<!--   ResultObsC_SVM = readRDS(file = "./Results/simObsC_SVM.RDS") -->
+<!--   ResultObsR_SVM = readRDS(file = "./Results/simObsR_SVM.RDS") -->
+
+<!--   ResultAbC_SVM = readRDS(file = "./Results/simAbC_SVM.RDS") -->
+<!--   ResultAbR_SVM = readRDS(file = "./Results/simAbR_SVM.RDS") -->
+
+<!--   ResultBaselineC_SVM = readRDS(file = "./Results/simBaselineC_SVM.RDS") -->
+<!--   ResultBaselineR_SVM = readRDS(file = "./Results/simBaselineR_SVM.RDS") -->
+<!--   source("./Code/helpFunctions.R") -->
+
+<!--   for(i in 1:3){ -->
+<!--     ResultSizeC[[i]]$Result[["SVM"]] = ResultSizeC_SVM[[i]]$Result$SVM -->
+<!--     ResultSizeR[[i]]$Result[["SVM"]] = ResultSizeR_SVM[[i]]$Result$SVM -->
+
+<!--     ResultObsC[[i]]$Result[["SVM"]] = ResultObsC_SVM[[i]]$Result$SVM -->
+<!--     ResultObsR[[i]]$Result[["SVM"]] = ResultObsR_SVM[[i]]$Result$SVM -->
+<!--   } -->
+
+<!--   ResultBaselineC$Result[["SVM"]] = ResultSizeBaselineC_SVM$Result$SVM -->
+<!--   ResultBaselineR$Result[["SVM"]] = ResultSizeBaselineR_SVM$Result$SVM -->
+
+<!--   ResultAbR$Result[["SVM"]] = ResultAbR_SVM$Result$SVM -->
+<!--   ResultAbC$Result[["SVM"]] = ResultAbC_SVM$Result$SVM -->
 
 
-We computed tss, auc (rmse, spearman) for testing and training splits: 
-```{r,results=FALSE}
-load(file = "./Results/ResultsSimulationAgg.RData")
-tss = auc =  tssObs = aucObs = aucGenSize = data.frame(matrix(0,3,7))
-tssGenSize = aucAB = tssAB = data.frame(matrix(0,3,7))
-rmse = spear = rmseObs = spearObs = spearGenSize = data.frame(matrix(0, 3, 5))
-spearGenObs = spearAB = rmseAB = data.frame(matrix(0, 3, 5))
+<!-- } -->
+<!-- ``` -->
 
-methods = ResultSizeRagg[[1]][[6]][ResultSizeRagg[[1]][[6]]$set == "test",]$method
-colnames(rmse) = colnames(spear) = methods
-colnames(rmseObs) = colnames(spearObs) = methods
-colnames(spearGenObs) = colnames(spearGenSize) = methods
-colnames(spearAB) = colnames(rmseAB) = methods
+<!-- Tune classifiers' thresholds with the true skill statistic and aggregate results for both (classifier and regressor): -->
+<!-- ```{r,results=FALSE} -->
+<!-- if(run){ -->
+<!--   tune = tuneAndAggregate -->
+<!--   ResultSizeCagg = lapply(ResultSizeC,  -->
+<!--                           function(x) return(tune(x, tuneT = tss, bc = "None", onlyTest = F))) -->
+<!--   ResultObsCagg = lapply(ResultObsC,  -->
+<!--                          function(x) return(tune(x, TraitMatching::tss,"None", onlyTest = F))) -->
+<!--   ResultAbCagg = tune(ResultAbC, tuneT = TraitMatching::tss, bc = "None", onlyTest = F) -->
 
-methods2 = ResultSizeCagg[[1]][[8]][ResultSizeCagg[[1]][[8]]$set == "test",c(1,11,13)]$method
-colnames(tss) = colnames(auc) = methods2
-colnames(aucObs) = colnames(tssObs) = methods2
-colnames(aucGenSize) = colnames(tssGenSize) = methods2
-colnames(aucAB) = colnames(tssAB)= methods2
+<!--   ResultBaselineCagg = tune(ResultBaselineC, tuneT = TraitMatching::tss, bc = "None", onlyTest = F)  -->
 
-agg = function(d, m,  n) d[d$set == "test" & d$method == m, n]
-aggT = function(d, m, n) d[d$set == "train" & d$method == m, n]
-aucCheck = function(a) ifelse(a < 0.5, 1- a, a)
-for(i in 1:3){
-  for(k in 1:8){
-    # Classification
-    tss[i,k] = agg(ResultSizeCagg[[i]][[8]], colnames(tss)[k], 11)
-    tssAB[i,k] = agg(ResultAbCagg[[i]][[8]], colnames(tss)[k], 11)
-    tssObs[i,k] = agg(ResultObsCagg[[i]][[8]], colnames(tss)[k], 11)
-    
-    auc[i,k] = agg(ResultSizeCagg[[i]][[8]], colnames(auc)[k], 1)
-    aucAB[i,k] = agg(ResultAbCagg[[i]][[8]], colnames(auc)[k], 1)
-    aucObs[i,k] = agg(ResultObsCagg[[i]][[8]], colnames(auc)[k], 1)
-    
-    aucGenSize[i,k] = (aucCheck(aggT(ResultSizeCagg[[i]][[8]], colnames(auc)[k], 1))- aucCheck(auc[i,k]))/aucCheck(aggT(ResultSizeCagg[[i]][[8]], colnames(auc)[k], 1))
-    
-    tssGenSize[i,k] = (aggT(ResultSizeCagg[[i]][[8]], colnames(tss)[k], 11)-tss[i,k])/aggT(ResultSizeCagg[[i]][[8]], colnames(tss)[k], 11)
-    
-    # Regression
-    if(k < 6){
-      rmse[i,k] = agg(ResultSizeRagg[[i]][[6]], colnames(rmse)[k], 1)
-      rmseAB[i,k] = agg(ResultAbRagg[[i]][[6]], colnames(rmse)[k], 1)
-      rmseObs[i,k] = agg(ResultObsRagg[[i]][[6]], colnames(rmse)[k], 1)
-      spear[i,k] = abs(agg(ResultSizeRagg[[i]][[6]], colnames(spear)[k], 2))
-      spearAB[i,k] = abs(agg(ResultAbRagg[[i]][[6]], colnames(spear)[k], 2))
-      spearObs[i,k] = abs(agg(ResultObsRagg[[i]][[6]], colnames(spear)[k], 2))
-      spearGenSize[i,k] =(aggT(ResultSizeRagg[[i]][[6]], colnames(spear)[k], 2)-spear[i,k])/aggT(ResultSizeRagg[[i]][[6]], colnames(spear)[k], 2)
-      spearGenObs[i,k] = (aggT(ResultObsRagg[[i]][[6]], colnames(spear)[k], 2)-spear[i,k])/aggT(ResultObsRagg[[i]][[6]], colnames(spear)[k], 2)
-    }
-  }
-}
-auc = as.data.frame(lapply(auc, function(x) ifelse(x < 0.5, 1-x, x)))
-aucAB = as.data.frame(lapply(aucAB, function(x) ifelse(x < 0.5, 1-x, x)))
-aucObs = as.data.frame(lapply(aucObs, function(x) ifelse(x < 0.5, 1-x, x)))
-
-save(rmse, rmseAB, rmseObs, spear,spearAB,spearGenObs, spearGenSize,tss,tssAB,tssGenSize,tssObs,auc,aucAB,aucObs,aucGenSize, file = "./Results/SimulationAggreationFig2.RData")
-
-```
+<!--   tune = tuneAndAggregateRegression -->
+<!--   ResultSizeRagg = lapply(ResultSizeR,  -->
+<!--                           function(x) return(tune(x,onlyTest = F))) -->
+<!--   ResultObsRagg = lapply(ResultObsR,  -->
+<!--                          function(x) return(tune(x, onlyTest = F)) -->
+<!--                          ) -->
+<!--   ResultAbRagg = tune(ResultAbR, onlyTest = F) -->
+<!--   ResultBaselineRagg = tune(ResultBaselineR, onlyTest = F)  -->
 
 
-
-# Plant-pollinator network
-
-## Prepare Data 
-```{r}
-set.seed(42)
-library(dplyr)
-plantPollRaw<-read.csv("./Data/Raw/traits2_florian.csv",sep=";")
-
-plantTraitsRaw<-plantPollRaw[,1:11]
-insectTraitsRaw<-plantPollRaw[,12:ncol(plantPollRaw)]
-
-colnames(plantTraitsRaw)[1] = "plant"
-colnames(insectTraitsRaw)[1] = "insect"
-
-interactionMatrix<-plantPollRaw[,-c(2:11,13:ncol(plantPollRaw))]
-interactionMatrix<-xtabs(~.,data=interactionMatrix)
-interactionMatrix<-as.data.frame.matrix(interactionMatrix)
-
-data = TraitMatching::createCommunity(plantTraitsRaw, insectTraitsRaw, z = interactionMatrix)
-
-saveRDS(data, file = "./Data/plantPoll.RDS")
-
-```
+<!--   save(ResultSizeCagg, ResultSizeRagg,ResultObsRagg, ResultObsCagg, ResultAbCagg, ResultAbRagg, ResultBaselineCagg, ResultBaselineRagg, -->
+<!--        file = "./Results/ResultsSimulationAgg_GLM.RData") -->
+<!-- } -->
+<!-- ``` -->
 
 
+<!-- We computed tss, auc (rmse, spearman) for testing and training splits:  -->
+<!-- ```{r,results=FALSE} -->
+<!-- load(file = "./Results/ResultsSimulationAgg.RData") -->
+<!-- tss = auc =  tssObs = aucObs = aucGenSize = data.frame(matrix(0,3,7)) -->
+<!-- tssGenSize = aucAB = tssAB = data.frame(matrix(0,3,7)) -->
+<!-- rmse = spear = rmseObs = spearObs = spearGenSize = data.frame(matrix(0, 3, 5)) -->
+<!-- spearGenObs = spearAB = rmseAB = data.frame(matrix(0, 3, 5)) -->
+
+<!-- methods = ResultSizeRagg[[1]][[6]][ResultSizeRagg[[1]][[6]]$set == "test",]$method -->
+<!-- colnames(rmse) = colnames(spear) = methods -->
+<!-- colnames(rmseObs) = colnames(spearObs) = methods -->
+<!-- colnames(spearGenObs) = colnames(spearGenSize) = methods -->
+<!-- colnames(spearAB) = colnames(rmseAB) = methods -->
+
+<!-- methods2 = ResultSizeCagg[[1]][[8]][ResultSizeCagg[[1]][[8]]$set == "test",c(1,11,13)]$method -->
+<!-- colnames(tss) = colnames(auc) = methods2 -->
+<!-- colnames(aucObs) = colnames(tssObs) = methods2 -->
+<!-- colnames(aucGenSize) = colnames(tssGenSize) = methods2 -->
+<!-- colnames(aucAB) = colnames(tssAB)= methods2 -->
+
+<!-- agg = function(d, m,  n) d[d$set == "test" & d$method == m, n] -->
+<!-- aggT = function(d, m, n) d[d$set == "train" & d$method == m, n] -->
+<!-- aucCheck = function(a) ifelse(a < 0.5, 1- a, a) -->
+<!-- for(i in 1:3){ -->
+<!--   for(k in 1:8){ -->
+<!--     # Classification -->
+<!--     tss[i,k] = agg(ResultSizeCagg[[i]][[8]], colnames(tss)[k], 11) -->
+<!--     tssAB[i,k] = agg(ResultAbCagg[[i]][[8]], colnames(tss)[k], 11) -->
+<!--     tssObs[i,k] = agg(ResultObsCagg[[i]][[8]], colnames(tss)[k], 11) -->
+
+<!--     auc[i,k] = agg(ResultSizeCagg[[i]][[8]], colnames(auc)[k], 1) -->
+<!--     aucAB[i,k] = agg(ResultAbCagg[[i]][[8]], colnames(auc)[k], 1) -->
+<!--     aucObs[i,k] = agg(ResultObsCagg[[i]][[8]], colnames(auc)[k], 1) -->
+
+<!--     aucGenSize[i,k] = (aucCheck(aggT(ResultSizeCagg[[i]][[8]], colnames(auc)[k], 1))- aucCheck(auc[i,k]))/aucCheck(aggT(ResultSizeCagg[[i]][[8]], colnames(auc)[k], 1)) -->
+
+<!--     tssGenSize[i,k] = (aggT(ResultSizeCagg[[i]][[8]], colnames(tss)[k], 11)-tss[i,k])/aggT(ResultSizeCagg[[i]][[8]], colnames(tss)[k], 11) -->
+
+<!--     # Regression -->
+<!--     if(k < 6){ -->
+<!--       rmse[i,k] = agg(ResultSizeRagg[[i]][[6]], colnames(rmse)[k], 1) -->
+<!--       rmseAB[i,k] = agg(ResultAbRagg[[i]][[6]], colnames(rmse)[k], 1) -->
+<!--       rmseObs[i,k] = agg(ResultObsRagg[[i]][[6]], colnames(rmse)[k], 1) -->
+<!--       spear[i,k] = abs(agg(ResultSizeRagg[[i]][[6]], colnames(spear)[k], 2)) -->
+<!--       spearAB[i,k] = abs(agg(ResultAbRagg[[i]][[6]], colnames(spear)[k], 2)) -->
+<!--       spearObs[i,k] = abs(agg(ResultObsRagg[[i]][[6]], colnames(spear)[k], 2)) -->
+<!--       spearGenSize[i,k] =(aggT(ResultSizeRagg[[i]][[6]], colnames(spear)[k], 2)-spear[i,k])/aggT(ResultSizeRagg[[i]][[6]], colnames(spear)[k], 2) -->
+<!--       spearGenObs[i,k] = (aggT(ResultObsRagg[[i]][[6]], colnames(spear)[k], 2)-spear[i,k])/aggT(ResultObsRagg[[i]][[6]], colnames(spear)[k], 2) -->
+<!--     } -->
+<!--   } -->
+<!-- } -->
+<!-- auc = as.data.frame(lapply(auc, function(x) ifelse(x < 0.5, 1-x, x))) -->
+<!-- aucAB = as.data.frame(lapply(aucAB, function(x) ifelse(x < 0.5, 1-x, x))) -->
+<!-- aucObs = as.data.frame(lapply(aucObs, function(x) ifelse(x < 0.5, 1-x, x))) -->
+
+<!-- save(rmse, rmseAB, rmseObs, spear,spearAB,spearGenObs, spearGenSize,tss,tssAB,tssGenSize,tssObs,auc,aucAB,aucObs,aucGenSize, file = "./Results/SimulationAggreationFig2.RData") -->
+
+<!-- ``` -->
+
+
+
+<!-- # Plant-pollinator network -->
+
+<!-- ## Prepare Data  -->
+<!-- ```{r} -->
+<!-- set.seed(42) -->
+<!-- library(dplyr) -->
+<!-- plantPollRaw<-read.csv("./Data/Raw/traits2_florian.csv",sep=";") -->
+
+<!-- plantTraitsRaw<-plantPollRaw[,1:11] -->
+<!-- insectTraitsRaw<-plantPollRaw[,12:ncol(plantPollRaw)] -->
+
+<!-- colnames(plantTraitsRaw)[1] = "plant" -->
+<!-- colnames(insectTraitsRaw)[1] = "insect" -->
+
+<!-- interactionMatrix<-plantPollRaw[,-c(2:11,13:ncol(plantPollRaw))] -->
+<!-- interactionMatrix<-xtabs(~.,data=interactionMatrix) -->
+<!-- interactionMatrix<-as.data.frame.matrix(interactionMatrix) -->
+
+<!-- data = TraitMatching::createCommunity(plantTraitsRaw, insectTraitsRaw, z = interactionMatrix) -->
+
+<!-- saveRDS(data, file = "./Data/plantPoll.RDS") -->
+
+<!-- ``` -->
 
 
 
 
-## Predictive comparison on empirical plant-pollinator network
-```{r,results=FALSE}
-library(mlr)
-library(TraitMatching)
-library(tidyverse)
-oldpar = par()
-reset = function() suppressWarnings(do.call(par, oldpar))
-source("./Code/helpFunctions.R")
-```
 
-### Train models
-Training was splitted due to high computional cost
-- 20 random tuning steps of hyper-parameter
-- AUC evaluates tuning
-- Nested cross-validation: ten-fold outer and three-fold inner with leaving out insect species+all of their interactions
 
-```{r,results=FALSE}
-set.seed(42)
-if(run){
-  cv = list(outer = list(method = "SpCV", iters = 10, predict = "both"), inner = list(method = "SpCV", iters = 5))
-  
-  
-  
-  cC = readRDS(file = "./Data/plantPoll.RDS")
-  
-  
-  result = runTM(cC, tune = "random", iters = iter, tuningMetric = "auc", crossValidation = cv, block = T, parallel = parallel, fitSpecies = F, balanceClasses = c("Over", "SMOTE", "Under"),
-                 method =  c( "glm"),  
-                settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs),
-                          cnn = list(seed = 42, activation = "relu", drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs))
-                )
-  saveRDS(result, file = "./Results/CaseStudy1_GLM.RDS")
-  
-}
-```
+<!-- ## Predictive comparison on empirical plant-pollinator network -->
+<!-- ```{r,results=FALSE} -->
+<!-- library(mlr) -->
+<!-- library(TraitMatching) -->
+<!-- library(tidyverse) -->
+<!-- oldpar = par() -->
+<!-- reset = function() suppressWarnings(do.call(par, oldpar)) -->
+<!-- source("./Code/helpFunctions.R") -->
+<!-- ``` -->
+
+<!-- ### Train models -->
+<!-- Training was splitted due to high computional cost -->
+<!-- - 20 random tuning steps of hyper-parameter -->
+<!-- - AUC evaluates tuning -->
+<!-- - Nested cross-validation: ten-fold outer and three-fold inner with leaving out insect species+all of their interactions -->
+
+<!-- ```{r,results=FALSE} -->
+<!-- set.seed(42) -->
+<!-- if(run){ -->
+<!--   cv = list(outer = list(method = "SpCV", iters = 10, predict = "both"), inner = list(method = "SpCV", iters = 5)) -->
 
 
 
-
-## Results
-
-Connect results and tune thresholds+computing of additional measurements
-```{r,results=FALSE}
-tune = FALSE
-if(tune){
-  
-  raw = readRDS(file = "../Results/CaseStudy1.RDS")
-  
-  
- 
-  Results = tuneAndAggregate(raw, tuneT = tss,onlyTest = F, bc = "all")
-  
-  saveRDS(Results, file = "../Results/aggregatedResults.RDS")
-}
+<!--   cC = readRDS(file = "./Data/plantPoll.RDS") -->
 
 
-```
+<!--   result = runTM(cC, tune = "random", iters = iter, tuningMetric = "auc", crossValidation = cv, block = T, parallel = parallel, fitSpecies = F, balanceClasses = c("Over", "SMOTE", "Under"), -->
+<!--                  method =  c( "glm"),   -->
+<!--                 settings = list(dnn = list(seed = 42,  activation = "relu", drop = 0.2, archFunction = "continous", epochs = epochs), -->
+<!--                           cnn = list(seed = 42, activation = "relu", drop = 0.2, nConv = 1, archFunction = "continous", epochs = epochs)) -->
+<!--                 ) -->
+<!--   saveRDS(result, file = "./Results/CaseStudy1_GLM.RDS") -->
 
-Prepare data for figure
-```{r,results=FALSE}
-Results = readRDS(file = "../Results/aggregatedResults.RDS")
-test = Results$combinedTable[Results$combinedTable$set == "test",]
-train = Results$combinedTable[Results$combinedTable$set == "train",]
-colnames(test) = c("auc", "f1", "bac", "acc", "fdr", "fpr", "npv", "precision","specificity", "sensitivity", "tss", "set", "method", "balance")
-colnames(train) = c("auc", "f1", "bac", "acc", "fdr", "fpr", "npv", "precision","specificity", "sensitivity", "tss", "set", "method", "balance")
-test = test[order(test$tss, decreasing = T),]
-bestTest = test[!duplicated(test$method),]
-bestTest = bestTest[order(bestTest$auc),]
-bestTrain = train[paste0(rep("tr",7),substr(rownames(bestTest),3,4)),]
+<!-- } -->
+<!-- ``` -->
 
 
 
-```
+
+<!-- ## Results -->
+
+<!-- Connect results and tune thresholds+computing of additional measurements -->
+<!-- ```{r,results=FALSE} -->
+<!-- tune = FALSE -->
+<!-- if(tune){ -->
+
+<!--   raw = readRDS(file = "../Results/CaseStudy1.RDS") -->
+
+
+
+<!--   Results = tuneAndAggregate(raw, tuneT = tss,onlyTest = F, bc = "all") -->
+
+<!--   saveRDS(Results, file = "../Results/aggregatedResults.RDS") -->
+<!-- } -->
+
+
+<!-- ``` -->
+
+<!-- Prepare data for figure -->
+<!-- ```{r,results=FALSE} -->
+<!-- Results = readRDS(file = "../Results/aggregatedResults.RDS") -->
+<!-- test = Results$combinedTable[Results$combinedTable$set == "test",] -->
+<!-- train = Results$combinedTable[Results$combinedTable$set == "train",] -->
+<!-- colnames(test) = c("auc", "f1", "bac", "acc", "fdr", "fpr", "npv", "precision","specificity", "sensitivity", "tss", "set", "method", "balance") -->
+<!-- colnames(train) = c("auc", "f1", "bac", "acc", "fdr", "fpr", "npv", "precision","specificity", "sensitivity", "tss", "set", "method", "balance") -->
+<!-- test = test[order(test$tss, decreasing = T),] -->
+<!-- bestTest = test[!duplicated(test$method),] -->
+<!-- bestTest = bestTest[order(bestTest$auc),] -->
+<!-- bestTrain = train[paste0(rep("tr",7),substr(rownames(bestTest),3,4)),] -->
+
+
+
+<!-- ``` -->
 
 
 
