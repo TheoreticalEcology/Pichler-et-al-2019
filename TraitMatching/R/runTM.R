@@ -46,9 +46,9 @@ runTM <- function(classCommunity, settings = NULL,method = "RF", tune = "random"
 ), balanceClasses = "Over", fitSpecies = F, returnOnlySetup = F, block = NULL, seed = NULL, keepModels = FALSE, normalize = T){
 
   require(mlr, quietly = TRUE)
-  if(any(!method %in% c("RF", "SVM", "DNN", "CNN", "boost", "ngBinDnn", "naive", "knn", "RFranger"))) stop("Method is not supported")
-
-  method[which(method == "RF")] = "RFranger"
+  # if(any(!method %in% c("RF", "SVM", "DNN", "CNN", "boost", "ngBinDnn", "naive", "knn", "RFranger"))) stop("Method is not supported")
+  #
+  # method[which(method == "RF")] = "RFranger"
 
   if(is.null(settings)) {
     settings = list()

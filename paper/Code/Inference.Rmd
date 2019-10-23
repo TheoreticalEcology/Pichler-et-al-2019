@@ -29,7 +29,6 @@ knitr::knit_hooks$set(output = function(x, options) {
   hook_output(x, options)
 })
 library(TraitMatching)
-library(iml)
 library(mlr)
 library(tidyverse)
 oldpar = par()

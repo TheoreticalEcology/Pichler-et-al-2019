@@ -26,6 +26,25 @@ knitr::knit_hooks$set(output = function(x, options) {
   hook_output(x, options)
 })
 ```
+Note: 
+- The analyses are computationally expensive. We seeded each simulation in case of unforseen aborts (and for separated computations).
+- We used several parallelization levels, including the parallelMap package and the parallelization within the algorithms and seeding was not always possible for the models. Results may slightly vary for repeated runs. However, we used nested cross-validation in each step to garuantee validity.
+- Be aware that the Result files might get large.
+
+# Install Instructions:
+```{r}
+packages = c("ranger", 
+             "randomForest", 
+             "mlr", 
+             "liquidSVM", 
+             "xgboost",
+             "kknn", 
+             "keras", 
+             "tensorflow", 
+             "tfprobability")
+```
+
+
 
 # Simulated plant-pollinator networks
 
@@ -82,7 +101,7 @@ resultBaselineC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOne
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultBaselineC, file = "Results/simBaselineC.RDS")
+    saveRDS(resultBaselineC, file = "Results/simBaselineC22.RDS")
 
 resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$poisson(3e2)),log = FALSE ), 
                          method = c("negBinDnn", "RFranger", "knn", "boost"), 
@@ -93,7 +112,7 @@ resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOne
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, tuningMetric = "spearmanrho",
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultBaselineR, file = "Results/simBaselineR.RDS")
+    saveRDS(resultBaselineR, file = "Results/simBaselineR22.RDS")
 ```
 
 ### Without effects but with abundances - baseline with abundances
