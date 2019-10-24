@@ -101,7 +101,7 @@ resultBaselineC = runTM(createCommunity(simulatedData$A, simulatedData$B, minOne
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, 
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultBaselineC, file = "Results/simBaselineC22.RDS")
+    saveRDS(resultBaselineC, file = "Results/simBaselineC.RDS")
 
 resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOneInter(simulatedData$poisson(3e2)),log = FALSE ), 
                          method = c("negBinDnn", "RFranger", "knn", "boost"), 
@@ -112,7 +112,7 @@ resultBaselineR = runTM(createCommunity(simulatedData$A, simulatedData$B, minOne
                        tune = "random", iters = iter,  fitSpecies = F,
                        crossValidation = crossValidation, tuningMetric = "spearmanrho",
                        balanceClasses = "None", block = T, parallel = parallel, seed = 42, keepModels = T)
-    saveRDS(resultBaselineR, file = "Results/simBaselineR22.RDS")
+    saveRDS(resultBaselineR, file = "Results/simBaselineR.RDS")
 ```
 
 ### Without effects but with abundances - baseline with abundances
@@ -535,10 +535,10 @@ for(i in 1:3){
     }
   }
 }
-colnames(spearCI) =  names(ResultSizeRagg[[i]])[1:len]
+colnames(spearCI) =  names(ResultSizeRagg[[1]])[1:len]
 colnames(baseRCI) =  names(ResultBaselineRagg)[1:len]
 colnames(spearABCI) =  names(ResultAbRagg)[1:len]
-colnames(spearObsCI) = names(ResultObsRagg)[1:len]
+colnames(spearObsCI) = names(ResultObsRagg[[1]])[1:len]
 
 save(tssCI, baseCCI, aucCI, aucABCI, tssABCI, baseCTSSCI, aucObsCI, tssObsCI, spearObsCI,
      spearCI, baseRCI, spearABCI,file = "Results/SimulationAggreationCIFig2.RData")
