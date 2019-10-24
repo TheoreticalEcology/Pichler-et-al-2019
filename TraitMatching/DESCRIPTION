@@ -14,18 +14,16 @@ Imports:
     parallel,
     parallelMap,
     cluster,
-    cvTools,
-    DMwR,
     rowr,
     ParamHelpers,
     missForest,
     kknn,
     snow,
     keras,
-    kknn
+    kknn,
+    reticulate
 RoxygenNote: 6.1.1
 Suggests:
     testthat,
-    mvtnorm,
     roxygen2
 VignetteBuilder: knitr

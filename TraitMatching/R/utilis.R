@@ -1,3 +1,6 @@
+.onLoad = function(libname, pkgname){
+  require(mlr, quietly = TRUE)
+}
 
 #' @export
 poisson.fun = function(task, model, pred, feats, extra.args) {

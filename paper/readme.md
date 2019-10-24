@@ -1,10 +1,29 @@
 
-## Results for Pichler et al. Machine Learning to predict species interactions
+## Pichler et al. Machine Learning to predict species interactions
+* Installation
+  - [Prerequisites](#pre)
+* Results
+  - [Figure 2](#fig2)
+  - [Figure 3](#fig3)
+  - [Figure 4](#fig4)
+  - [Figure 5](#fig5)
+  - [Figure S1](#figs1)
+  - [Figure S2](#figs2)
+  - [Figure S3](#figs3)
+  - [Figure S4](#figs4)
+  - [Figure S5](#figs5)
+  
 
-1. [Figure 2](#fig2)
-2. [Figure 3](#fig3)
-3. [Figure 4](#fig4)
-4. [Figure 5](#fig5)
+### Prerequisites <a name="pre"></a>
+```{r}
+# TM dependencies:
+install.packages(c("mlr","keras", "tfprobability", "ranger", "kknn", "xgboost", "missForest", "snow", "liquidSVM"))
+
+devtools::install_github(repo = "https://github.com/TheoreticalEcology/Pichler-et-al-2019", subdir = "TraitMatching")
+devtools::install_github(repo = "https://github.com/MaximilianPi/Aranea")
+
+```
+For a minimal example, see [code](https://github.com/TheoreticalEcology/Pichler-et-al-2019/tree/master/TraitMatching)
 
 
 ### Figure 2 <a name="fig2"></a>
@@ -30,3 +49,23 @@
 <img src="./Figures/Fig5.svg">
 
 <figcaption>Figure 5: a) Elevation profile for the three plant-hummingbird networks in Costa Rica (details see Maglianesi et al. 2014; b) The eight strongest trait-trait interactions (blue – yellow gradient) inferred with the H-statistic from RF models fitted to the combined plant-hummingbird network (colors code the ranking of strengths). Corolla length – bill length and corolla curvature – bill length had the highest interaction strengths.</figcaption>
+
+
+### Figure S1 <a name="figs1"></a>
+<img src="./Figures/FigS1.svg">
+
+
+### Figure S2 <a name="figs1"></a>
+<img src="./Figures/FigS2.svg">
+
+
+### Figure S3 <a name="figs1"></a>
+<img src="./Figures/FigS3.svg">
+
+
+### Figure S4 <a name="figs1"></a>
+<img src="./Figures/FigS4.svg">
+
+
+### Figure S5 <a name="figs1"></a>
+<img src="./Figures/FigS5.svg">

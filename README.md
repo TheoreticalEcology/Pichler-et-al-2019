@@ -1,12 +1,15 @@
-# Pichler-et-al-2019
+# Pichler-et-al-2019 
 
-To install the TraitMatching paper:
+## Machine learning algorithms to infer trait matching and predict species interactions in ecological networks
+[Results and Supporting Information](https://github.com/TheoreticalEcology/Pichler-et-al-2019/tree/master/paper)
+
+## TraitMatching package
+[Link to package with further information](https://github.com/TheoreticalEcology/Pichler-et-al-2019/tree/master/TraitMatching)
+
+To install the TraitMatching package:
 
 ```{r}
-devtools::install_github(repo = "https://github.com/TheoreticalEcology/Pichler-et-al-2019", subdir = "TraitMatching", 
-build_vignettes = T)
-
+devtools::install_github(repo = "https://github.com/TheoreticalEcology/Pichler-et-al-2019", subdir = "TraitMatching")
 library(TraitMatching)
-vignette("TraitMatching")
 
 ```
