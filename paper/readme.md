@@ -11,7 +11,7 @@
 ![Alt text](./Figures/Fig2.svg)
 <img src="./Figures/Fig2.svg">
 
-<figcaption>**Figure 2:** Predictive performance of kNN, CNN, DNN, RF, BRT, naive Bayes, GLM and SVM with simulated plant-pollinator networks (50 plants * 100 pollinators) for baseline scenarios with random interactions and even or uneven species abundances (squares and triangles, respectively), and trait-based interactions with even species abundances (circles). Predictive performance was measured by TSS (a) and AUC (b) for binary interaction data; and Spearman Rho factor (c) for interaction counts. Lowest predictive performance corresponds to zero for TSS, AUC, and Spearman Rho factor.</figcaption>
+<figcaption>__Figure 2:__ Predictive performance of kNN, CNN, DNN, RF, BRT, naive Bayes, GLM and SVM with simulated plant-pollinator networks (50 plants * 100 pollinators) for baseline scenarios with random interactions and even or uneven species abundances (squares and triangles, respectively), and trait-based interactions with even species abundances (circles). Predictive performance was measured by TSS (a) and AUC (b) for binary interaction data; and Spearman Rho factor (c) for interaction counts. Lowest predictive performance corresponds to zero for TSS, AUC, and Spearman Rho factor.</figcaption>
 
 
 ### Figure 3 <a name="fig3"></a>
