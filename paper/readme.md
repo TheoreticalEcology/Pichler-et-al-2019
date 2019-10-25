@@ -28,8 +28,8 @@ For a minimal example, see [code](https://github.com/TheoreticalEcology/Pichler-
 
 
 ### Data availability <a name="ava"></a>
-Global plant-pollinator database: [https://doi.org/10.6084/m9.figshare.9980471.v1](https://doi.org/10.6084/m9.figshare.9980471.v1)
-Plant-hummingbird networks: [https://doi.org/10.6084/m9.figshare.3560895.v1](https://doi.org/10.6084/m9.figshare.3560895.v1) see original publication Maglianesi et al. 2014 (DOI: 10.1890/13-2261.1)
+- Global plant-pollinator database: [https://doi.org/10.6084/m9.figshare.9980471.v1](https://doi.org/10.6084/m9.figshare.9980471.v1)
+- Plant-hummingbird networks: [https://doi.org/10.6084/m9.figshare.3560895.v1](https://doi.org/10.6084/m9.figshare.3560895.v1) see original publication Maglianesi et al. 2014 (DOI: 10.1890/13-2261.1)
 
 
 
