@@ -2,6 +2,7 @@
 ## Pichler et al. Machine Learning to predict species interactions
 * Installation
   - [Prerequisites](#pre)
+  - [Data availability](#ava)
 * Results
   - [Figure 2](#fig2)
   - [Figure 3](#fig3)
@@ -24,6 +25,12 @@ devtools::install_github(repo = "https://github.com/MaximilianPi/Aranea")
 
 ```
 For a minimal example, see [code](https://github.com/TheoreticalEcology/Pichler-et-al-2019/tree/master/TraitMatching)
+
+
+### Data availability <a name="ava"></a>
+Global plant-pollinator database: [https://doi.org/10.6084/m9.figshare.9980471.v1](https://doi.org/10.6084/m9.figshare.9980471.v1)
+Plant-hummingbird networks: [https://doi.org/10.6084/m9.figshare.3560895.v1](https://doi.org/10.6084/m9.figshare.3560895.v1) see original publication Maglianesi et al. 2014 (DOI: 10.1890/13-2261.1)
+
 
 
 ### Figure 2 <a name="fig2"></a>
@@ -53,19 +60,23 @@ For a minimal example, see [code](https://github.com/TheoreticalEcology/Pichler-
 
 ### Figure S1 <a name="figs1"></a>
 <img src="./Figures/FigS1.svg">
+<figcaption>Figure S1: Unlogged and logged fraction of two trait-trait matches.</figcaption>
 
 
 ### Figure S2 <a name="figs1"></a>
 <img src="./Figures/FigS2.svg">
+<figcaption>Figure S2: Predictive comparison of machine learning models for varying network sizes (a-c) and varying observation times (d-f). We compared three network sizes (20x50, 50x100, and 100x200 speciesxspecies), for presence-absence plant-pollinator interactions (a, b) and plant-pollinator interaction counts , (c) and three observation times (0.007, 0.0032, 0.12) for presence-absence plant-pollinator interactions (d, e) and plant-pollinator interaction counts (f). We used TSS (true skill statistic) and AUC (area under the curve) for estimating predictive performance for presence-absence (a, b, d, e) and Spearman Rho correlation factor for count frequencies (c, f). </figcaption>
 
 
 ### Figure S3 <a name="figs1"></a>
 <img src="./Figures/FigS3.svg">
-
+<figcaption>Figure S3: Averaged true positive rates for causal inferential performance on a 50*100 simulated plant-pollinator network. We tested the performance for DNN and BRT on one to four true trait-trait interactions. Red line is the averaged mean of true positive rates. Results were higher for species presence-absence (a) interactions than for species interaction counts. </figcaption>
 
 ### Figure S4 <a name="figs1"></a>
 <img src="./Figures/FigS4.svg">
+<figcaption>Figure S4: For estimating the predictive power of random forest, BRT, DNN with a negative binomial log-likelihood, and a DNN with a Poisson log-likelihood, we plotted the true observations versus the predictions. BRT and random forest showed best fits. Spearman rho correlation was used to quantify the predictive power and therefor the fit.</figcaption>
 
 
 ### Figure S5 <a name="figs1"></a>
 <img src="./Figures/FigS5.svg">
+<figcaption>Figure S5: Low network - BRT, DNN with poisson log-likelihood, DNN with negative binomial log-likelihood, and random forest were fit to the low plant-hummingbird network. The four traits with highest interaction strength versus all traits and for each of those the top two pairwise interactions were here visualized. Random forest identified mainly trait combinations between plants and hummingbirds with higher interaction strengths.</figcaption>
