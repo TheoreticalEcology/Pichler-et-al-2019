@@ -553,17 +553,17 @@ save(tssCI, baseCCI, aucCI, aucABCI, tssABCI, baseCTSSCI, aucObsCI, tssObsCI, sp
 ```{r}
 set.seed(42)
 library(dplyr)
-plantPollRaw<-read.csv("Data/Raw/traits2_florian.csv",sep=";")
+plantPollRaw = read.csv("Data/Raw/plant_pollinator_database.csv")[,-1] #without row indices
 
-plantTraitsRaw<-plantPollRaw[,1:11]
-insectTraitsRaw<-plantPollRaw[,12:ncol(plantPollRaw)]
+plantTraitsRaw = plantPollRaw[,1:11]
+insectTraitsRaw = plantPollRaw[,12:ncol(plantPollRaw)]
 
 colnames(plantTraitsRaw)[1] = "plant"
 colnames(insectTraitsRaw)[1] = "insect"
 
-interactionMatrix<-plantPollRaw[,-c(2:11,13:ncol(plantPollRaw))]
-interactionMatrix<-xtabs(~.,data=interactionMatrix)
-interactionMatrix<-as.data.frame.matrix(interactionMatrix)
+interactionMatrix = plantPollRaw[,-c(2:11,13:ncol(plantPollRaw))]
+interactionMatrix = xtabs(~.,data=interactionMatrix)
+interactionMatrix = as.data.frame.matrix(interactionMatrix)
 
 data = TraitMatching::createCommunity(plantTraitsRaw, insectTraitsRaw, z = interactionMatrix)
 
