@@ -93,9 +93,9 @@ text(x = 0.5, pos = 4, y = 1, xpd = NA, labels = "(b)", cex = cex*1.1, font = 2)
 text(x = 0.5*max(x), pos = 4, y = 0.3, xpd = NA, labels = "AUC", cex = cex, font = 1)
 points(x = c(-8,1,10), y = rep(-0.23,3), pch = rev(pch), col = rev(col_full), xpd = NA)
 text(x =  c(-8,1,10), y = rep(-0.23,3), pos = 4, 
-    labels = rev(c("Trait-matching effect", 
-                 "Species abundance effect", 
-                 "Without effects")), xpd = NA, cex = cex)
+    labels = rev(c("Trait-matching ", 
+                 "Baseline 2", 
+                 "Baseline 1")), xpd = NA, cex = cex)
 
 ## Spearman Rho correlation factor
 dictonary = c("DNN", "kNN", "CNN", "RF", "BRT", "naive", "SVM", "GLM")

@@ -515,6 +515,7 @@ saveRDS(resAggMiddleClass, file = "./Results/resAggMiddleClass.RDS")
 
 
 # Hummingbird-plant network
+Hummingbird_plant networks are here available: https://doi.org/10.6084/m9.figshare.3560895.v1
 Approach:
 - normalize each plant-hummingbird network
 - combine plant-hummingbird networks with "plot" variable as identifier

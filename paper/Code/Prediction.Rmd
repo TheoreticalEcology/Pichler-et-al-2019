@@ -31,7 +31,7 @@ Note:
 - We used several parallelization levels, including the parallelMap package and the parallelization within the algorithms and seeding was not always possible for the models. Results may slightly vary for repeated runs. However, we used nested cross-validation in each step to garuantee validity.
 - Be aware that the Result files might get large.
 
-# Install Instructions:
+# Install instructions (dependencies):
 ```{r}
 packages = c("ranger", 
              "randomForest", 
@@ -43,18 +43,18 @@ packages = c("ranger",
              "tensorflow", 
              "tfprobability")
 ```
-
+R-version: R 3.4.4 and R 3.5
 
 
 # Simulated plant-pollinator networks
 
-## Run Simulation for comparing predictive performance
+## Run Simulation to compare predictive performance
 ```{r, results = FALSE}
 library(TraitMatching)
 library(mlr)
 oldpar = par()
 reset = function() suppressWarnings(do.call(par, oldpar))
-run =TRUE
+run = TRUE
 set.seed(42)
 ```
 
@@ -550,6 +550,7 @@ save(tssCI, baseCCI, aucCI, aucABCI, tssABCI, baseCTSSCI, aucObsCI, tssObsCI, sp
 # Plant-pollinator database
 
 ## Prepare Data 
+Database is here available: https://doi.org/10.6084/m9.figshare.9980471.v1
 ```{r}
 set.seed(42)
 library(dplyr)
@@ -574,9 +575,8 @@ saveRDS(data, file = "Data/plantPoll.RDS")
 
 
 
+## Predictive comparison on empirical global plant-pollinator database
 
-
-## Predictive comparison on empirical plant-pollinator network
 ```{r,results=FALSE}
 library(mlr)
 library(TraitMatching)
