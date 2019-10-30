@@ -1,3 +1,6 @@
+[![DOI](https://zenodo.org/badge/177774609.svg)](https://zenodo.org/badge/latestdoi/177774609)
+
+
 # Pichler-et-al-2019 
 
 ## Machine learning algorithms to infer trait-matching and predict species interactions in ecological networks
