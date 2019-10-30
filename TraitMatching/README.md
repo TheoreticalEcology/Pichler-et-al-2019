@@ -12,6 +12,7 @@ devtools::install_github(repo = "https://github.com/MaximilianPi/Aranea")
 
 ### Workflow
 ```{r}
+library(TraitMatching)
 species = simulateInteraction(
                inter = matrix(c("A1", "B1"), nrow = 1L),
                weights = list(main = 0, inter = 500),
