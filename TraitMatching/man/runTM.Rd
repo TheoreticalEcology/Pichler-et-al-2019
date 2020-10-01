@@ -4,15 +4,24 @@
 \alias{runTM}
 \title{Fit TM model}
 \usage{
-runTM(classCommunity, settings = NULL, method = "RF",
-  tune = "random", tuningMetric = "auc", parallel = T, iters = 20,
-  crossValidation = list(outer = list(method = "CV", iters = 10), inner =
-  list(method = "CV", iters = 3)), balanceClasses = "Over",
-  fitSpecies = F, returnOnlySetup = F, block = NULL, seed = NULL,
-  keepModels = FALSE, normalize = T)
+runTM(
+  classCommunity,
+  settings = NULL,
+  method = "RF",
+  tune = c("random", "grid"),
+  metric = c("AUC", "R2", "Spear"),
+  parallel = TRUE,
+  iters = 20L,
+  crossValidation = list(outer = list(method = "CV", iters = 10), inner = list(method =
+    "CV", iters = 3)),
+  balance = c(FALSE, "Over", "Under", "SMOTE"),
+  block = NULL,
+  seed = 42,
+  keepModels = c(TRUE, FALSE)
+)
 }
 \arguments{
-\item{classCommunity}{object of class classCommunity created by \code{\link{createCommunity}}}
+\item{classCommunity}{object of class classCommunity created by \code{\link[=createCommunity]{createCommunity()}}}
 
 \item{settings}{list of settings for the machine learning model. See details}
 
@@ -20,7 +29,7 @@ runTM(classCommunity, settings = NULL, method = "RF",
 
 \item{tune}{How to tune ML parameters. We support only "random" at the moment.}
 
-\item{tuningMetric}{Which predictive measurement should be used for tuning. "AUC" is default. See details.}
+\item{metric}{Which predictive measurement should be used for tuning. "AUC" is default. See details.}
 
 \item{parallel}{boolean or numeric. See details.}
 
@@ -28,90 +37,16 @@ runTM(classCommunity, settings = NULL, method = "RF",
 
 \item{crossValidation}{List for CV plan. See details.}
 
-\item{balanceClasses}{How to balance classes. Default is oversampling "Over".}
-
-\item{fitSpecies}{boolean for fit species as categorical predictor.}
-
-\item{returnOnlySetup}{return setup without fitting.}
+\item{balance}{How to balance classes. Default is oversampling "Over".}
 
 \item{block}{...}
 
 \item{seed}{set seed}
 
 \item{keepModels}{Whether to return all fitted Models or not.}
-
-\item{normalize}{Whether to normalize data or not.}
 }
 \description{
 Fit, tune and cross-validate a TM model
-}
-\details{
-\itemize{
-\item \code{\link{classCommunity}}: Provide a, b, z as data.frames. a and b are group matrices (e.g. plants and pollinators). First column in each data.frame must be species names. The z data.frame is the interaction matrix with rownames == speciesnames of a, and colnames == speciesnames of b.
-\item \code{settings}: The parameters you set here will be not tuned. We support at the moment the following ML algorithms with parameters:
-RF (Classification and Regression): mtry, nodesize, replace.
-knn (Classification and Regression): k, kernel \code{= c("rectangular", "triangular", "epanechnikov", "optimal")}
-SVM (Classification and Regression): kernel = \code{c("gauss_rbf", "poisson")}, lambdas, gammas.
-DNN (Classification and Regression): lr, arch, drop, nLayer, bias, activation, archFunction, batch, decay, alpha, opti, logTarget (only for Regression).
-boost (Classification and Regression): booster = \code{c("gbtree", "tree")}, sample_type = \code{c("uniform", "weighted")}, normalize_type = \code{c("tree", "forest")}, eta, gamma, max_depth, lambda, alpha, min_child_weight, nrounds, rate_drop, skip_drop.
-CNN (Classification): lr, arch, drop, filter, bias, pool, nLayer, nConv, activation, archFunction, batch, decay, opti
-naive (Classification): laplace
-negBinDnn (Regression): lr, arch, nLayer, activation, bias, archFunction, batch, opti, distribution =\code{ c("poisson", "negBin")}, Link
-\item \code{method}: scalar or subset of \code{c("RF", "SVM", "DNN", "CNN", "boost", "ngBinDnn", "naive", "knn")}
-\item \code{tuningMetric}: At the moment we support: \code{c("tss", "spearmanrho", "rmsle", "poisson", "poissonQuasi", "negBinLL", "rmse", "expvar", "arsq", "sae", "mcc", "auc", "bac", "ber", "brier.scaled", "f1", "gpr", "kappa", "logloss", "mcc", "ppv", "ssr", "tpr", "wkappa")}
-\item \code{parallel}: Boolean or numeric vector. If TRUE, all available cores will be used. If numeric vector, "double" parallelization will be used. Each model will get its own cluster and the tuning will be parallelized.
-\item \code{crossValidation}: list of two named list that define the outer and inner resampling strategy. \code{list = list(outer = list(method = "CV", iters), inner = list(method = "CV", iters))}. Methods can be change to SpCV. With SpCV, Species from the b Matrix will be left out with all its interactions (structured CV).
-}
-}
-\examples{
-species = simulateInteraction(
-               inter = matrix(c("A1", "B1"), nrow = 1L),
-               weights = list(main = 0, inter = 500),
-               setSeed = 42,
-               abundance = FALSE,
-               traitsA = c(0, 3),
-               traitsB = c(0, 3),
-               NumberA = 25,
-               NumberB = 50)
-# We have to transform our three matrices into a community
-# object with the createCommunity function.
-# Here, you can replace the simulated data with your empiricial data.
-# The minOneInter function trims our interaction matrix z
-# because probably we observe only species that interaction at least once:
-community = createCommunity(species$A, species$B, minOneInter(species$binar(0.07)))
-table(community$data$target)
-# binar for 0/1 interactions, we have to provide an observation time value,
-# the longer we observe the network, the more interactions we will observe.
-summary(community$data)
-## Fit model
-results = runTM(community,
-                iters = 10L,
-                method = "RF",
-                parallel = 5L,
-                balanceClasses = "None",
-                crossValidation = list(
-                  outer = list(method = "CV", iters = 5),
-                  inner = list(method = "CV", iters = 3))
-                )
-print(results)
-
-
-
-# extract one of the models and let's see if we can
-# infer the causal trait-matching
-# (Normally we would fit a new model with the found hyperparameters on the full data)
-model = results$Result$RFranger$result$models[[1]]
-inference = get_Interaction_Strengths(community$data[,-c(1,2)],
-                                      target = "target",
-                                      model,
-                                      depth = 6L,
-                                      grid_size = 50L, # subsample from marginal trait distribution
-                                      # it would better to use all
-                                      # but it is computationally expensive
-                                      parallel = 4L,
-                                      any = FALSE) # only pairwise interactions
-ord_ind = order(inference$pairwise_interactions$Interactions,decreasing = TRUE)
-print(inference$pairwise_interactions[ord_ind,,drop=FALSE])
 }
 \author{
 Maximilian Pichler

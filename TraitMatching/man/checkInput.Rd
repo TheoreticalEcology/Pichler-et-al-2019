@@ -4,8 +4,14 @@
 \alias{checkInput}
 \title{check function for input}
 \usage{
-checkInput(a = NULL, b = NULL, z = NULL, community = NULL,
-  response = NULL, positive = NULL)
+checkInput(
+  a = NULL,
+  b = NULL,
+  z = NULL,
+  community = NULL,
+  response = NULL,
+  positive = NULL
+)
 }
 \arguments{
 \item{a, }{group a}

@@ -4,8 +4,16 @@
 \alias{createCommunity}
 \title{createCommunity}
 \usage{
-createCommunity(a = NULL, b = NULL, z = NULL, community = NULL,
-  response = NULL, positive = NULL, impute = T, log = T)
+createCommunity(
+  a = NULL,
+  b = NULL,
+  z = NULL,
+  community = NULL,
+  response = NULL,
+  positive = NULL,
+  impute = T,
+  log = T
+)
 }
 \arguments{
 \item{a, }{group a}

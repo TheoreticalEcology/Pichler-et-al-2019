@@ -68,8 +68,8 @@ createCommunity = function(a = NULL, b = NULL, z = NULL, community = NULL, respo
 
   if(!is.null(response) && is.null(classCommunity$target)){
     classCommunity$target = response
-    if(length(unique(classCommunity$data[,response])) > 2) classCommunity$type = "Regression"
-    else classCommunity$type = "Classification"
+    if(length(unique(classCommunity$data[,response])) > 2) classCommunity$type = "regr"
+    else classCommunity$type = "classif"
   }
 
   # create coordinates for species cv

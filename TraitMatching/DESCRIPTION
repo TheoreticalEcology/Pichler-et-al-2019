@@ -8,22 +8,15 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Imports: 
-    mlr,
-    party,
-    e1071,
-    parallel,
-    parallelMap,
-    cluster,
-    rowr,
-    ParamHelpers,
-    missForest,
-    kknn,
-    snow,
-    keras,
-    kknn,
-    reticulate
-RoxygenNote: 6.1.1
+    mlr3,
+    mlr3learners,
+    mlr3pipelines,
+    mlr3measures,
+    mlr3tuning,
+    paradox
+RoxygenNote: 7.1.1
 Suggests:
     testthat,
     roxygen2
 VignetteBuilder: knitr
+Roxygen: list(markdown = TRUE)

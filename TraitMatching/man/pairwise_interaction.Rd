@@ -4,9 +4,13 @@
 \alias{pairwise_interaction}
 \title{Function to calculate Friedman's H-statistic}
 \usage{
-pairwise_interaction(data = NULL, model, grid_size = 50,
-  target = NULL, pairs = list(a = c("x.1"), b = c("x.2", "x.3", "x.4",
-  "x.5")))
+pairwise_interaction(
+  data = NULL,
+  model,
+  grid_size = 50,
+  target = NULL,
+  pairs = list(a = c("x.1"), b = c("x.2", "x.3", "x.4", "x.5"))
+)
 }
 \arguments{
 \item{data}{data.frame w/e or w/o target}

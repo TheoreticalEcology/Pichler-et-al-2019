@@ -4,9 +4,17 @@
 \alias{get_Interaction_Strengths}
 \title{Calculate interaction strengths}
 \usage{
-get_Interaction_Strengths(data, model, any = TRUE, groups = NULL,
-  grid_size = 50L, target = NULL, depth = 4L, any_n_times = 5,
-  parallel = FALSE)
+get_Interaction_Strengths(
+  data,
+  model,
+  any = TRUE,
+  groups = NULL,
+  grid_size = 50L,
+  target = NULL,
+  depth = 4L,
+  any_n_times = 5,
+  parallel = FALSE
+)
 }
 \arguments{
 \item{data}{data.frame w/e or w/o target}

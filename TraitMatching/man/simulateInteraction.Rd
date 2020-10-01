@@ -4,10 +4,15 @@
 \alias{simulateInteraction}
 \title{Simulate plant-pollinator networks}
 \usage{
-simulateInteraction(species = NULL, main = NULL,
-  inter = matrix(c("A1", "B1", "A2", "B2", "A3", "B3"), ncol = 2, nrow =
-  3, byrow = T), weights = list(main = 1, inter = c(1, 4, 2)),
-  reSim = NULL, setSeed = 42, ...)
+simulateInteraction(
+  species = NULL,
+  main = NULL,
+  inter = matrix(c("A1", "B1", "A2", "B2", "A3", "B3"), ncol = 2, nrow = 3, byrow = T),
+  weights = list(main = 1, inter = c(1, 4, 2)),
+  reSim = NULL,
+  setSeed = 42,
+  ...
+)
 }
 \arguments{
 \item{species}{can be of createSpecies class, optional, default NULL}
