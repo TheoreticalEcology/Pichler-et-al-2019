@@ -1,5 +1,5 @@
 
-.onLoad = function() {
+.onLoad = function(libname, pkgname) {
   .e = mlr3learners::LearnerClassifKKNN
   .e = mlr3learners::LearnerClassifRanger
   .e = mlr3learners::LearnerClassifSVM

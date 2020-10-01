@@ -5,3 +5,5 @@
 **.Rproj.user
 **.Rhistory
 .Rproj.user
+*.tar.gz
+*.Rcheck

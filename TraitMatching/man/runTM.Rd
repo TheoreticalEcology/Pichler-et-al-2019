@@ -5,7 +5,7 @@
 \title{Fit TM model}
 \usage{
 runTM(
-  classCommunity,
+  community,
   settings = NULL,
   method = "RF",
   tune = c("random", "grid"),
@@ -21,7 +21,7 @@ runTM(
 )
 }
 \arguments{
-\item{classCommunity}{object of class classCommunity created by \code{\link[=createCommunity]{createCommunity()}}}
+\item{community}{object of class classCommunity created by \code{\link[=createCommunity]{createCommunity()}}}
 
 \item{settings}{list of settings for the machine learning model. See details}
 
