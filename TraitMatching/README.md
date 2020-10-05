@@ -1,5 +1,7 @@
 ## TraitMatching package
 
+Note: the code (and in particular the R package) uses a previous version of the MLR package. If you are working with the latest version of MLR (3 or later), it will not run. You can either downgrade to the old version, or, if you are just interested in applying these methods to your own data, use this new implementation of our methods, which is compatible with MLR 3 https://github.com/MaximilianPi/TraitMatching
+
 ### Installation
 ```{r}
 # TM dependencies:
